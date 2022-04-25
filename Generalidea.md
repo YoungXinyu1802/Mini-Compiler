@@ -40,7 +40,7 @@
 
 要实现的语法：
 
-- ​	Program
+- Program
 
   ```
   Program:
@@ -82,45 +82,63 @@
   Statement:
   	-Definition
   	-Expression
+  	-return(keyword) singleExpression ';'
   ```
 
 - Definition:
 
   ```
   Definition:
-  	-DataType IdentifierList ';'
+  	-DataType VarList ';'
   ```
 
-- IdentifierList:
+- VarList:
 
   ```
-  IdentifierList:
-  	-Identifier IdentifierList
+  VarList:
+  	- Variable ',' VarList
+  	- Variable
+  ```
+
+- Variable:
+
+  ```
+  Variable:
+  	- Identifier
+  	- Identifier '[ Expression ]'
   ```
 
 - Expression:
 
   ```
   Expression:
-  	-singleExpression
+  	-AssignExpression ';'
   	-complexExpression
+  	-functionCall ';'
   ```
 
+- AssignExpression:
+
+  ```
+  AssignExpression:	
+  	-Variable '=' singleExpression
+  ```
+  
 - singleExpression:
 
   ```
   singleExpression:
-  	-functionCall ';'
-  	-identifier '=' Expression ';'
-  	-identifier ';'
-  	-val ';'
+  	-Variable OP singleExpression
+  	-functionCall
+  	-Variable
+  	-val
   ```
 
 - functionCall:
 
   ```
   funtcionCall:
-  	-Identifier(Argslist);
+  	-Identifier '(' Argslist ')'
   ```
 
 - complexStatement:
@@ -136,7 +154,7 @@
 
   ```
   for-stmt:
-  	-for(key-word)'(' expression1 ';' expression2 ';' expression3 ')'
+  	-for(key-word)'(' AssignExpression ';' singleExpression ';' AssignExpression ')'
   		'{'   
   		statementList
   		'}'
@@ -146,7 +164,7 @@
 
   ```
   while-stmt:
-  	-while(key-word) '(' expression ')'
+  	-while(key-word) '(' singleExpression ')'
   		'{'
   			statementList
   		'}'
@@ -156,7 +174,7 @@
 
   ```
   if-stmt:
-  	-if(key-word)'(' expression ')'
+  	-if(key-word)'(' singleExp ')'
   		'{'
   			statementList
   		'}'
@@ -187,13 +205,21 @@
 - ArgsList:
 
   ```
+  ArgsList:
+  	- Variable ',' ArgsList
+  	- Variable
+  	- epsilon
   ```
 
 - ArgsDefinitionList:
 
   ```
+  ArgsDefinitionList:
+  	- DataType Variable ',' ArgsDefinitionList
+  	- DataType Variable
+  	- eplsilon
   ```
-
+  
   
 
 
