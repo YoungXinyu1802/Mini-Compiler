@@ -40,72 +40,167 @@
 
 要实现的语法：
 
-- 变量声明（数组等特殊类型的声明和存储？）
+- ​	Program
 
-  ```cpp
-  dataType Identifier1,..Identifier2;
-  //数组？
-  dataType Identifier [num];
+  ```
+  Program:
+  	-functionList
   ```
 
-- 变量赋值
+- functionList
 
-  ```cpp
-  Identifier=Expression (Expression 是个很大的父类-->表达式|数值|其他Identifier)
-  //数组初始化？
+  ```
+  functionList:
+  	-function functionList
   ```
 
-- 函数声明 （需要考虑局部变量和全局变量如何存储） (参数列表，返回值)
+- Function:
 
-  ```cpp
-  ReturnType Identifier ( Args...  ){
-  			statement.....
-       //变量声明 (局部变量...栈帧的处理？)
-  		 //变量赋值
-  		 //表达式计算
-  		 //复合语句
-  		 //函数调用
-  			....
-  }
+  ```
+  Function:
+  	-mainFunc
+  	-subroutine
   ```
 
-- 循环语句（while, for）
+- mainFunc
 
-  ```cpp
-  while (condition [expression])
-  {
-     statement....;
-  }
+  ```
+  mainFunc:
+  	-ReturnType Main(key-word) '(' ArgsList ')' '{' StatementList '}'
+  ```
+
+- StatementList
+
+  ```
+  StatementList:
+  	-Statement StatementList
+  ```
+
+- Statement:
+
+  ```
+  Statement:
+  	-Definition
+  	-Expression
+  ```
+
+- Definition:
+
+  ```
+  Definition:
+  	-DataType IdentifierList ';'
+  ```
+
+- IdentifierList:
+
+  ```
+  IdentifierList:
+  	-Identifier IdentifierList
+  ```
+
+- Expression:
+
+  ```
+  Expression:
+  	-singleExpression
+  	-complexExpression
+  ```
+
+- singleExpression:
+
+  ```
+  singleExpression:
+  	-functionCall ';'
+  	-identifier '=' Expression ';'
+  	-identifier ';'
+  	-val ';'
+  ```
+
+- functionCall:
+
+  ```
+  funtcionCall:
+  	-Identifier(Argslist);
+  ```
+
+- complexStatement:
+
+  ```
+  complexStatement:
+  	-for-stmt
+  	-while-stmt
+  	-if-stmt
+  ```
+
+- for-stmt:
+
+  ```
+  for-stmt:
+  	-for(key-word)'(' expression1 ';' expression2 ';' expression3 ')'
+  		'{'   
+  		statementList
+  		'}'
+  ```
+
+- while-stmt:
+
+  ```
+  while-stmt:
+  	-while(key-word) '(' expression ')'
+  		'{'
+  			statementList
+  		'}'
+  ```
+
+- if-stmt:
+
+  ```
+  if-stmt:
+  	-if(key-word)'(' expression ')'
+  		'{'
+  			statementList
+  		'}'
+  		elsePart
+  ```
+
+- elsePart:
+
+  ```
+  elsePart:
+  	- ε
+  	- else '{'
+  		statementList
+  		'}'
+      - else if-stmt
+  ```
+
+- subroutine:
+
+  ```
+  subroutine:
+  	- returnType Identifier '(' ArgsDefinitionList')'
+  		'{'
+  			statementList
+  		'}'
+  ```
+
+- ArgsList:
+
+  ```
+  ```
+
+- ArgsDefinitionList:
+
+  ```
+  ```
+
   
-  for(expression1;expression2;expression3)
-  {
-  	statement.....;
-  }
-  ```
 
-- 条件语句（if-else）
 
-  ```cpp
-  if(statement[细分一下？？？])
-  {
-  	statement1...;
-  }
-  else if(){
-  	statement2...;
-  }
-  ....
-  else{
-  	statement3...;
-  }
-  ```
 
-- struct 结构？
 
-  ```cpp
-  这部分可以先不考虑
-  ```
 
-- 函数调用（这属于语法分析还是语义分析？）
+
 
 
 
