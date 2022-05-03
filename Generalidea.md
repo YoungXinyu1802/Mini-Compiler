@@ -220,17 +220,70 @@
   	- eplsilon
   ```
   
+
+
+
+### About AST 
+
+- Node 类设计
+
+  ```
+  class Node
+  {
+  public:
+      virtual ~Node(){} 
+      virtual void setNodeType(NodeType type){
+          this->type=type;
+      }
+      // 用于llvm生成中间代码
+      virtual llvm::Value *codeGen(CodeGenerator & generator) = 0;
+      // 用于生成AST可视化需要的Json数据
+      virtual string getJson(){return "";};
+      //打印测试接口
+      virtual void printNode(){};
+  private:
+      int type;
+  };
+  
+  ```
+
+- 子类设计
+
+  基类
+
+  ```
+  class Function{
+  
+  }
+  
+  class Statement{
+  
+  }
+  
+  class Data{
+  
+  }
+  
+  class Args{
+  
+  } 
+  
+  class ArgsDefinition{
+  
+  }
+  ```
+
   
 
+- 变量注册 查找 生命周期
+
+
+
+- 
 
 
 
 
-
-
-
-
-​	解析过程中打印语法树
 
 ### 三、语义分析
 
