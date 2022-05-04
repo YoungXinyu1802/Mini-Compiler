@@ -34,7 +34,6 @@ _Program *root;
     _Function *c_Function;
     _mainFunction *c_mainFunction;
     _Subroutine *c_Subroutine;
-    _ArgsList *c_ArgsList;
     _Statement *c_Statement;
     _StatementList *c_StatementList;
     _Definition *c_Definition;
@@ -48,20 +47,20 @@ _Program *root;
     _forStatement *c_forSTMT;
     _whileStatement *c_whileSTMT;
     _ifStatement *c_ifSTMT;
-    _Data *c_Data;
     _elsePart *c_elsePart;
     _ArgsDefinitionList *c_ArgsDefinitionList;
     _argsDefinition *c_ArgsDefinition;
     _returnStatement *c_returnStatement;
     _SingleExpressionList *c_singleExpressionList;
     _Term *c_Term;
+    _Value *c_Value;
 }
 
 
 
 //特殊符号
 
-%token LP RP LB RB RCB LCB DOT COMMA COLON MUL DIV NOT PLUS MINUS NOEQUAL
+%token LP RP LB RB RCB LCB DOT COMMA COLON MUL DIV NOT ADD SUB NOEQUAL
 %token AND OR GE GT LE LT EQUAL ASSIGN SEMI 
 
 
@@ -72,7 +71,7 @@ _Program *root;
 %token FLOAT BREAK AUTO CLASS OPERATOR CASE DO LONG TYPEDEF STATIC FRIEND
 %token TEMPLATE DEFAULT NEW VOID REGISTER RETURN ENUM INLINE TRY SHORT CONTINUE 
 %token SIZEOF SWITCH PRIVATE PROTECTED ASM WHILE CATCH DELETE PUBLIC VOLATILE 
-%token STRUCT PRINTF SCANF MAIN STRING CHAR
+%token STRUCT PRINTF SCANF MAIN CHAR
 
 
 
@@ -91,7 +90,6 @@ _Program *root;
 %type<c_Function>                    Function
 %type<c_mainFunction>                mainFunc
 %type<c_Subroutine>                  Subroutine 
-%type<c_ArgsList>                    ArgsList
 %type<c_StatementList>               StatementList
 %type<c_Statement>                   Statement
 %type<c_Definition>                  Definition
@@ -106,7 +104,7 @@ _Program *root;
 %type<c_whileSTMT>                   whileSTMT
 %type<c_ifSTMT>                      ifSTMT
 %type<c_ArgsDefinitionList>          ArgsDefinitionList
-%type<c_Data>                        Value
+%type<c_Value>                       Value
 %type<c_elsePart>                    elsePart
 %type<c_ArgsDefinition>              ArgsDefinition
 %type<c_returnStatement>             returnStatement
@@ -171,18 +169,16 @@ Statement:
 Definition{
     $$=new _Statement($1);
 }
-
 |Expression{
     $$=new _Statement($1);
 }
-
 |returnStatement{
     $$=new _Statement($1);
 }
 
 returnStatement:
 RETURN singleExpressionList SEMI{
-    $$=new _returnExpression($2);
+    $$=new _returnStatement($2);
 }
 
 
@@ -227,16 +223,13 @@ assignExpression SEMI{
     $$=new _Expression($1);
 }
 
-
-
 assignExpression:
 Variable ASSIGN singleExpressionList{
     $$= new _assignExpression($1,$3);
 }
-Variable ASSIGN functionCall{
+|Variable ASSIGN functionCall{
     $$= new _assignExpression($1,$3);
 }
-
 
 singleExpressionList:
 singleExpression singleExpressionList{
@@ -244,7 +237,7 @@ singleExpression singleExpressionList{
     $$->push_back($1);
 }
 |singleExpression{
-    $$=new _singleExpressionList();
+    $$=new _SingleExpressionList();
     $$->push_back($1);
 }
 
@@ -297,7 +290,7 @@ Value{
     $$=new _Term($1);
 }
 |LP singleExpressionList RP{
-    $$=new _Term($1);
+    $$=new _Term($2);
 }
 
 
@@ -318,6 +311,7 @@ functionCall:
 IDENTIFIER LP VarList RP{
     $$=new _functionCall($1,$3);
 }
+
 
 complexExpression:
 forSTMT{

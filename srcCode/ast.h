@@ -24,7 +24,7 @@ class Node;
 class _Program;
 class _Function;
 class _mainFunction;
-class _SubRoutine;
+class _Subroutine;
 class _Statement;
 class _Definition;
 class _Expression;
@@ -43,7 +43,7 @@ class _argsDefinition;
 class _String;
 class _returnStatement;
 class _Term;
-class _binaryOpExpression;
+class _Value;
 
 
 typedef std::vector<_argsDefinition*> _ArgsDefinitionList;
@@ -99,7 +99,7 @@ enum C_Operator {
     C_LT,
     C_LE,
     C_EQUAL,
-    C_UNEQUAL,
+    C_NOEQUAL,
     C_OR,
     C_MOD,
     C_AND,
@@ -181,7 +181,7 @@ class _Statement: public Node{
 public:
     _Definition* definStatement;
     _Expression* exprStatement;
-    _returnExpression* returnStatement;
+    _returnStatement* returnStatement;
     _Statement(){
         this->definStatement=NULL;
         this->exprStatement=NULL;
@@ -197,7 +197,7 @@ public:
         this->exprStatement=expr;
         this->returnStatement=NULL;
     }
-    _Statement(_returnExpression *returnExpr){
+    _Statement(_returnStatement* returnExpr){
         this->definStatement=NULL;
         this->exprStatement=NULL;
         this->returnStatement=returnExpr;
@@ -287,7 +287,7 @@ class _Term:public Node{
 public:
     _Value* val;
     _Variable* var;
-    _singleExpression* singleExpr;
+    _SingleExpressionList* singleExpr;
     int Type;
     _Term(_Value* value){
         this->val=value;
@@ -301,7 +301,7 @@ public:
         this->singleExpr=NULL;
         this->Type=2;
     }
-    _Term(_singleExpression* single){
+    _Term(_SingleExpressionList* single){
         this->val=NULL;
         this->var=NULL;
         this->singleExpr=single;
@@ -314,15 +314,24 @@ public:
     _SingleExpressionList* rhs;
     _Variable* val;
     _functionCall* function;
+    int type;
     _assignExpression(_Variable* value,_SingleExpressionList* stas){
         this->val=value;
         this->rhs=stas;
         this->function=NULL;
+        this->type=1;
     }
     _assignExpression(_Variable* value,_functionCall* func){
         this->val=value;
         this->rhs=NULL;
         this->function=func;
+        this->type=2;
+    }
+    _assignExpression(_functionCall* func){
+        this->val=NULL;
+        this->rhs=NULL;
+        this->function=func;
+        this->type=0;
     }
 };
 
@@ -354,14 +363,6 @@ public:
         this->whileSTMT=NULL;
         this->ifSTMT=ifSTMT;
         this->complex_Type="if";
-    }
-};
-
-class _returnExpression: public Node{
-public: 
-    _SingleExpressionList *expr;
-    _returnExpression(_SingleExpressionList *expression){
-        this->expr=expression;
     }
 };
 

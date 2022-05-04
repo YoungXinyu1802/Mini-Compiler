@@ -1,5 +1,6 @@
 %{
 // 待补充头文件
+#include "ast.h"
 #include <string>
 #include <iostream>
 #include "compiler.tab.h"
@@ -42,8 +43,8 @@ STRING "\""({LETTER}|{DIGIT})*"\""
 "*"                                                     {return MUL;}
 "/"                                                     {return DIV;} 
 "~"                                                     {return NOT;}
-"+"                                                     {return PLUS;}
-"-"                                                     {return MINUS;}
+"+"                                                     {return ADD;}
+"-"                                                     {return SUB;}
 "!="                                                    {return NOEQUAL;}
 "&&"                                                    {return AND;}
 "||"                                                    {return OR;}
