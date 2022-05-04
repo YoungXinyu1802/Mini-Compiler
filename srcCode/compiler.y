@@ -52,6 +52,9 @@ _Program *root;
     _elsePart *c_elsePart;
     _ArgsDefinitionList *c_ArgsDefinitionList;
     _argsDefinition *c_ArgsDefinition;
+    _returnStatement *c_returnStatement;
+    _SingleExpressionList *c_singleExpressionList;
+    _Term *c_Term;
 }
 
 
@@ -106,6 +109,9 @@ _Program *root;
 %type<c_Data>                        Value
 %type<c_elsePart>                    elsePart
 %type<c_ArgsDefinition>              ArgsDefinition
+%type<c_returnStatement>             returnStatement
+%type<c_singleExpressionList>        singleExpressionList;
+%type<c_Term>                        term
 
 
 %start Program
@@ -132,17 +138,17 @@ Function functionList{
 
 Function:
 mainFunc{
-    $$=$1;
+    $$=new _Function($1);
 }
 
 |Subroutine{
-    $$=$1;
+    $$=new _Function($1);
 }
 
 
 
 mainFunc:
-SYS_TYPE MAIN LP ArgsList RP LCB StatementList RCB{
+SYS_TYPE MAIN LP ArgsDefinitionList RP LCB StatementList RCB{
     $$=new _mainFunction($4,$7);
 }
 
@@ -163,14 +169,19 @@ Statement StatementList{
 
 Statement:
 Definition{
-    $$=$1;
+    $$=new _Statement($1);
 }
 
 |Expression{
-    $$=$1;
+    $$=new _Statement($1);
 }
 
-|RETURN singleExpression SEMI{
+|returnStatement{
+    $$=new _Statement($1);
+}
+
+returnStatement:
+RETURN singleExpressionList SEMI{
     $$=new _returnExpression($2);
 }
 
@@ -178,19 +189,7 @@ Definition{
 
 Definition:
 SYS_TYPE IDENTIFIER SEMI{
-    if(*$1=="int"){
-        $$=new _Definition("int",$2);
-    }
-    else if(*$1=="double"){
-        $$=new _Definition("double",$2);
-    }
-    else if(*$1=="boolean"){
-        $$=new _Definition("boolean",$2);
-    }
-    else{
-        $$=new _Definition("char",$2);   
-    }
-    
+    $$=new _Definition($1,$2);
 }
 
 
@@ -201,7 +200,8 @@ Variable COMMA VarList{
     $$=$3;
 }
 |Variable{
-    $$=new _VarList().push_back($1);
+    $$=new _VarList();
+    $$->push_back($1);
 }
 
 
@@ -210,106 +210,115 @@ Variable:
 IDENTIFIER{
     $$=new _Variable($1);
 }
-
 |IDENTIFIER LB Expression RB{
-
-    $$=new _Variable(*$1,*$3);
-
+    $$=new _Variable($1,$3);
 }
 
 
 
 Expression:
 assignExpression SEMI{
-    $$=$1;
+    $$=new _Expression($1);
 }
 |complexExpression{
-    $$=$1;
+    $$=new _Expression($1);
 }
 |functionCall SEMI{
-    $$=$1;
+    $$=new _Expression($1);
 }
 
 
 
 assignExpression:
-Variable ASSIGN singleExpression{
+Variable ASSIGN singleExpressionList{
     $$= new _assignExpression($1,$3);
 }
 
 
+singleExpressionList:
+singleExpression singleExpressionList{
+    $$=$2;
+    $$->push_back($1);
+}
+|singleExpression{
+    $$=new _singleExpressionList();
+    $$->push_back($1);
+}
+
 singleExpression:
-Variable PLUS singleExpression{
-    $$=new _singleExpression($1,"PLUS",$3);
+term ADD{
+    $$=new _singleExpression($1,C_ADD);
 }
-|Variable MINUS singleExpression{
-    $$=new _singleExpression($1,"MINUS",$3);
+|term SUB{
+    $$=new _singleExpression($1,C_SUB);
 }
-|Variable MUL singleExpression{
-    $$=new _singleExpression($1,"MUL",$3);
+|term MUL{
+    $$=new _singleExpression($1,C_MUL);
 }
-|Variable DIV singleExpression{
-    $$=new _singleExpression($1,"DIV",$3);
+|term DIV{
+    $$=new _singleExpression($1,C_DIV);
 }
-|Variable GE singleExpression{
-    $$=new _singleExpression($1,"GE",$3);
+|term AND{
+    $$=new _singleExpression($1,C_AND);
 }
-|Variable GT singleExpression{
-    $$=new _singleExpression($1,"GT",$3);
+|term OR{
+    $$=new _singleExpression($1,C_OR);
 }
-|Variable LE singleExpression{
-    $$=new _singleExpression($1,"LE",$3);
+|term EQUAL{
+    $$=new _singleExpression($1,C_EQUAL);
 }
-|Variable LT singleExpression{
-    $$=new _singleExpression($1,"LT",$3);
+|term NOEQUAL{
+    $$=new _singleExpression($1,C_NOEQUAL);
 }
-|Variable EQUAL singleExpression{
-    $$=new _singleExpression($1,"EQUAL",$3);
+|term{
+    $$=new _singleExpression($1);
 }
-|Variable NOEQUAL singleExpression{
-    $$=new _singleExpression($1,"NOEQUAL",$3);
+
+term:
+Value{
+    $$=new _Term($1);
 }
 |Variable{
-    $$=$1;
+    $$=new _Term($1);
 }
-|Value{
-    $$=new _Data();
-    $$=$1;
+|LP singleExpressionList RP{
+    $$=new _Term($1);
 }
+
 
 
 Value:
 REAL{
-    $$=new _Float($1);
+    $$=new _Value($1);
 }
 |INTEGER{
-    $$=new _Integer($1);
+    $$=new _Value($1);
 }
 |STRING{
-    $$=new _String($1);
+    $$=new _Value($1);
 }
 
 
 functionCall:
-IDENTIFIER LP ArgsList RP{
+IDENTIFIER LP VarList RP{
     $$=new _functionCall($1,$3);
 }
 
 complexExpression:
 forSTMT{
-    $$=$1;
+    $$=new _complexExpression($1);
 }
 |whileSTMT{
-    $$=$1;
+    $$=new _complexExpression($1);
 }
 |ifSTMT{
-    $$=$1;
+    $$=new _complexExpression($1);
 }
 
 
 
 forSTMT:
-FOR LP assignExpression SEMI singleExpression SEMI assignExpression RP LCB StatementList RCB
+FOR LP assignExpression SEMI singleExpressionList SEMI assignExpression RP LCB StatementList RCB
 {
     $$=new _forStatement($3,$5,$7,$10);
 }
@@ -317,14 +326,14 @@ FOR LP assignExpression SEMI singleExpression SEMI assignExpression RP LCB State
 
 
 whileSTMT:
-WHILE LP singleExpression RB LCB StatementList RCB{
+WHILE LP singleExpressionList RB LCB StatementList RCB{
     $$=new _whileStatement($3,$6);
 }
 
 
 
 ifSTMT:
-IF LP singleExpression RP LCB StatementList RCB elsePart{
+IF LP singleExpressionList RP LCB StatementList RCB elsePart{
     $$=new _ifStatement($3,$6,$8);
 }
 
@@ -338,7 +347,7 @@ ELSE LCB StatementList RCB{
     $$= new _elsePart($2);
 }
 |{
-    $$=new _elsePart();//空body,应该能支持这个选项
+    $$=new _elsePart();//空body
 }
 
 
@@ -347,23 +356,6 @@ Subroutine:
 SYS_TYPE IDENTIFIER LP ArgsDefinitionList RP LCB StatementList RCB{
     $$=new _Subroutine($1,$2,$4,$7);
 }
-
-
-
-ArgsList:
-Variable COMMA ArgsList{
-    $3->push_back($1);
-    $$=$3;
-}
-|Variable{
-    $$=new _ArgsList();
-    $$->push_back($1);
-}
-|{
-    $$=new _ArgsList();
-}
-
-
 
 ArgsDefinitionList:
 ArgsDefinition COMMA ArgsDefinitionList{

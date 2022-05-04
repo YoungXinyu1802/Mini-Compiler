@@ -41,15 +41,16 @@ class _elsePart;
 class _Args;
 class _argsDefinition;
 class _String;
-
+class _returnStatement;
+class _Term;
 class _binaryOpExpression;
 
 
-typedef std::vector<_Variable*> _ArgsList;
 typedef std::vector<_argsDefinition*> _ArgsDefinitionList;
 typedef std::vector<_Function*> _FunctionList;
 typedef std::vector<_Statement*> _StatementList;
 typedef std::vector<_Variable*> _VarList;
+typedef std::vector<_singleExpression*>_SingleExpressionList;
 //待完善 变量存储相关
 
 union c_val {
@@ -86,8 +87,23 @@ enum BuildInType {
     C_INTEGER,
     C_REAL,
     C_CHAR,
-    C_BOOLEAN,
-    C_STRING
+    C_BOOLEAN
+};
+enum C_Operator {
+    C_ADD,
+    C_SUB,
+    C_MUL,
+    C_DIV,
+    C_GE,
+    C_GT, 
+    C_LT,
+    C_LE,
+    C_EQUAL,
+    C_UNEQUAL,
+    C_OR,
+    C_MOD,
+    C_AND,
+    C_XOR,
 };
 
 class Node
@@ -115,194 +131,282 @@ public:
 };
 
 //基类 1
-class _Function:public _Program{
+class _Function:public Node{
 public:
-    _StatementList* statements;
-    string func_Type;
+    std::string func_Type;
+    _mainFunction* mainFunc;
+    _Subroutine* subFunc;
     _Function(){
-        this->statements=NULL;
         this->func_Type="NULL";
+        this->mainFunc=NULL;
+        this->subFunc=NULL;
+    }
+    _Function(_mainFunction* mainFunc){
+        this->func_Type="mainFunc";
+        this->mainFunc=mainFunc;
+        this->subFunc=NULL;
+    }
+    _Function(_Subroutine* subFunc){
+        this->func_Type="subFunc";
+        this->mainFunc=NULL;
+        this->subFunc=subFunc;
     }
 };
 
-class _mainFunction: public _Function{
+class _mainFunction: public Node{
 public:
-    _ArgsList*  args;
-    _mainFunction(_ArgsList* _args, _StatementList* _statements){
+    _StatementList* statements;
+    _ArgsDefinitionList*  args;
+    _mainFunction(_ArgsDefinitionList* _args, _StatementList* _statements){
         this->args=_args;
         this->statements=_statements;
-        this->func_Type="main";
     }
 };
-class _Subroutine:public _Function{
+class _Subroutine:public Node{
 public:
-    std::string* Type;
-    std::string* Func_Id;
-    _ArgsDefinitionList*  args;
+    _StatementList* statements;
+    std::string* Type; /* "int"|"char"|"double"|"boolean" */
+    std::string* Func_Id;  /* Function Identifier */
+    _ArgsDefinitionList*  args; 
     _Subroutine(std::string* Type,std::string* Identifier,_ArgsDefinitionList* _args, _StatementList* _statements){
         this->Type=Type;
         this->Func_Id=Identifier;
         this->args=_args;
-        this->statements=_statements;
-        this->func_Type="subRoutine";
-    
+        this->statements=_statements;    
     }
 };
 
 //基类 2
 class _Statement: public Node{
 public:
-    string Statement_Type;
-    int label=-1;
-    // 用于为语句设置标号
-    void setLabel(int label){
-        this->label = label;
+    _Definition* definStatement;
+    _Expression* exprStatement;
+    _returnExpression* returnStatement;
+    _Statement(){
+        this->definStatement=NULL;
+        this->exprStatement=NULL;
+        this->returnStatement=NULL;
     }
-    // 用于得到标号
-    int getLable() const{
-        return label;
+    _Statement(_Definition* defin){
+        this->definStatement=defin;
+        this->exprStatement=NULL;
+        this->returnStatement=NULL;
+    }
+    _Statement(_Expression* expr){
+        this->definStatement=NULL;
+        this->exprStatement=expr;
+        this->returnStatement=NULL;
+    }
+    _Statement(_returnExpression *returnExpr){
+        this->definStatement=NULL;
+        this->exprStatement=NULL;
+        this->returnStatement=returnExpr;
     }
 };
 
+class _returnStatement: public Node{
+public:
+    _SingleExpressionList *expr;
+    _returnStatement(_SingleExpressionList* expression){
+        this->expr=expression;
+    }
 
-class _Definition: public _Statement{
+};
+
+class _Definition: public Node{
 public:
     BuildInType def_Type;
-    string *def_Name;
-    _Definition(string type, string *name){
-        if(type=="int"){
+    std::string *def_Name;
+    _Definition(std::string* type, std::string *name){
+        if(*type=="int"){
             def_Type=C_INTEGER;
         }
-        else if(type=="char"){
+        else if(*type=="char"){
             def_Type=C_CHAR;
         }
-        else if (type=="double"){
+        else if (*type=="double"){
             def_Type=C_REAL;
         }
         else{
             def_Type=C_BOOLEAN;
         }
         this->def_Name=name;
-        this->Statement_Type="Definition";//给一个判断依据
     }
-    //怎么注册生命周期？
-
 };
 
-class _Expression: public _Statement{
+class _Expression: public Node{
 public:
-    string Expression_Type;
+    std::string Expression_Type;
+    _assignExpression* assignExpression;
+    _complexExpression* complexExpression;
+    _functionCall* functionCall;
+
     _Expression(){
-        this->Statement_Type="Expression";
+        this->assignExpression=NULL;
+        this->complexExpression=NULL;
+        this->functionCall=NULL;
+    }
+    _Expression(_assignExpression* assignExpr){
+        this->assignExpression=assignExpr;
+        this->complexExpression=NULL;
+        this->functionCall=NULL;
+        this->Expression_Type="assign";
+    }
+    _Expression(_complexExpression* complexExpr){
+        this->assignExpression=NULL;
+        this->complexExpression=complexExpr;
+        this->functionCall=NULL;
+        this->Expression_Type="complex";
+    }
+    _Expression(_functionCall* func){
+        this->assignExpression=NULL;
+        this->complexExpression=NULL;
+        this->functionCall=func;
+        this->Expression_Type="func";
     }
 
 };
 
-class _singleExpression:public _Statement{
+class _singleExpression:public Node{
 public:
-    _Variable *lhs;
-    _singleExpression *rhs;
-    std::string OP;
-    _singleExpression(_Variable *lhs, std::string OP,_singleExpression *rhs){
-        this->lhs=lhs;
-        this->rhs=rhs;
-        this->OP=OP;
-        this->Statement_Type="singleExpression";
+    _Term* term;
+    C_Operator OP;
+    int type;
+    _singleExpression(_Term* term,C_Operator Op){
+        this->term=term;
+        this->OP=Op;
+        this->type=1;
     }
-    _singleExpression(){
-        this->lhs=NULL;
-        this->rhs=NULL;
+    _singleExpression(_Term* term){
+        this->term=term;
+        this->type=2;
     }
 };
 
+class _Term:public Node{
+public:
+    _Value* val;
+    _Variable* var;
+    _singleExpression* singleExpr;
+    int Type;
+    _Term(_Value* value){
+        this->val=value;
+        this->var=NULL;
+        this->singleExpr=NULL;
+        this->Type=1;
+    }
+    _Term(_Variable* value){
+        this->val=NULL;
+        this->var=value;
+        this->singleExpr=NULL;
+        this->Type=2;
+    }
+    _Term(_singleExpression* single){
+        this->val=NULL;
+        this->var=NULL;
+        this->singleExpr=single;
+        this->Type=3;
+    }
+};
 
-class _assignExpression: public _Expression{
+class _assignExpression: public Node{
 public: 
-    _Statement *rhs;
+    _SingleExpressionList *rhs;
     _Variable *val;
-    _assignExpression(_Variable *value,_Statement *stas){
+    _assignExpression(_Variable *value,_SingleExpressionList *stas){
         this->val=value;
         this->rhs=stas;
-        this->Expression_Type="Assignment";
     }
 };
 
-class _complexExpression: public _Expression{
+class _complexExpression: public Node{
 public: 
     string complex_Type;
+    _forStatement* forSTMT;
+    _whileStatement* whileSTMT;
+    _ifStatement* ifSTMT;
     _complexExpression(){
-        this->Expression_Type="Complex";
+        this->forSTMT=NULL;
+        this->whileSTMT=NULL;
+        this->ifSTMT=NULL;
+    }
+    _complexExpression(_forStatement* forSTMT){
+        this->forSTMT=forSTMT;
+        this->whileSTMT=NULL;
+        this->ifSTMT=NULL;
+        this->complex_Type="for";
+    }
+    _complexExpression(_whileStatement* whileSTMT){
+        this->forSTMT=NULL;
+        this->whileSTMT=whileSTMT;
+        this->ifSTMT=NULL;
+        this->complex_Type="while";
+    }
+    _complexExpression(_ifStatement* ifSTMT){
+        this->forSTMT=NULL;
+        this->whileSTMT=NULL;
+        this->ifSTMT=ifSTMT;
+        this->complex_Type="if";
     }
 };
 
-class _returnExpression: public _Expression{
+class _returnExpression: public Node{
 public: 
-    _singleExpression *expr;
-    _returnExpression(_singleExpression *expression){
-        this->Expression_Type="return";
+    _SingleExpressionList *expr;
+    _returnExpression(_SingleExpressionList *expression){
         this->expr=expression;
     }
 };
 
-class _functionCall: public _Expression{
+class _functionCall: public Node{
 public: 
     std::string* func_Name;
-    _ArgsList *args;
-    BuildInType returnType;
-    _functionCall(std::string* func_Name,_ArgsList *arg){
+    _VarList *args;
+    _functionCall(std::string* func_Name,_VarList *arg){
         this->func_Name=func_Name;
         this->args=arg;
-        this->getReturnType();
-        this->Expression_Type="functionCall";
-    }
-    BuildInType getReturnType(){
-        //return getFuncType(func_Name);
-        return C_INTEGER;
     }
 };
 
 
-class _forStatement: public _complexExpression{
+class _forStatement: public Node{
 public: 
     _assignExpression *expr1;
-    _singleExpression *expr2;
+    _SingleExpressionList *expr2;
     _assignExpression *expr3;
     _StatementList *statements;
-    _forStatement(_assignExpression *s1,_singleExpression *s2, _assignExpression *s3, _StatementList *ss){
+    _forStatement(_assignExpression *s1,_SingleExpressionList *s2, _assignExpression *s3, _StatementList *ss){
         this->expr1=s1;
         this->expr2=s2;
         this->expr3=s3;
         this->statements=ss;
-        this->complex_Type="forSTMT";
     }
 
 };
 
-class _whileStatement: public _complexExpression{
+class _whileStatement: public Node{
 public:
-    _singleExpression *condition;
+    _SingleExpressionList *condition;
     _StatementList *statements;
-    _whileStatement(_singleExpression *con, _StatementList *ss){
+    _whileStatement(_SingleExpressionList *con, _StatementList *ss){
         this->condition=con;
         this->statements=ss;
-        this->complex_Type="whileSTMT";
     }
 };
 
-class _ifStatement: public _complexExpression{
+class _ifStatement: public Node{
 public:
-    _singleExpression *condition1;
+    _SingleExpressionList *condition1;
     _StatementList *statements;
     _elsePart *elsePart;
-    _ifStatement(_singleExpression *condition1, _StatementList *s1,_elsePart *elseP){
+    _ifStatement(_SingleExpressionList *condition1, _StatementList *s1,_elsePart *elseP){
         this->condition1=condition1;
         this->statements=s1;
         this->elsePart=elseP;
-        this->complex_Type="ifSTMT";
     }
 };
 
-class _elsePart: public _complexExpression{
+class _elsePart: public Node{
 public:
     _StatementList *statements;
     _ifStatement *ifBody;
@@ -311,19 +415,16 @@ public:
         this->statements=ss;
         this->ifBody=NULL;
         this->type=1;
-        this->complex_Type="elsePart";
     }
     _elsePart(_ifStatement *ifbody){
         this->ifBody=ifbody;
         this->statements=NULL;
         this->type=2;
-        this->complex_Type="elsePart";
     }
     _elsePart(){
         this->type=0;
         this->statements=NULL;
         this->ifBody=NULL;
-        this->complex_Type="elsePart";
     }
 };
 
@@ -355,12 +456,8 @@ public:
     }
 };
 
-//基类3
-class _Data:public _singleExpression{
-    
-};
 
-class _Identifier: public _Data{
+class _Identifier: public Node{
 public:
     string *Id;
     int Type;
@@ -381,69 +478,44 @@ public:
     }
 };
 
-class _Variable: public _singleExpression{
+class _Variable: public Node{
 public:
     std::string *ID_Name;
     _Expression *expr;
+    int var_Type;
     _Variable(std::string *name){
         this->ID_Name=name;
+        this->expr=NULL;
+        this->var_Type=1;
     }
-    _Variable(std::string name,_Expression expression){
-        *this->ID_Name=name;
-        *this->expr=expression;
-    }
-};
-
-
-
-class _Integer:public _Data{
-public: 
-    int value;
-    _Integer(int value){
-        this->value=value;
-    }
-    _Integer(char *value){
-        this->value=atoi(value); //将字符串转换为整数
-    }
-    BuildInType getType() {
-        return C_INTEGER;
+    _Variable(std::string* name,_Expression* expression){
+        this->ID_Name=name;
+        this->expr=expression;
+        this->var_Type=2;
     }
 };
 
-class _Float:public _Data{
+class _Value:public Node{
 public:
-    double value;
-    _Float(double value){
-        this->value=value;
+    int i_val;
+    double f_val;
+    std::string s_val;
+    bool b_val;
+    std::string var_type;
+    _Value(int value){
+        this->i_val=value;
+        this->var_type="Integer";
     }
-    _Float(char *value){
-        this->value=atof(value);
+    _Value(double value){
+        this->f_val=value;
+        this->var_type="Float";
     }
-    BuildInType getType(){
-        return C_REAL;
+    _Value(std::string value){
+        this->s_val=value;
+        this->var_type="String";
     }
-};
-
-class _Bool:public _Data{
-public:
-    bool value;
-    _Bool(bool value){
-        this->value=value;
-    }
- 
-    BuildInType getType() {
-        return C_BOOLEAN;
-    }
-};
-
-class _String:public _Data{
-public:
-    std::string *value;
-    _String(std::string *value){
-        this->value=value;
-    }
-    BuildInType getType() {
-        return C_STRING;
+    _Value(bool value){
+        this->b_val=value;
+        this->var_type="Bool";
     }
 };
-//暂不支持string

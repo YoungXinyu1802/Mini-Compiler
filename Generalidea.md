@@ -36,252 +36,69 @@
 
 首先需要实现变量存储的类型定义 `%union`
 
-要实现的语法：
+#### AST 结构简单描述
 
-要实现的语法：
+```
+Program
+|
+Function FunctionList
+        |					                              |
+     mainFunction                                     Subroutine
+   |			 |										  |
+statementlist  argsDefinitionList			     Type Func_ID  statementlist
 
-- Program
+_______________________________________________________________________________________
+					statement statementlist
+				 |				|			|
+             definition     expression   returnExpression
+            	|							|
+            type name					singleExpressionList
+_____________________________________________________________________________________
 
-  ```
-  Program:
-  	-functionList
-  ```
-
-- functionList
-
-  ```
-  functionList:
-  	-function functionList
-  ```
-
-- Function:
-
-  ```
-  Function:
-  	-mainFunc
-  	-subroutine
-  ```
-
-- mainFunc
-
-  ```
-  mainFunc:
-  	-ReturnType Main(key-word) '(' ArgsList ')' '{' StatementList '}'
-  ```
-
-- StatementList
-
-  ```
-  StatementList:
-  	-Statement StatementList
-  ```
-
-- Statement:
-
-  ```
-  Statement:
-  	-Definition
-  	-Expression
-  	-return(keyword) singleExpression ';'
-  ```
-
-- Definition:
-
-  ```
-  Definition:
-  	-DataType VarList ';'
-  ```
-
-- VarList:
-
-  ```
-  VarList:
-  	- Variable ',' VarList
-  	- Variable
-  ```
-
-- Variable:
-
-  ```
-  Variable:
-  	- Identifier
-  	- Identifier '[ Expression ]'
-  ```
-
-- Expression:
-
-  ```
-  Expression:
-  	-AssignExpression ';'
-  	-complexExpression
-  	-functionCall ';'
-  ```
-
-- AssignExpression:
-
-  ```
-  AssignExpression:	
-  	-Variable '=' singleExpression
-  ```
+            				expression
+            			|				|				|(这个部分可能还有问题)
+                assignExpression   complexExpression  functionCall        
+ 
+ ____________________________________________________________________________________
+							singleExpression singleExpressionList
+							 |				|
+							term OP 		term
+									   |		|			|
+                                    value  variable  (singleExpressionList)
+                                     |			|				
+                  int|double|bool|string     indentifier     
+                                    
+   _________________________________________________________________________________ 
+    			assignExpression
+    				|
+               variable singleExpressionList         
+               
+ _________________________________________________________________________________
+ 				complexExpression
+ 			|		  |					|
+    forStatement   whileStatement    ifStatement
+ 
+ ____________________________________________________________________________________
+ 					forStatement
+ 						|
+  assingmentExpression  SingleExpressionList assignExpresion statementList
   
-- singleExpression:
+  _________________________________________________________________________________
+  					whileStatement
+  						|
+   singleExpressionList   statementList
+   
+   _______________________________________________________________________________
+   					ifStatement
+   						|
+   	singleExpression  statementList elsePart
+   								      |		  |          \
+   									空	  statementList  ifStatement
+  __________________________________________________________________________________
+   									
+```
 
-  ```
-  singleExpression:
-  	-Variable OP singleExpression
-  	-functionCall
-  	-Variable
-  	-val
-  ```
-
-- functionCall:
-
-  ```
-  funtcionCall:
-  	-Identifier '(' Argslist ')'
-  ```
-
-- complexStatement:
-
-  ```
-  complexStatement:
-  	-for-stmt
-  	-while-stmt
-  	-if-stmt
-  ```
-
-- for-stmt:
-
-  ```
-  for-stmt:
-  	-for(key-word)'(' AssignExpression ';' singleExpression ';' AssignExpression ')'
-  		'{'   
-  		statementList
-  		'}'
-  ```
-
-- while-stmt:
-
-  ```
-  while-stmt:
-  	-while(key-word) '(' singleExpression ')'
-  		'{'
-  			statementList
-  		'}'
-  ```
-
-- if-stmt:
-
-  ```
-  if-stmt:
-  	-if(key-word)'(' singleExp ')'
-  		'{'
-  			statementList
-  		'}'
-  		elsePart
-  ```
-
-- elsePart:
-
-  ```
-  elsePart:
-  	- ε
-  	- else '{'
-  		statementList
-  		'}'
-      - else if-stmt
-  ```
-
-- subroutine:
-
-  ```
-  subroutine:
-  	- returnType Identifier '(' ArgsDefinitionList')'
-  		'{'
-  			statementList
-  		'}'
-  ```
-
-- ArgsList:
-
-  ```
-  ArgsList:
-  	- Variable ',' ArgsList
-  	- Variable
-  	- epsilon
-  ```
-
-- ArgsDefinitionList:
-
-  ```
-  ArgsDefinitionList:
-  	- DataType Variable ',' ArgsDefinitionList
-  	- DataType Variable
-  	- eplsilon
-  ```
-  
-
-
-
-### About AST 
-
-- Node 类设计
-
-  ```
-  class Node
-  {
-  public:
-      virtual ~Node(){} 
-      virtual void setNodeType(NodeType type){
-          this->type=type;
-      }
-      // 用于llvm生成中间代码
-      virtual llvm::Value *codeGen(CodeGenerator & generator) = 0;
-      // 用于生成AST可视化需要的Json数据
-      virtual string getJson(){return "";};
-      //打印测试接口
-      virtual void printNode(){};
-  private:
-      int type;
-  };
-  
-  ```
-
-- 子类设计
-
-  基类
-
-  ```
-  class Function{
-  
-  }
-  
-  class Statement{
-  
-  }
-  
-  class Data{
-  
-  }
-  
-  class Args{
-  
-  } 
-  
-  class ArgsDefinition{
-  
-  }
-  ```
-
-  
-
-- 变量注册 查找 生命周期
-
-
-
-- 
-
-
+​		
 
 
 
