@@ -311,11 +311,18 @@ public:
 
 class _assignExpression: public Node{
 public: 
-    _SingleExpressionList *rhs;
-    _Variable *val;
-    _assignExpression(_Variable *value,_SingleExpressionList *stas){
+    _SingleExpressionList* rhs;
+    _Variable* val;
+    _functionCall* function;
+    _assignExpression(_Variable* value,_SingleExpressionList* stas){
         this->val=value;
         this->rhs=stas;
+        this->function=NULL;
+    }
+    _assignExpression(_Variable* value,_functionCall* func){
+        this->val=value;
+        this->rhs=NULL;
+        this->function=func;
     }
 };
 

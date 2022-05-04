@@ -233,6 +233,9 @@ assignExpression:
 Variable ASSIGN singleExpressionList{
     $$= new _assignExpression($1,$3);
 }
+Variable ASSIGN functionCall{
+    $$= new _assignExpression($1,$3);
+}
 
 
 singleExpressionList:
@@ -263,6 +266,18 @@ term ADD{
 }
 |term OR{
     $$=new _singleExpression($1,C_OR);
+}
+|term GE{
+    $$=new _singleExpression($1,C_GE);
+}
+|term GT{
+    $$=new _singleExpression($1,C_GT);
+}
+|term LT{
+    $$=new _singleExpression($1,C_LT);
+}
+|term LE{
+    $$=new _singleExpression($1,C_LE);
 }
 |term EQUAL{
     $$=new _singleExpression($1,C_EQUAL);
