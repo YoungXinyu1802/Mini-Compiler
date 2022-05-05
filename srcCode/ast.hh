@@ -7,12 +7,11 @@
 #include <iostream>
 #include <sstream>
 #include <list>
-#include <string>
+#include <string.h>
 #include <vector>
 #include <map>
 #include <ostream>
 #include <climits>
-
 
 using namespace std;
 /* class declaration */ 
@@ -115,7 +114,7 @@ public:
         this->type=type;
     }
 
-    virtual void printNode(){};
+    virtual string JsonGen()=0;
 private:
     int type;
 };
@@ -129,6 +128,7 @@ public:
     _Program(){
         this->myFuncs=NULL;
     }
+    virtual string JsonGen() override;
 };
 
 //基类 1
@@ -152,6 +152,8 @@ public:
         this->mainFunc=NULL;
         this->subFunc=subFunc;
     }
+
+    virtual string JsonGen() override;
 };
 
 class _mainFunction: public Node{
@@ -162,6 +164,8 @@ public:
         this->args=_args;
         this->statements=_statements;
     }
+
+    virtual string JsonGen() override;
 };
 
 class _Subroutine:public Node{
@@ -176,6 +180,8 @@ public:
         this->args=_args;
         this->statements=_statements;    
     }
+
+    virtual string JsonGen() override;
 };
 
 //基类 2
@@ -220,6 +226,8 @@ public:
         this->returnStatement=NULL;
         this->inputExpr=NULL;
     }
+
+    virtual string JsonGen() override;
 };
 
 class _Input:public Node{
@@ -228,6 +236,8 @@ public:
     _Input(_VarList* variables){
         this->vars=variables;
     }
+
+    virtual string JsonGen() override;
 };
 
 class _Output:public  Node{
@@ -236,6 +246,8 @@ public:
     _Output(_VarList* variables){
         this->vars=variables;
     }
+
+    virtual string JsonGen() override;
 };
 
 
@@ -246,6 +258,7 @@ public:
         this->expr=expression;
     }
 
+    virtual string JsonGen() override;
 };
 
 class _Definition: public Node{
@@ -267,6 +280,8 @@ public:
         }
         this->def_Name=name;
     }
+
+    virtual string JsonGen() override;
 };
 
 class _Expression: public Node{
@@ -300,6 +315,7 @@ public:
         this->Expression_Type="func";
     }
 
+    virtual string JsonGen() override;
 };
 
 class _singleExpression:public Node{
@@ -316,6 +332,8 @@ public:
         this->term=term;
         this->type=2;
     }
+
+    virtual string JsonGen() override;
 };
 
 class _Term:public Node{
@@ -342,6 +360,8 @@ public:
         this->singleExpr=single;
         this->Type=3;
     }
+
+    virtual string JsonGen() override;
 };
 
 class _assignExpression: public Node{
@@ -368,6 +388,8 @@ public:
         this->function=func;
         this->type=0;
     }
+
+    virtual string JsonGen() override;
 };
 
 class _complexExpression: public Node{
@@ -399,6 +421,8 @@ public:
         this->ifSTMT=ifSTMT;
         this->complex_Type="if";
     }
+
+    virtual string JsonGen() override;
 };
 
 class _functionCall: public Node{
@@ -409,6 +433,8 @@ public:
         this->func_Name=func_Name;
         this->args=arg;
     }
+
+    virtual string JsonGen() override;
 };
 
 
@@ -425,6 +451,7 @@ public:
         this->statements=ss;
     }
 
+    virtual string JsonGen() override;
 };
 
 class _whileStatement: public Node{
@@ -435,6 +462,8 @@ public:
         this->condition=con;
         this->statements=ss;
     }
+
+    virtual string JsonGen() override;
 };
 
 class _ifStatement: public Node{
@@ -447,6 +476,8 @@ public:
         this->statements=s1;
         this->elsePart=elseP;
     }
+
+    virtual string JsonGen() override;
 };
 
 class _elsePart: public Node{
@@ -469,6 +500,8 @@ public:
         this->statements=NULL;
         this->ifBody=NULL;
     }
+
+    virtual string JsonGen() override;
 };
 
 //参数接口
@@ -483,6 +516,8 @@ public:
     _Args(std::string* name){
         this->arg_ID=name;
     }
+
+    virtual string JsonGen() override;
 };
 
 class _argsDefinition: public Node{
@@ -497,6 +532,8 @@ public:
     _argsDefinition(){
         this->type="none";
     }
+
+    virtual string JsonGen() override;
 };
 
 
@@ -519,6 +556,8 @@ public:
     string getId(){
         return *this->Id;
     }
+
+    virtual string JsonGen() override;
 };
 
 class _Variable: public Node{
@@ -536,6 +575,8 @@ public:
         this->expr=expression;
         this->var_Type=2;
     }
+
+    virtual string JsonGen() override;
 };
 
 class _Value:public Node{
@@ -561,4 +602,6 @@ public:
         this->b_val=value;
         this->var_type="Bool";
     }
+
+    virtual string JsonGen() override;
 };
