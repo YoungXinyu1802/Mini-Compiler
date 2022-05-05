@@ -1,6 +1,6 @@
 %{
 // 待补充头文件
-#include "ast.h"
+#include "ast.hh"
 #include <string>
 #include <iostream>
 #include "compiler.tab.h"
@@ -55,7 +55,8 @@ STRING "\""({LETTER}|{DIGIT})*"\""
 "=="                                                    {return EQUAL;} 
 "="                                                     {return ASSIGN;} 
 ";"                                                     {return SEMI;} 
-    
+"<<"                                                    {return LD;}
+">>"                                                    {return RD;};    
     /* 关键字部分 */
 if                                                      {return IF;}
 else                                                    {return ELSE;}
@@ -103,6 +104,8 @@ struct                                                  {return STRUCT;}
 printf                                                  {return PRINTF;}
 scanf                                                   {return SCANF;}
 main                                                    {return MAIN;}
+cin                                                     {return CIN;}
+cout                                                    {return COUT;}
 
 
 

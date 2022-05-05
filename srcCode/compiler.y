@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include "ast.h"
+#include "ast.hh"
 
 void yyerror(const char *s) { 
     std::printf("Error: %s\n", s);
@@ -54,6 +54,8 @@ _Program *root;
     _SingleExpressionList *c_singleExpressionList;
     _Term *c_Term;
     _Value *c_Value;
+    _Input *c_Input;
+    _Output *c_Output;
 }
 
 
@@ -61,7 +63,7 @@ _Program *root;
 //特殊符号
 
 %token LP RP LB RB RCB LCB DOT COMMA COLON MUL DIV NOT ADD SUB NOEQUAL
-%token AND OR GE GT LE LT EQUAL ASSIGN SEMI 
+%token AND OR GE GT LE LT EQUAL ASSIGN SEMI LD RD
 
 
 
@@ -71,7 +73,7 @@ _Program *root;
 %token FLOAT BREAK AUTO CLASS OPERATOR CASE DO LONG TYPEDEF STATIC FRIEND
 %token TEMPLATE DEFAULT NEW VOID REGISTER RETURN ENUM INLINE TRY SHORT CONTINUE 
 %token SIZEOF SWITCH PRIVATE PROTECTED ASM WHILE CATCH DELETE PUBLIC VOLATILE 
-%token STRUCT PRINTF SCANF MAIN CHAR
+%token STRUCT PRINTF SCANF MAIN CHAR CIN COUT
 
 
 
@@ -110,6 +112,8 @@ _Program *root;
 %type<c_returnStatement>             returnStatement
 %type<c_singleExpressionList>        singleExpressionList;
 %type<c_Term>                        term
+%type<c_Input>                       Input
+%type<c_Output>                      Output
 
 
 %start Program
@@ -174,6 +178,23 @@ Definition{
 }
 |returnStatement{
     $$=new _Statement($1);
+}
+|Input SEMI{
+    $$=new _Statement($1);
+}
+|Output SEMI{
+    $$=new _Statement($1);
+}
+
+
+Input:
+CIN RD VarList{
+    $$=new _Input($3);
+}
+
+Output:
+COUT LD VarList{
+    $$=new _Output($3);
 }
 
 returnStatement:

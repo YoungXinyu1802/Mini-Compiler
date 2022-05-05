@@ -13,8 +13,8 @@
 #include <ostream>
 #include <climits>
 
-using namespace std;
 
+using namespace std;
 /* class declaration */ 
 #pragma region
 
@@ -44,7 +44,8 @@ class _String;
 class _returnStatement;
 class _Term;
 class _Value;
-
+class _Input;
+class _Output;
 
 typedef std::vector<_argsDefinition*> _ArgsDefinitionList;
 typedef std::vector<_Function*> _FunctionList;
@@ -162,6 +163,7 @@ public:
         this->statements=_statements;
     }
 };
+
 class _Subroutine:public Node{
 public:
     _StatementList* statements;
@@ -182,6 +184,8 @@ public:
     _Definition* definStatement;
     _Expression* exprStatement;
     _returnStatement* returnStatement;
+    _Output* outputExpr;
+    _Input* inputExpr;
     _Statement(){
         this->definStatement=NULL;
         this->exprStatement=NULL;
@@ -202,7 +206,38 @@ public:
         this->exprStatement=NULL;
         this->returnStatement=returnExpr;
     }
+    _Statement(_Input* inputExpr){
+        this->inputExpr=inputExpr;
+        this->definStatement=NULL;
+        this->exprStatement=NULL;
+        this->returnStatement=NULL;
+        this->outputExpr=NULL;
+    }
+    _Statement(_Output* outputExpr){
+        this->outputExpr=outputExpr;
+        this->definStatement=NULL;
+        this->exprStatement=NULL;
+        this->returnStatement=NULL;
+        this->inputExpr=NULL;
+    }
 };
+
+class _Input:public Node{
+public:
+    _VarList* vars;
+    _Input(_VarList* variables){
+        this->vars=variables;
+    }
+};
+
+class _Output:public  Node{
+public:
+    _VarList* vars;
+    _Output(_VarList* variables){
+        this->vars=variables;
+    }
+};
+
 
 class _returnStatement: public Node{
 public:
