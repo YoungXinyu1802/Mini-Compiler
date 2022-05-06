@@ -272,45 +272,46 @@ singleExpression singleExpressionList{
 }
 
 singleExpression:
-term ADD{
-    $$=new _singleExpression($1,C_ADD);
-}
-|term SUB{
-    $$=new _singleExpression($1,C_SUB);
-}
-|term MUL{
-    $$=new _singleExpression($1,C_MUL);
-}
-|term DIV{
-    $$=new _singleExpression($1,C_DIV);
-}
-|term AND{
-    $$=new _singleExpression($1,C_AND);
-}
-|term OR{
-    $$=new _singleExpression($1,C_OR);
-}
-|term GE{
-    $$=new _singleExpression($1,C_GE);
-}
-|term GT{
-    $$=new _singleExpression($1,C_GT);
-}
-|term LT{
-    $$=new _singleExpression($1,C_LT);
-}
-|term LE{
-    $$=new _singleExpression($1,C_LE);
-}
-|term EQUAL{
-    $$=new _singleExpression($1,C_EQUAL);
-}
-|term NOEQUAL{
-    $$=new _singleExpression($1,C_NOEQUAL);
-}
-|term{
+term{
     $$=new _singleExpression($1);
 }
+|ADD term{
+    $$=new _singleExpression($2,C_ADD);
+}
+|SUB term{
+    $$=new _singleExpression($2,C_SUB);
+}
+|MUL term{
+    $$=new _singleExpression($2,C_MUL);
+}
+|DIV term{
+    $$=new _singleExpression($2,C_DIV);
+}
+|AND term{
+    $$=new _singleExpression($2,C_AND);
+}
+|OR term{
+    $$=new _singleExpression($2,C_OR);
+}
+|GE term{
+    $$=new _singleExpression($2,C_GE);
+}
+|GT term{
+    $$=new _singleExpression($2,C_GT);
+}
+|LT term{
+    $$=new _singleExpression($2,C_LT);
+}
+|LE term{
+    $$=new _singleExpression($2,C_LE);
+}
+|EQUAL term{
+    $$=new _singleExpression($2,C_EQUAL);
+}
+|NOEQUAL term{
+    $$=new _singleExpression($2,C_NOEQUAL);
+}
+
 
 term:
 Value{
