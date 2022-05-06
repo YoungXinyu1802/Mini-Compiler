@@ -242,8 +242,8 @@ public:
 
 class _returnStatement: public Node{
 public:
-    _singleExpression *expr;
-    _returnStatement(_singleExpression* expression){
+    _SingleExpressionList *expr;
+    _returnStatement(_SingleExpressionList* expression){
         this->expr=expression;
     }
 
@@ -305,33 +305,23 @@ public:
 
 class _singleExpression:public Node{
 public:
-   _singleExpression* lhs;
-   _singleExpression* rhs;
-   C_Operator OP;
-   union u_single{
-       _Value* val;
-       _Variable* var;
-   }v_single;
-   enum u_Type{
-       VALUE,
-       VARIABLE,
-       EXPRESSION
-   }v_Type;
+    _Term* term;
+    C_Operator OP;
+    enum u_Type{
+        Noend,
+        End
+    }v_Type;
+    _singleExpression(_Term* term,C_Operator Op){
+        this->term=term;
+        this->OP=Op;
+        this->v_Type=Noend;
+    }
+    _singleExpression(_Term* term){
+        this->term=term;
+        this->v_Type=End;
+    }
 
-   _singleExpression(_Value* value){
-       this->v_single.val=value;
-       this->v_Type=VALUE;
-   }
-   _singleExpression(_Variable* value){
-       this->v_single.var=value;
-       this->v_Type=VARIABLE;
-   }
-   _singleExpression(_singleExpression* lhs,C_Operator OP,_singleExpression* rhs){
-       this->lhs=lhs;
-       this->rhs=rhs;
-       this->OP=OP;
-       this->v_Type=EXPRESSION;
-   }
+    // virtual string JsonGen() override;
 };
 
 class _Term:public Node{
@@ -340,10 +330,10 @@ public:
     union u_Term{
         _Value* val;
         _Variable* var;
-        _singleExpression* singleExpr;
+        _SingleExpressionList* singleExpr;
     }v_Term;
 
-    enum u_Type{ 
+    enum u_Type{
         VALUE,
         VARIABLE,
         SINGLE
@@ -357,7 +347,7 @@ public:
         this->v_Term.var=value;
         this->v_Type=VARIABLE;
     }
-    _Term(_singleExpression* single){
+    _Term(_SingleExpressionList* single){
         this->v_Term.singleExpr=single;
         this->v_Type=SINGLE;
     }
@@ -369,7 +359,7 @@ class _assignExpression: public Node{
 public: 
     _Variable* val;
     union u_assignExpression{
-        _singleExpression* rhs;
+        _SingleExpressionList* rhs;
         _functionCall* function;
     }v_assignExpression;
 
@@ -380,7 +370,7 @@ public:
     }v_Type;
 
     int type;
-    _assignExpression(_Variable* value,_singleExpression* stas){
+    _assignExpression(_Variable* value,_SingleExpressionList* stas){
         
     }
     _assignExpression(_Variable* value,_functionCall* func){
@@ -443,10 +433,10 @@ public:
 class _forStatement: public Node{
 public: 
     _assignExpression *expr1;
-    _singleExpression *expr2;
+    _SingleExpressionList *expr2;
     _assignExpression *expr3;
     _StatementList *statements;
-    _forStatement(_assignExpression *s1,_singleExpression *s2, _assignExpression *s3, _StatementList *ss){
+    _forStatement(_assignExpression *s1,_SingleExpressionList *s2, _assignExpression *s3, _StatementList *ss){
         this->expr1=s1;
         this->expr2=s2;
         this->expr3=s3;
@@ -458,9 +448,9 @@ public:
 
 class _whileStatement: public Node{
 public:
-    _singleExpression *condition;
+    _SingleExpressionList *condition;
     _StatementList *statements;
-    _whileStatement(_singleExpression *con, _StatementList *ss){
+    _whileStatement(_SingleExpressionList *con, _StatementList *ss){
         this->condition=con;
         this->statements=ss;
     }
@@ -470,10 +460,10 @@ public:
 
 class _ifStatement: public Node{
 public:
-    _singleExpression *condition1;
+    _SingleExpressionList *condition1;
     _StatementList *statements;
     _elsePart *elsePart;
-    _ifStatement(_singleExpression *condition1, _StatementList *s1,_elsePart *elseP){
+    _ifStatement(_SingleExpressionList *condition1, _StatementList *s1,_elsePart *elseP){
         this->condition1=condition1;
         this->statements=s1;
         this->elsePart=elseP;
