@@ -56,7 +56,8 @@ STRING "\""({LETTER}|{DIGIT})*"\""
 "="                                                     {return ASSIGN;} 
 ";"                                                     {return SEMI;} 
 "<<"                                                    {return LD;}
-">>"                                                    {return RD;};    
+">>"                                                    {return RD;}    
+"%"                                                     {return MOD;}
     /* 关键字部分 */
 if                                                      {return IF;}
 else                                                    {return ELSE;}
