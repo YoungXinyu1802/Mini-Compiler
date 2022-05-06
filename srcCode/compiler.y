@@ -63,7 +63,7 @@ _Program *root;
 //特殊符号
 
 %token LP RP LB RB RCB LCB DOT COMMA COLON MUL DIV NOT ADD SUB NOEQUAL
-%token AND OR GE GT LE LT EQUAL ASSIGN SEMI LD RD
+%token AND OR GE GT LE LT EQUAL ASSIGN SEMI LD RD MOD
 
 
 
@@ -96,7 +96,7 @@ _Program *root;
 %type<c_Statement>                   Statement
 %type<c_Definition>                  Definition
 %type<c_Expression>                  Expression
-%type<c_singleExpression>            singleExpression
+%type<c_singleExpression>            singleExpression term expr factor
 %type<c_DataList>                    DataList
 %type<c_Variable>                    Variable
 %type<c_assignExpression>            assignExpression
@@ -110,8 +110,6 @@ _Program *root;
 %type<c_elsePart>                    elsePart
 %type<c_ArgsDefinition>              ArgsDefinition
 %type<c_returnStatement>             returnStatement
-%type<c_singleExpressionList>        singleExpressionList;
-%type<c_Term>                        term
 %type<c_Input>                       Input
 %type<c_Output>                      Output
 
@@ -198,7 +196,7 @@ COUT LD DataList{
 }
 
 returnStatement:
-RETURN singleExpressionList SEMI{
+RETURN singleExpression SEMI{
     $$=new _returnStatement($2);
 }
 
@@ -254,75 +252,88 @@ assignExpression SEMI{
 
 
 assignExpression:
-Variable ASSIGN singleExpressionList{
+Variable ASSIGN singleExpression{
     $$= new _assignExpression($1,$3);
 }
 |Variable ASSIGN functionCall{
     $$= new _assignExpression($1,$3);
 }
 
-singleExpressionList:
-singleExpression singleExpressionList{
-    $$=$2;
-    $$->push_back($1);
+singleExpression : 
+singleExpression  GE  expr {
+    $$ = new _singleExpression($1, C_GE, $3);
 }
-|singleExpression{
-    $$=new _SingleExpressionList();
-    $$->push_back($1);
+|singleExpression  GT  expr {
+    $$ = new _singleExpression($1, C_GT, $3);
+}
+|singleExpression  LE  expr {
+    $$ = new _singleExpression($1, C_LE, $3);
+}
+|singleExpression  LT  expr {
+    $$ = new _singleExpression($1, C_LT, $3);
+}
+|singleExpression  EQUAL  expr {
+    $$ = new _singleExpression($1, C_EQUAL, $3);
+}
+|singleExpression  NOEQUAL  expr {
+    $$ = new _singleExpression($1, C_NOEQUAL, $3);
+}
+|expr {
+    $$ = $1;
+}
+;
+
+expr : 
+expr  ADD  term{ 
+    $$ = new _singleExpression($1, C_ADD, $3); 
+}
+|expr  SUB  term {
+    $$ = new _singleExpression($1, C_SUB, $3); 
+}
+|expr  OR  term { 
+    $$ = new _singleExpression($1, C_OR, $3); 
+}
+|term {
+    $$ = $1; 
+}
+;
+
+
+term : 
+term  MUL  factor {
+    $$ = new _singleExpression($1, C_MUL, $3);
+}
+|term  DIV  factor {
+    $$ = new _singleExpression($1, C_DIV, $3);
+}
+|term  MOD  factor {
+    $$ = new _singleExpression($1, C_MOD, $3);
+}
+|term  AND  factor {
+    $$ = new _singleExpression($1, C_AND, $3);
+}
+|factor {
+    $$ = $1; 
 }
 
-singleExpression:
-term{
+
+factor:
+LP singleExpression RP{
+    $$=$2;
+}
+|Value{
     $$=new _singleExpression($1);
 }
-|ADD term{
-    $$=new _singleExpression($2,C_ADD);
-}
-|SUB term{
-    $$=new _singleExpression($2,C_SUB);
-}
-|MUL term{
-    $$=new _singleExpression($2,C_MUL);
-}
-|DIV term{
-    $$=new _singleExpression($2,C_DIV);
-}
-|AND term{
-    $$=new _singleExpression($2,C_AND);
-}
-|OR term{
-    $$=new _singleExpression($2,C_OR);
-}
-|GE term{
-    $$=new _singleExpression($2,C_GE);
-}
-|GT term{
-    $$=new _singleExpression($2,C_GT);
-}
-|LT term{
-    $$=new _singleExpression($2,C_LT);
-}
-|LE term{
-    $$=new _singleExpression($2,C_LE);
-}
-|EQUAL term{
-    $$=new _singleExpression($2,C_EQUAL);
-}
-|NOEQUAL term{
-    $$=new _singleExpression($2,C_NOEQUAL);
-}
-
-
-term:
-Value{
-    $$=new _Term($1);
-}
 |Variable{
-    $$=new _Term($1);
+    $$=new _singleExpression($1);
 }
-|LP singleExpressionList RP{
-    $$=new _Term($2);
+|NOT factor{
+    $$=new _singleExpression(new _singleExpression(new _Value(1)),C_XOR,$2);
 }
+|SUB factor{
+    $$=new _singleExpression(new _singleExpression(new _Value(1)),C_SUB,$2);
+}
+
 
 
 
@@ -358,7 +369,7 @@ forSTMT{
 
 
 forSTMT:
-FOR LP assignExpression SEMI singleExpressionList SEMI assignExpression RP LCB StatementList RCB
+FOR LP assignExpression SEMI singleExpression SEMI assignExpression RP LCB StatementList RCB
 {
     $$=new _forStatement($3,$5,$7,$10);
 }
@@ -366,14 +377,14 @@ FOR LP assignExpression SEMI singleExpressionList SEMI assignExpression RP LCB S
 
 
 whileSTMT:
-WHILE LP singleExpressionList RB LCB StatementList RCB{
+WHILE LP singleExpression RB LCB StatementList RCB{
     $$=new _whileStatement($3,$6);
 }
 
 
 
 ifSTMT:
-IF LP singleExpressionList RP LCB StatementList RCB elsePart{
+IF LP singleExpression RP LCB StatementList RCB elsePart{
     $$=new _ifStatement($3,$6,$8);
 }
 
