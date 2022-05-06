@@ -39,7 +39,7 @@ _Program *root;
     _Definition *c_Definition;
     _Expression *c_Expression;
     _singleExpression *c_singleExpression;
-    _VarList *c_VarList;
+    _DataList *c_DataList;
     _Variable *c_Variable;
     _assignExpression *c_assignExpression;
     _complexExpression *c_complexExpression;
@@ -97,7 +97,7 @@ _Program *root;
 %type<c_Definition>                  Definition
 %type<c_Expression>                  Expression
 %type<c_singleExpression>            singleExpression
-%type<c_VarList>                     VarList
+%type<c_DataList>                    DataList
 %type<c_Variable>                    Variable
 %type<c_assignExpression>            assignExpression
 %type<c_complexExpression>           complexExpression
@@ -188,12 +188,12 @@ Definition{
 
 
 Input:
-CIN RD VarList{
+CIN RD DataList{
     $$=new _Input($3);
 }
 
 Output:
-COUT LD VarList{
+COUT LD DataList{
     $$=new _Output($3);
 }
 
@@ -211,13 +211,21 @@ SYS_TYPE IDENTIFIER SEMI{
 
 
 
-VarList:
-Variable COMMA VarList{
+DataList:
+Variable COMMA DataList{
     $3->push_back($1);
     $$=$3;
 }
+|Value COMMA DataList{
+    $3->push_back($1);
+    $$=$3;
+}
+|Value{
+    $$=new _DataList();
+    $$->push_back($1);
+}
 |Variable{
-    $$=new _VarList();
+    $$=new _DataList();
     $$->push_back($1);
 }
 
@@ -243,6 +251,7 @@ assignExpression SEMI{
 |functionCall SEMI{
     $$=new _Expression($1);
 }
+
 
 assignExpression:
 Variable ASSIGN singleExpressionList{
@@ -329,7 +338,7 @@ REAL{
 
 
 functionCall:
-IDENTIFIER LP VarList RP{
+IDENTIFIER LP DataList RP{
     $$=new _functionCall($1,$3);
 }
 
@@ -402,7 +411,18 @@ ArgsDefinition COMMA ArgsDefinitionList{
 
 ArgsDefinition:
 SYS_TYPE Variable{
-    $$=new _argsDefinition($1,$2);
+    if(*$1=="int"){
+        $$=new _argsDefinition(C_INTEGER,$2);
+    }
+    else if(*$1=="double"){
+        $$=new _argsDefinition(C_REAL,$2);
+    }
+    else if(*$1=="char"){
+        $$=new _argsDefinition(C_CHAR,$2);
+    }
+    else if(*$1=="boolean"){
+        $$=new _argsDefinition(C_BOOLEAN,$2);
+    }
 }
 
 
