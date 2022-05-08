@@ -1,9 +1,9 @@
 %{
 // 待补充头文件
-#include "ast.hh"
+#include "ast.h"
 #include <string>
 #include <iostream>
-#include "compiler.tab.h"
+#include "parser.hpp"
 
 #define SAVE_TOKEN yylval.sVal = new std::string(yytext);
 %}
@@ -56,7 +56,8 @@ STRING "\""({LETTER}|{DIGIT})*"\""
 "="                                                     {return ASSIGN;} 
 ";"                                                     {return SEMI;} 
 "<<"                                                    {return LD;}
-">>"                                                    {return RD;};    
+">>"                                                    {return RD;}    
+"%"                                                     {return MOD;}
     /* 关键字部分 */
 if                                                      {return IF;}
 else                                                    {return ELSE;}

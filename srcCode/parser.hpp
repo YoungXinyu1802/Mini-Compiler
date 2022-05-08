@@ -34,8 +34,8 @@
 /* Undocumented macros, especially those whose name start with YY_,
    are private implementation details.  Do not rely on them.  */
 
-#ifndef YY_YY_COMPILER_TAB_H_INCLUDED
-# define YY_YY_COMPILER_TAB_H_INCLUDED
+#ifndef YY_YY_PARSER_HPP_INCLUDED
+# define YY_YY_PARSER_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -175,7 +175,7 @@ union YYSTYPE
     _Input *c_Input;
     _Output *c_Output;
 
-#line 179 "compiler.tab.h"
+#line 179 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -188,4 +188,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_COMPILER_TAB_H_INCLUDED  */
+#endif /* !YY_YY_PARSER_HPP_INCLUDED  */

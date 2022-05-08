@@ -1,5 +1,6 @@
+#line 2 "tokenizer.cpp"
 
-#line 3 "lex.yy.c"
+#line 4 "tokenizer.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -619,8 +620,8 @@ char *yytext;
 #include "parser.hpp"
 
 #define SAVE_TOKEN yylval.sVal = new std::string(yytext);
-#line 623 "lex.yy.c"
-#line 624 "lex.yy.c"
+#line 624 "tokenizer.cpp"
+#line 625 "tokenizer.cpp"
 
 #define INITIAL 0
 
@@ -839,7 +840,7 @@ YY_DECL
 	{
 #line 25 "compiler.l"
 
-#line 843 "lex.yy.c"
+#line 844 "tokenizer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1333,7 +1334,7 @@ YY_RULE_SETUP
 #line 123 "compiler.l"
 ECHO;
 	YY_BREAK
-#line 1337 "lex.yy.c"
+#line 1338 "tokenizer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

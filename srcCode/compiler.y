@@ -1,9 +1,9 @@
 %{
-#include <string.h>
+#include <string>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include "ast.hh"
+#include "ast.h"
 
 void yyerror(const char *s) { 
     std::printf("Error: %s\n", s);
@@ -13,10 +13,10 @@ void yyerror(const char *s) {
 int yylex(void);
 
 
-int main()
-{
-	int yyparse (void);
-}
+// int main()
+// {
+// 	int yyparse();
+// }
 
 _Program *root;
 %}
@@ -39,7 +39,7 @@ _Program *root;
     _Definition *c_Definition;
     _Expression *c_Expression;
     _singleExpression *c_singleExpression;
-    _VarList *c_VarList;
+    _DataList *c_DataList;
     _Variable *c_Variable;
     _assignExpression *c_assignExpression;
     _complexExpression *c_complexExpression;
@@ -63,7 +63,7 @@ _Program *root;
 //特殊符号
 
 %token LP RP LB RB RCB LCB DOT COMMA COLON MUL DIV NOT ADD SUB NOEQUAL
-%token AND OR GE GT LE LT EQUAL ASSIGN SEMI LD RD
+%token AND OR GE GT LE LT EQUAL ASSIGN SEMI LD RD MOD
 
 
 
@@ -96,8 +96,8 @@ _Program *root;
 %type<c_Statement>                   Statement
 %type<c_Definition>                  Definition
 %type<c_Expression>                  Expression
-%type<c_singleExpression>            singleExpression
-%type<c_VarList>                     VarList
+%type<c_singleExpression>            singleExpression term expr factor
+%type<c_DataList>                    DataList
 %type<c_Variable>                    Variable
 %type<c_assignExpression>            assignExpression
 %type<c_complexExpression>           complexExpression
@@ -110,8 +110,6 @@ _Program *root;
 %type<c_elsePart>                    elsePart
 %type<c_ArgsDefinition>              ArgsDefinition
 %type<c_returnStatement>             returnStatement
-%type<c_singleExpressionList>        singleExpressionList;
-%type<c_Term>                        term
 %type<c_Input>                       Input
 %type<c_Output>                      Output
 
@@ -122,6 +120,7 @@ _Program *root;
 Program: 
 functionList{
     $$=new _Program($1);
+    root=$$;
 }
 
 
@@ -188,36 +187,44 @@ Definition{
 
 
 Input:
-CIN RD VarList{
+CIN RD DataList{
     $$=new _Input($3);
 }
 
 Output:
-COUT LD VarList{
+COUT LD DataList{
     $$=new _Output($3);
 }
 
 returnStatement:
-RETURN singleExpressionList SEMI{
+RETURN singleExpression SEMI{
     $$=new _returnStatement($2);
 }
 
 
 
 Definition:
-SYS_TYPE IDENTIFIER SEMI{
+SYS_TYPE Variable SEMI{
     $$=new _Definition($1,$2);
 }
 
 
 
-VarList:
-Variable COMMA VarList{
+DataList:
+Variable COMMA DataList{
     $3->push_back($1);
     $$=$3;
 }
+|Value COMMA DataList{
+    $3->push_back($1);
+    $$=$3;
+}
+|Value{
+    $$=new _DataList();
+    $$->push_back($1);
+}
 |Variable{
-    $$=new _VarList();
+    $$=new _DataList();
     $$->push_back($1);
 }
 
@@ -244,92 +251,110 @@ assignExpression SEMI{
     $$=new _Expression($1);
 }
 
+
 assignExpression:
-Variable ASSIGN singleExpressionList{
+Variable ASSIGN singleExpression{
     $$= new _assignExpression($1,$3);
 }
 |Variable ASSIGN functionCall{
     $$= new _assignExpression($1,$3);
 }
 
-singleExpressionList:
-singleExpression singleExpressionList{
-    $$=$2;
-    $$->push_back($1);
+singleExpression : 
+singleExpression  GE  expr {
+    $$ = new _singleExpression($1, C_GE, $3);
 }
-|singleExpression{
-    $$=new _SingleExpressionList();
-    $$->push_back($1);
+|singleExpression  GT  expr {
+    $$ = new _singleExpression($1, C_GT, $3);
+}
+|singleExpression  LE  expr {
+    $$ = new _singleExpression($1, C_LE, $3);
+}
+|singleExpression  LT  expr {
+    $$ = new _singleExpression($1, C_LT, $3);
+}
+|singleExpression  EQUAL  expr {
+    $$ = new _singleExpression($1, C_EQUAL, $3);
+}
+|singleExpression  NOEQUAL  expr {
+    $$ = new _singleExpression($1, C_NOEQUAL, $3);
+}
+|expr {
+    $$ = $1;
+}
+;
+
+expr : 
+expr  ADD  term{ 
+    $$ = new _singleExpression($1, C_ADD, $3); 
+}
+|expr  SUB  term {
+    $$ = new _singleExpression($1, C_SUB, $3); 
+}
+|expr  OR  term { 
+    $$ = new _singleExpression($1, C_OR, $3); 
+}
+|term {
+    $$ = $1; 
+}
+;
+
+
+term : 
+term  MUL  factor {
+    $$ = new _singleExpression($1, C_MUL, $3);
+}
+|term  DIV  factor {
+    $$ = new _singleExpression($1, C_DIV, $3);
+}
+|term  MOD  factor {
+    $$ = new _singleExpression($1, C_MOD, $3);
+}
+|term  AND  factor {
+    $$ = new _singleExpression($1, C_AND, $3);
+}
+|factor {
+    $$ = $1; 
 }
 
-singleExpression:
-term ADD{
-    $$=new _singleExpression($1,C_ADD);
+
+factor:
+LP singleExpression RP{
+    $$=$2;
 }
-|term SUB{
-    $$=new _singleExpression($1,C_SUB);
-}
-|term MUL{
-    $$=new _singleExpression($1,C_MUL);
-}
-|term DIV{
-    $$=new _singleExpression($1,C_DIV);
-}
-|term AND{
-    $$=new _singleExpression($1,C_AND);
-}
-|term OR{
-    $$=new _singleExpression($1,C_OR);
-}
-|term GE{
-    $$=new _singleExpression($1,C_GE);
-}
-|term GT{
-    $$=new _singleExpression($1,C_GT);
-}
-|term LT{
-    $$=new _singleExpression($1,C_LT);
-}
-|term LE{
-    $$=new _singleExpression($1,C_LE);
-}
-|term EQUAL{
-    $$=new _singleExpression($1,C_EQUAL);
-}
-|term NOEQUAL{
-    $$=new _singleExpression($1,C_NOEQUAL);
-}
-|term{
+|Value{
     $$=new _singleExpression($1);
 }
-
-term:
-Value{
-    $$=new _Term($1);
-}
 |Variable{
-    $$=new _Term($1);
+    $$=new _singleExpression($1);
 }
-|LP singleExpressionList RP{
-    $$=new _Term($2);
+|NOT factor{
+    $$=new _singleExpression(new _singleExpression(new _Value(1)),C_XOR,$2);
 }
+|SUB factor{
+    $$=new _singleExpression(new _singleExpression(new _Value(1)),C_SUB,$2);
+}
+
 
 
 
 Value:
 REAL{
+    cout<<"real";
     $$=new _Value($1);
 }
 |INTEGER{
+    cout<<"int";
     $$=new _Value($1);
 }
 |STRING{
+    cout<<"string";
     $$=new _Value($1);
 }
 
 
 functionCall:
-IDENTIFIER LP VarList RP{
+IDENTIFIER LP DataList RP{
     $$=new _functionCall($1,$3);
 }
 
@@ -348,7 +373,7 @@ forSTMT{
 
 
 forSTMT:
-FOR LP assignExpression SEMI singleExpressionList SEMI assignExpression RP LCB StatementList RCB
+FOR LP assignExpression SEMI singleExpression SEMI assignExpression RP LCB StatementList RCB
 {
     $$=new _forStatement($3,$5,$7,$10);
 }
@@ -356,14 +381,14 @@ FOR LP assignExpression SEMI singleExpressionList SEMI assignExpression RP LCB S
 
 
 whileSTMT:
-WHILE LP singleExpressionList RB LCB StatementList RCB{
+WHILE LP singleExpression RP LCB StatementList RCB{
     $$=new _whileStatement($3,$6);
 }
 
 
 
 ifSTMT:
-IF LP singleExpressionList RP LCB StatementList RCB elsePart{
+IF LP singleExpression RP LCB StatementList RCB elsePart{
     $$=new _ifStatement($3,$6,$8);
 }
 
@@ -371,12 +396,15 @@ IF LP singleExpressionList RP LCB StatementList RCB elsePart{
 
 elsePart:
 ELSE LCB StatementList RCB{
+    cout<<"else";
     $$=new _elsePart($3);
 }
 |ELSE ifSTMT{
+    cout<<"else";
     $$= new _elsePart($2);
 }
 |{
+    cout<<"else";
     $$=new _elsePart();//空body
 }
 
@@ -384,25 +412,45 @@ ELSE LCB StatementList RCB{
 
 Subroutine:
 SYS_TYPE IDENTIFIER LP ArgsDefinitionList RP LCB StatementList RCB{
+    cout<<"subr";
     $$=new _Subroutine($1,$2,$4,$7);
 }
 
 ArgsDefinitionList:
 ArgsDefinition COMMA ArgsDefinitionList{
+    cout<<"argsL";
     $3->push_back($1);
     $$=$3;
 }
 |ArgsDefinition{
+    cout<<"argsL";
     $$=new _ArgsDefinitionList();
     $$->push_back($1);
 }
 |{
+    cout<<"argsL";
    $$=new _ArgsDefinitionList(); 
+   
 }
 
 ArgsDefinition:
 SYS_TYPE Variable{
-    $$=new _argsDefinition($1,$2);
+    if(*$1=="int"){
+        $$=new _argsDefinition(C_INTEGER,$2);
+        cout<<"args";
+    }
+    else if(*$1=="double"){
+        $$=new _argsDefinition(C_REAL,$2);
+        cout<<"args";
+    }
+    else if(*$1=="char"){
+        $$=new _argsDefinition(C_CHAR,$2);
+        cout<<"args";
+    }
+    else if(*$1=="boolean"){
+        $$=new _argsDefinition(C_BOOLEAN,$2);
+        cout<<"args";
+    }
 }
 
 

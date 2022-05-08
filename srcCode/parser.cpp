@@ -82,14 +82,14 @@ void yyerror(const char *s) {
 int yylex(void);
 
 
-int main()
-{
-	int yyparse();
-}
+// int main()
+// {
+// 	int yyparse();
+// }
 
 _Program *root;
 
-#line 93 "compiler.tab.c"
+#line 93 "parser.cpp"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -122,8 +122,8 @@ _Program *root;
 
 /* Use api.header.include to #include this header
    instead of duplicating it here.  */
-#ifndef YY_YY_COMPILER_TAB_H_INCLUDED
-# define YY_YY_COMPILER_TAB_H_INCLUDED
+#ifndef YY_YY_PARSER_HPP_INCLUDED
+# define YY_YY_PARSER_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -263,7 +263,7 @@ union YYSTYPE
     _Input *c_Input;
     _Output *c_Output;
 
-#line 267 "compiler.tab.c"
+#line 267 "parser.cpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -276,7 +276,7 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_COMPILER_TAB_H_INCLUDED  */
+#endif /* !YY_YY_PARSER_HPP_INCLUDED  */
 
 
 
@@ -646,13 +646,13 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   121,   121,   127,   132,   140,   144,   151,   158,   163,
-     171,   174,   177,   180,   183,   189,   194,   199,   206,   213,
-     217,   221,   225,   233,   237,   245,   248,   251,   257,   260,
-     265,   268,   271,   274,   277,   280,   283,   289,   292,   295,
-     298,   305,   308,   311,   314,   317,   323,   326,   329,   332,
-     335,   343,   347,   351,   358,   364,   367,   370,   377,   385,
-     392,   399,   403,   407,   415,   421,   426,   431,   438
+       0,   121,   121,   128,   133,   141,   145,   152,   159,   164,
+     172,   175,   178,   181,   184,   190,   195,   200,   207,   214,
+     218,   222,   226,   234,   237,   244,   247,   250,   256,   259,
+     264,   267,   270,   273,   276,   279,   282,   288,   291,   294,
+     297,   304,   307,   310,   313,   316,   322,   325,   328,   331,
+     334,   342,   346,   350,   357,   363,   366,   369,   376,   384,
+     391,   398,   402,   406,   414,   420,   425,   430,   437
 };
 #endif
 
@@ -716,17 +716,17 @@ static const yytype_int16 yypact[] =
      -74,   -45,   -45,   -42,    46,    41,    56,    70,   -74,    83,
      -45,    93,   -22,   -25,   -74,   -25,   102,   103,   111,    43,
       95,   115,    96,    97,   -74,   -74,   -74,   -74,    -1,    98,
-     104,   -42,   117,   -25,    99,   106,   -74,   -74,   -74,   131,
+     101,   -42,   117,   -25,   105,   106,   -74,   -74,   -74,   132,
       -1,   -42,    -1,    28,     4,   -74,   -74,   -74,    -1,    -1,
-      -1,   -74,   -74,   -74,   -74,   130,    84,    14,   -74,   -74,
-      28,    28,   114,   -74,   -74,   -74,   -74,   -74,    72,   123,
-     122,   137,   147,   155,   146,   -74,   113,   -74,   -74,    -1,
+      -1,   -74,   -74,   -74,   -74,   129,    84,    14,   -74,   -74,
+      28,    28,   114,   -74,   -74,   -74,   -74,   -74,    72,   122,
+     113,   143,   146,   154,   145,   -74,   121,   -74,   -74,    -1,
       -1,    -1,    -1,    -1,    -1,   -74,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,   -74,   -74,   -74,   140,    -1,   163,   -74,
+      -1,    -1,    -1,   -74,   -74,   -74,   162,    -1,   163,   -74,
       28,    28,   -74,    84,    84,    84,    84,    84,    84,    14,
-      14,    14,   -74,   -74,   -74,   -74,   -25,   138,   -25,   -74,
-     -74,   165,   -42,   166,   143,   171,   -74,    17,   -74,   168,
-     -25,   -74,   -25,   170,   172,   -74,   -74
+      14,    14,   -74,   -74,   -74,   -74,   -25,   137,   -25,   -74,
+     -74,   165,   -42,   166,   144,   170,   -74,    17,   -74,   168,
+     -25,   -74,   -25,   171,   172,   -74,   -74
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -754,7 +754,7 @@ static const yytype_int8 yydefact[] =
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-     -74,   -74,   174,   -74,   -74,   -24,   -74,   -74,   -74,   -74,
+     -74,   -74,   173,   -74,   -74,   -24,   -74,   -74,   -74,   -74,
      -74,    -3,   -13,   158,   -48,   -17,   -20,   -19,   -36,   -49,
      127,   -74,   -74,   -74,    45,   -74,   -74,    24,   -74
 };
@@ -783,13 +783,13 @@ static const yytype_uint8 yytable[] =
       17,    61,    62,    63,   135,    29,    61,    62,    63,    89,
      127,    23,    90,    91,    92,    93,    94,    82,    82,    96,
       97,    25,   131,    98,   133,    50,    51,   129,   130,    17,
-      61,    62,    63,    30,    52,    30,   143,   112,   144,    30,
-      54,    55,    56,    57,    73,    75,    70,    30,   108,    30,
-      89,    71,    76,    90,    91,    92,    93,    94,    77,    89,
-     105,   109,    90,    91,    92,    93,    94,    89,   126,   107,
-      90,    91,    92,    93,    94,    89,    95,   110,    90,    91,
-      92,    93,    94,    89,   132,   111,    90,    91,    92,    93,
-      94,   128,   134,   136,   137,   139,   142,   145,    10,   146,
+      61,    62,    63,    30,    52,    30,   143,   108,   144,    30,
+      54,    55,    56,    57,    73,   112,    70,    30,    71,    30,
+      89,    75,    76,    90,    91,    92,    93,    94,    89,    77,
+     105,    90,    91,    92,    93,    94,    89,   109,   107,    90,
+      91,    92,    93,    94,    89,    95,   110,    90,    91,    92,
+      93,    94,    89,   132,   111,    90,    91,    92,    93,    94,
+     126,   128,   134,   136,   139,   137,   142,    10,   145,   146,
       31,    85,   141
 };
 
@@ -807,12 +807,12 @@ static const yytype_uint8 yycheck[] =
      107,     8,    20,    21,    22,    23,    24,   110,   111,    15,
       16,     8,   126,    19,   128,     3,     3,   110,   111,    81,
       82,    83,    84,   126,     3,   128,   140,     4,   142,   132,
-      25,     6,    26,    26,     7,    26,    28,   140,     6,   142,
-      17,    27,    26,    20,    21,    22,    23,    24,     7,    17,
-      26,     4,    20,    21,    22,    23,    24,    17,     8,    26,
-      20,    21,    22,    23,    24,    17,    26,    10,    20,    21,
-      22,    23,    24,    17,    26,    10,    20,    21,    22,    23,
-      24,     8,     7,     7,    31,     4,     8,     7,     4,     7,
+      25,     6,    26,    26,     7,     4,    28,   140,    27,   142,
+      17,    26,    26,    20,    21,    22,    23,    24,    17,     7,
+      26,    20,    21,    22,    23,    24,    17,     4,    26,    20,
+      21,    22,    23,    24,    17,    26,    10,    20,    21,    22,
+      23,    24,    17,    26,    10,    20,    21,    22,    23,    24,
+       8,     8,     7,     7,     4,    31,     8,     4,     7,     7,
       22,    54,   137
 };
 
@@ -830,7 +830,7 @@ static const yytype_int8 yystos[] =
       28,    27,    97,     7,    90,    26,    26,     7,   100,    99,
      100,    96,    97,   104,   100,   105,   100,   103,   103,    17,
       20,    21,    22,    23,    24,    26,    15,    16,    19,    12,
-      13,    18,    29,    96,    96,    26,     4,    26,     6,     4,
+      13,    18,    29,    96,    96,    26,     4,    26,     4,     4,
       10,    10,     4,   101,   101,   101,   101,   101,   101,   102,
      102,   102,   103,   103,   103,   103,     8,   100,     8,    96,
       96,    90,    26,    90,     7,    99,     7,    31,   110,     4,
@@ -1557,557 +1557,556 @@ yyreduce:
 #line 121 "compiler.y"
             {
     (yyval.c_Program)=new _Program((yyvsp[0].c_functionList));
+    root=(yyval.c_Program);
 }
-#line 1562 "compiler.tab.c"
+#line 1563 "parser.cpp"
     break;
 
   case 3:
-#line 127 "compiler.y"
+#line 128 "compiler.y"
                      {
     (yyvsp[0].c_functionList)->push_back((yyvsp[-1].c_Function));
     (yyval.c_functionList)=(yyvsp[0].c_functionList);
 
 }
-#line 1572 "compiler.tab.c"
+#line 1573 "parser.cpp"
     break;
 
   case 4:
-#line 132 "compiler.y"
+#line 133 "compiler.y"
          {
     (yyval.c_functionList)=new _FunctionList();
     (yyval.c_functionList)->push_back((yyvsp[0].c_Function));
 }
-#line 1581 "compiler.tab.c"
+#line 1582 "parser.cpp"
     break;
 
   case 5:
-#line 140 "compiler.y"
+#line 141 "compiler.y"
         {
     (yyval.c_Function)=new _Function((yyvsp[0].c_mainFunction));
 }
-#line 1589 "compiler.tab.c"
+#line 1590 "parser.cpp"
     break;
 
   case 6:
-#line 144 "compiler.y"
+#line 145 "compiler.y"
            {
     (yyval.c_Function)=new _Function((yyvsp[0].c_Subroutine));
 }
-#line 1597 "compiler.tab.c"
+#line 1598 "parser.cpp"
     break;
 
   case 7:
-#line 151 "compiler.y"
+#line 152 "compiler.y"
                                                             {
     (yyval.c_mainFunction)=new _mainFunction((yyvsp[-4].c_ArgsDefinitionList),(yyvsp[-1].c_StatementList));
 }
-#line 1605 "compiler.tab.c"
+#line 1606 "parser.cpp"
     break;
 
   case 8:
-#line 158 "compiler.y"
+#line 159 "compiler.y"
                        {
     (yyvsp[0].c_StatementList)->push_back((yyvsp[-1].c_Statement));
     (yyval.c_StatementList)=(yyvsp[0].c_StatementList);
 
 }
-#line 1615 "compiler.tab.c"
+#line 1616 "parser.cpp"
     break;
 
   case 9:
-#line 163 "compiler.y"
+#line 164 "compiler.y"
           {
     (yyval.c_StatementList)=new _StatementList();
     (yyval.c_StatementList)->push_back((yyvsp[0].c_Statement));
 }
-#line 1624 "compiler.tab.c"
+#line 1625 "parser.cpp"
     break;
 
   case 10:
-#line 171 "compiler.y"
+#line 172 "compiler.y"
           {
     (yyval.c_Statement)=new _Statement((yyvsp[0].c_Definition));
 }
-#line 1632 "compiler.tab.c"
+#line 1633 "parser.cpp"
     break;
 
   case 11:
-#line 174 "compiler.y"
+#line 175 "compiler.y"
            {
     (yyval.c_Statement)=new _Statement((yyvsp[0].c_Expression));
 }
-#line 1640 "compiler.tab.c"
+#line 1641 "parser.cpp"
     break;
 
   case 12:
-#line 177 "compiler.y"
+#line 178 "compiler.y"
                 {
     (yyval.c_Statement)=new _Statement((yyvsp[0].c_returnStatement));
 }
-#line 1648 "compiler.tab.c"
+#line 1649 "parser.cpp"
     break;
 
   case 13:
-#line 180 "compiler.y"
+#line 181 "compiler.y"
            {
     (yyval.c_Statement)=new _Statement((yyvsp[-1].c_Input));
 }
-#line 1656 "compiler.tab.c"
+#line 1657 "parser.cpp"
     break;
 
   case 14:
-#line 183 "compiler.y"
+#line 184 "compiler.y"
             {
     (yyval.c_Statement)=new _Statement((yyvsp[-1].c_Output));
 }
-#line 1664 "compiler.tab.c"
+#line 1665 "parser.cpp"
     break;
 
   case 15:
-#line 189 "compiler.y"
+#line 190 "compiler.y"
                {
     (yyval.c_Input)=new _Input((yyvsp[0].c_DataList));
 }
-#line 1672 "compiler.tab.c"
+#line 1673 "parser.cpp"
     break;
 
   case 16:
-#line 194 "compiler.y"
+#line 195 "compiler.y"
                 {
     (yyval.c_Output)=new _Output((yyvsp[0].c_DataList));
 }
-#line 1680 "compiler.tab.c"
+#line 1681 "parser.cpp"
     break;
 
   case 17:
-#line 199 "compiler.y"
+#line 200 "compiler.y"
                             {
     (yyval.c_returnStatement)=new _returnStatement((yyvsp[-1].c_singleExpression));
 }
-#line 1688 "compiler.tab.c"
+#line 1689 "parser.cpp"
     break;
 
   case 18:
-#line 206 "compiler.y"
+#line 207 "compiler.y"
                       {
     (yyval.c_Definition)=new _Definition((yyvsp[-2].sVal),(yyvsp[-1].c_Variable));
 }
-#line 1696 "compiler.tab.c"
+#line 1697 "parser.cpp"
     break;
 
   case 19:
-#line 213 "compiler.y"
+#line 214 "compiler.y"
                        {
     (yyvsp[0].c_DataList)->push_back((yyvsp[-2].c_Variable));
     (yyval.c_DataList)=(yyvsp[0].c_DataList);
 }
-#line 1705 "compiler.tab.c"
+#line 1706 "parser.cpp"
     break;
 
   case 20:
-#line 217 "compiler.y"
+#line 218 "compiler.y"
                      {
     (yyvsp[0].c_DataList)->push_back((yyvsp[-2].c_Value));
     (yyval.c_DataList)=(yyvsp[0].c_DataList);
 }
-#line 1714 "compiler.tab.c"
+#line 1715 "parser.cpp"
     break;
 
   case 21:
-#line 221 "compiler.y"
+#line 222 "compiler.y"
       {
     (yyval.c_DataList)=new _DataList();
     (yyval.c_DataList)->push_back((yyvsp[0].c_Value));
 }
-#line 1723 "compiler.tab.c"
+#line 1724 "parser.cpp"
     break;
 
   case 22:
-#line 225 "compiler.y"
+#line 226 "compiler.y"
          {
     (yyval.c_DataList)=new _DataList();
     (yyval.c_DataList)->push_back((yyvsp[0].c_Variable));
 }
-#line 1732 "compiler.tab.c"
+#line 1733 "parser.cpp"
     break;
 
   case 23:
-#line 233 "compiler.y"
+#line 234 "compiler.y"
           {
-    cout<<"var";
     (yyval.c_Variable)=new _Variable((yyvsp[0].sVal));
 }
-#line 1741 "compiler.tab.c"
+#line 1741 "parser.cpp"
     break;
 
   case 24:
 #line 237 "compiler.y"
                             {
-    cout<<"array";
     (yyval.c_Variable)=new _Variable((yyvsp[-3].sVal),(yyvsp[-1].c_Expression));
 }
-#line 1750 "compiler.tab.c"
+#line 1749 "parser.cpp"
     break;
 
   case 25:
-#line 245 "compiler.y"
+#line 244 "compiler.y"
                      {
     (yyval.c_Expression)=new _Expression((yyvsp[-1].c_assignExpression));
 }
-#line 1758 "compiler.tab.c"
+#line 1757 "parser.cpp"
     break;
 
   case 26:
-#line 248 "compiler.y"
+#line 247 "compiler.y"
                   {
     (yyval.c_Expression)=new _Expression((yyvsp[0].c_complexExpression));
 }
-#line 1766 "compiler.tab.c"
+#line 1765 "parser.cpp"
     break;
 
   case 27:
-#line 251 "compiler.y"
+#line 250 "compiler.y"
                   {
     (yyval.c_Expression)=new _Expression((yyvsp[-1].c_functionCall));
 }
-#line 1774 "compiler.tab.c"
+#line 1773 "parser.cpp"
     break;
 
   case 28:
-#line 257 "compiler.y"
+#line 256 "compiler.y"
                                 {
     (yyval.c_assignExpression)= new _assignExpression((yyvsp[-2].c_Variable),(yyvsp[0].c_singleExpression));
 }
-#line 1782 "compiler.tab.c"
+#line 1781 "parser.cpp"
     break;
 
   case 29:
-#line 260 "compiler.y"
+#line 259 "compiler.y"
                              {
     (yyval.c_assignExpression)= new _assignExpression((yyvsp[-2].c_Variable),(yyvsp[0].c_functionCall));
 }
-#line 1790 "compiler.tab.c"
+#line 1789 "parser.cpp"
     break;
 
   case 30:
-#line 265 "compiler.y"
+#line 264 "compiler.y"
                            {
     (yyval.c_singleExpression) = new _singleExpression((yyvsp[-2].c_singleExpression), C_GE, (yyvsp[0].c_singleExpression));
 }
-#line 1798 "compiler.tab.c"
+#line 1797 "parser.cpp"
     break;
 
   case 31:
-#line 268 "compiler.y"
+#line 267 "compiler.y"
                             {
     (yyval.c_singleExpression) = new _singleExpression((yyvsp[-2].c_singleExpression), C_GT, (yyvsp[0].c_singleExpression));
 }
-#line 1806 "compiler.tab.c"
+#line 1805 "parser.cpp"
     break;
 
   case 32:
-#line 271 "compiler.y"
+#line 270 "compiler.y"
                             {
     (yyval.c_singleExpression) = new _singleExpression((yyvsp[-2].c_singleExpression), C_LE, (yyvsp[0].c_singleExpression));
 }
-#line 1814 "compiler.tab.c"
+#line 1813 "parser.cpp"
     break;
 
   case 33:
-#line 274 "compiler.y"
+#line 273 "compiler.y"
                             {
     (yyval.c_singleExpression) = new _singleExpression((yyvsp[-2].c_singleExpression), C_LT, (yyvsp[0].c_singleExpression));
 }
-#line 1822 "compiler.tab.c"
+#line 1821 "parser.cpp"
     break;
 
   case 34:
-#line 277 "compiler.y"
+#line 276 "compiler.y"
                                {
     (yyval.c_singleExpression) = new _singleExpression((yyvsp[-2].c_singleExpression), C_EQUAL, (yyvsp[0].c_singleExpression));
 }
-#line 1830 "compiler.tab.c"
+#line 1829 "parser.cpp"
     break;
 
   case 35:
-#line 280 "compiler.y"
+#line 279 "compiler.y"
                                  {
     (yyval.c_singleExpression) = new _singleExpression((yyvsp[-2].c_singleExpression), C_NOEQUAL, (yyvsp[0].c_singleExpression));
 }
-#line 1838 "compiler.tab.c"
+#line 1837 "parser.cpp"
     break;
 
   case 36:
-#line 283 "compiler.y"
+#line 282 "compiler.y"
       {
     (yyval.c_singleExpression) = (yyvsp[0].c_singleExpression);
 }
-#line 1846 "compiler.tab.c"
+#line 1845 "parser.cpp"
     break;
 
   case 37:
-#line 289 "compiler.y"
+#line 288 "compiler.y"
                { 
     (yyval.c_singleExpression) = new _singleExpression((yyvsp[-2].c_singleExpression), C_ADD, (yyvsp[0].c_singleExpression)); 
 }
-#line 1854 "compiler.tab.c"
+#line 1853 "parser.cpp"
     break;
 
   case 38:
-#line 292 "compiler.y"
+#line 291 "compiler.y"
                  {
     (yyval.c_singleExpression) = new _singleExpression((yyvsp[-2].c_singleExpression), C_SUB, (yyvsp[0].c_singleExpression)); 
 }
-#line 1862 "compiler.tab.c"
+#line 1861 "parser.cpp"
     break;
 
   case 39:
-#line 295 "compiler.y"
+#line 294 "compiler.y"
                 { 
     (yyval.c_singleExpression) = new _singleExpression((yyvsp[-2].c_singleExpression), C_OR, (yyvsp[0].c_singleExpression)); 
 }
-#line 1870 "compiler.tab.c"
+#line 1869 "parser.cpp"
     break;
 
   case 40:
-#line 298 "compiler.y"
+#line 297 "compiler.y"
       {
     (yyval.c_singleExpression) = (yyvsp[0].c_singleExpression); 
 }
-#line 1878 "compiler.tab.c"
+#line 1877 "parser.cpp"
     break;
 
   case 41:
-#line 305 "compiler.y"
+#line 304 "compiler.y"
                   {
     (yyval.c_singleExpression) = new _singleExpression((yyvsp[-2].c_singleExpression), C_MUL, (yyvsp[0].c_singleExpression));
 }
-#line 1886 "compiler.tab.c"
+#line 1885 "parser.cpp"
     break;
 
   case 42:
-#line 308 "compiler.y"
+#line 307 "compiler.y"
                    {
     (yyval.c_singleExpression) = new _singleExpression((yyvsp[-2].c_singleExpression), C_DIV, (yyvsp[0].c_singleExpression));
 }
-#line 1894 "compiler.tab.c"
+#line 1893 "parser.cpp"
     break;
 
   case 43:
-#line 311 "compiler.y"
+#line 310 "compiler.y"
                    {
     (yyval.c_singleExpression) = new _singleExpression((yyvsp[-2].c_singleExpression), C_MOD, (yyvsp[0].c_singleExpression));
 }
-#line 1902 "compiler.tab.c"
+#line 1901 "parser.cpp"
     break;
 
   case 44:
-#line 314 "compiler.y"
+#line 313 "compiler.y"
                    {
     (yyval.c_singleExpression) = new _singleExpression((yyvsp[-2].c_singleExpression), C_AND, (yyvsp[0].c_singleExpression));
 }
-#line 1910 "compiler.tab.c"
+#line 1909 "parser.cpp"
     break;
 
   case 45:
-#line 317 "compiler.y"
+#line 316 "compiler.y"
         {
     (yyval.c_singleExpression) = (yyvsp[0].c_singleExpression); 
 }
-#line 1918 "compiler.tab.c"
+#line 1917 "parser.cpp"
     break;
 
   case 46:
-#line 323 "compiler.y"
+#line 322 "compiler.y"
                       {
     (yyval.c_singleExpression)=(yyvsp[-1].c_singleExpression);
 }
-#line 1926 "compiler.tab.c"
+#line 1925 "parser.cpp"
     break;
 
   case 47:
-#line 326 "compiler.y"
+#line 325 "compiler.y"
       {
     (yyval.c_singleExpression)=new _singleExpression((yyvsp[0].c_Value));
 }
-#line 1934 "compiler.tab.c"
+#line 1933 "parser.cpp"
     break;
 
   case 48:
-#line 329 "compiler.y"
+#line 328 "compiler.y"
          {
     (yyval.c_singleExpression)=new _singleExpression((yyvsp[0].c_Variable));
 }
-#line 1942 "compiler.tab.c"
+#line 1941 "parser.cpp"
     break;
 
   case 49:
-#line 332 "compiler.y"
+#line 331 "compiler.y"
            {
     (yyval.c_singleExpression)=new _singleExpression(new _singleExpression(new _Value(1)),C_XOR,(yyvsp[0].c_singleExpression));
 }
-#line 1950 "compiler.tab.c"
+#line 1949 "parser.cpp"
     break;
 
   case 50:
-#line 335 "compiler.y"
+#line 334 "compiler.y"
            {
     (yyval.c_singleExpression)=new _singleExpression(new _singleExpression(new _Value(1)),C_SUB,(yyvsp[0].c_singleExpression));
 }
-#line 1958 "compiler.tab.c"
+#line 1957 "parser.cpp"
     break;
 
   case 51:
-#line 343 "compiler.y"
+#line 342 "compiler.y"
     {
     cout<<"real";
     (yyval.c_Value)=new _Value((yyvsp[0].floatVal));
 }
-#line 1967 "compiler.tab.c"
+#line 1966 "parser.cpp"
     break;
 
   case 52:
-#line 347 "compiler.y"
+#line 346 "compiler.y"
         {
     cout<<"int";
     (yyval.c_Value)=new _Value((yyvsp[0].intVal));
 }
-#line 1976 "compiler.tab.c"
+#line 1975 "parser.cpp"
     break;
 
   case 53:
-#line 351 "compiler.y"
+#line 350 "compiler.y"
        {
     cout<<"string";
     (yyval.c_Value)=new _Value((yyvsp[0].sVal));
 }
-#line 1985 "compiler.tab.c"
+#line 1984 "parser.cpp"
     break;
 
   case 54:
-#line 358 "compiler.y"
+#line 357 "compiler.y"
                          {
     (yyval.c_functionCall)=new _functionCall((yyvsp[-3].sVal),(yyvsp[-1].c_DataList));
 }
-#line 1993 "compiler.tab.c"
+#line 1992 "parser.cpp"
     break;
 
   case 55:
-#line 364 "compiler.y"
+#line 363 "compiler.y"
        {
     (yyval.c_complexExpression)=new _complexExpression((yyvsp[0].c_forSTMT));
 }
-#line 2001 "compiler.tab.c"
+#line 2000 "parser.cpp"
     break;
 
   case 56:
-#line 367 "compiler.y"
+#line 366 "compiler.y"
           {
     (yyval.c_complexExpression)=new _complexExpression((yyvsp[0].c_whileSTMT));
 }
-#line 2009 "compiler.tab.c"
+#line 2008 "parser.cpp"
     break;
 
   case 57:
-#line 370 "compiler.y"
+#line 369 "compiler.y"
        {
     (yyval.c_complexExpression)=new _complexExpression((yyvsp[0].c_ifSTMT));
 }
-#line 2017 "compiler.tab.c"
+#line 2016 "parser.cpp"
     break;
 
   case 58:
-#line 378 "compiler.y"
+#line 377 "compiler.y"
 {
     (yyval.c_forSTMT)=new _forStatement((yyvsp[-8].c_assignExpression),(yyvsp[-6].c_singleExpression),(yyvsp[-4].c_assignExpression),(yyvsp[-1].c_StatementList));
 }
-#line 2025 "compiler.tab.c"
+#line 2024 "parser.cpp"
     break;
 
   case 59:
-#line 385 "compiler.y"
+#line 384 "compiler.y"
                                                   {
     (yyval.c_whileSTMT)=new _whileStatement((yyvsp[-4].c_singleExpression),(yyvsp[-1].c_StatementList));
 }
-#line 2033 "compiler.tab.c"
+#line 2032 "parser.cpp"
     break;
 
   case 60:
-#line 392 "compiler.y"
+#line 391 "compiler.y"
                                                         {
     (yyval.c_ifSTMT)=new _ifStatement((yyvsp[-5].c_singleExpression),(yyvsp[-2].c_StatementList),(yyvsp[0].c_elsePart));
 }
-#line 2041 "compiler.tab.c"
+#line 2040 "parser.cpp"
     break;
 
   case 61:
-#line 399 "compiler.y"
+#line 398 "compiler.y"
                           {
     cout<<"else";
     (yyval.c_elsePart)=new _elsePart((yyvsp[-1].c_StatementList));
 }
-#line 2050 "compiler.tab.c"
+#line 2049 "parser.cpp"
     break;
 
   case 62:
-#line 403 "compiler.y"
+#line 402 "compiler.y"
             {
     cout<<"else";
     (yyval.c_elsePart)= new _elsePart((yyvsp[0].c_ifSTMT));
 }
-#line 2059 "compiler.tab.c"
+#line 2058 "parser.cpp"
     break;
 
   case 63:
-#line 407 "compiler.y"
+#line 406 "compiler.y"
  {
     cout<<"else";
     (yyval.c_elsePart)=new _elsePart();//空body
 }
-#line 2068 "compiler.tab.c"
+#line 2067 "parser.cpp"
     break;
 
   case 64:
-#line 415 "compiler.y"
+#line 414 "compiler.y"
                                                                   {
     cout<<"subr";
     (yyval.c_Subroutine)=new _Subroutine((yyvsp[-7].sVal),(yyvsp[-6].sVal),(yyvsp[-4].c_ArgsDefinitionList),(yyvsp[-1].c_StatementList));
 }
-#line 2077 "compiler.tab.c"
+#line 2076 "parser.cpp"
     break;
 
   case 65:
-#line 421 "compiler.y"
+#line 420 "compiler.y"
                                        {
     cout<<"argsL";
     (yyvsp[0].c_ArgsDefinitionList)->push_back((yyvsp[-2].c_ArgsDefinition));
     (yyval.c_ArgsDefinitionList)=(yyvsp[0].c_ArgsDefinitionList);
 }
-#line 2087 "compiler.tab.c"
+#line 2086 "parser.cpp"
     break;
 
   case 66:
-#line 426 "compiler.y"
+#line 425 "compiler.y"
                {
     cout<<"argsL";
     (yyval.c_ArgsDefinitionList)=new _ArgsDefinitionList();
     (yyval.c_ArgsDefinitionList)->push_back((yyvsp[0].c_ArgsDefinition));
 }
-#line 2097 "compiler.tab.c"
+#line 2096 "parser.cpp"
     break;
 
   case 67:
-#line 431 "compiler.y"
+#line 430 "compiler.y"
  {
     cout<<"argsL";
    (yyval.c_ArgsDefinitionList)=new _ArgsDefinitionList(); 
    
 }
-#line 2107 "compiler.tab.c"
+#line 2106 "parser.cpp"
     break;
 
   case 68:
-#line 438 "compiler.y"
+#line 437 "compiler.y"
                  {
     if(*(yyvsp[-1].sVal)=="int"){
         (yyval.c_ArgsDefinition)=new _argsDefinition(C_INTEGER,(yyvsp[0].c_Variable));
@@ -2126,11 +2125,11 @@ yyreduce:
         cout<<"args";
     }
 }
-#line 2130 "compiler.tab.c"
+#line 2129 "parser.cpp"
     break;
 
 
-#line 2134 "compiler.tab.c"
+#line 2133 "parser.cpp"
 
       default: break;
     }
