@@ -5,7 +5,7 @@ using namespace std;
 
 // problems: array, input, output, assignment, variable
 void Debug(string s){
-    cout << '[Debug]' << s << endl;
+    cout << "[Debug]" << s << endl;
 }
 
 llvm::Value *_Value::codeGen(CodeGenerator & generator){
@@ -441,6 +441,28 @@ llvm::Value *_Definition::codeGen(CodeGenerator & generator){
         // auto alloc = createTempAlloca(TheFunction, *variable->ID_Name, defType);
     }
     auto alloc = createTempAlloca(TheFunction, *variable->ID_Name, defType);
+    return alloc;
+}
+
+// confusing...
+llvm::Value *_argsDefinition::codeGen(CodeGenerator & generator){
+    Debug("_Definition::codeGen");
+    llvm::Type *defType;
+    llvm::Function *TheFunction = generator.getCurFunc();
+
+    bool isArray = (args->v_Type == _Variable::ARRAY);
+
+    if (isArray){
+        llvm::Value *size = this->args->expr->codeGen(generator);
+        llvm::ConstantInt *sizeInt = llvm::dyn_cast<llvm::ConstantInt>(size);
+        // uint64_t size_int = size->getUniqueInteger().getZextValue();
+        llvm::Type *arrayType = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
+    }
+    else{
+        defType = llvmType(this->arg_Type);
+        // auto alloc = createTempAlloca(TheFunction, *variable->ID_Name, defType);
+    }
+    auto alloc = createTempAlloca(TheFunction, *args->ID_Name, defType);
     return alloc;
 }
 
