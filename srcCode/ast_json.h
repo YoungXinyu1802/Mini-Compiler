@@ -1,8 +1,8 @@
-#ifndef AST_HH
-#define AST_HH
+#ifndef AST_H
+#define AST_H
+#endif
 
-
-#include <llvm/IR/Value.h>
+// #include <llvm/IR/Value.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -16,6 +16,12 @@
 
 using namespace std;
 /* class declaration */ 
+#pragma region
+string getJsonString(string name, string value);
+string getJsonString(string name, string value ,vector<string> children);
+string getJsonString(string name, string value ,string type);
+string getJsonString(string name, vector<string> children);
+string getJsonString(string name);
 
 class CodeGenerator;
 
@@ -38,7 +44,6 @@ class _ifStatement;
 class _Data;
 class _elsePart;
 class _argsDefinition;
-class _String;
 class _returnStatement;
 class _Term;
 class _Value;
@@ -106,8 +111,8 @@ public:
         this->type=type;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) = 0;
-    // virtual string JsonGen()=0;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) = 0;
+    virtual string JsonGen()=0;
 private:
     int type;
 };
@@ -122,8 +127,8 @@ public:
         this->myFuncs=NULL;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 
@@ -150,8 +155,8 @@ public:
         this->v_Function.subFunc=subFunc;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 
@@ -164,8 +169,8 @@ public:
         this->statements=_statements;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 class _Subroutine:public Node{
@@ -173,7 +178,7 @@ public:
     _StatementList* statements;
     std::string* Type; /* "int"|"char"|"double"|"boolean" */
     std::string* Func_Id;  /* Function Identifier */
-    _ArgsDefinitionList* args; 
+    _ArgsDefinitionList*  args; 
     _Subroutine(std::string* Type,std::string* Identifier,_ArgsDefinitionList* _args, _StatementList* _statements){
         this->Type=Type;
         this->Func_Id=Identifier;
@@ -181,8 +186,8 @@ public:
         this->statements=_statements;    
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 //基类 2
@@ -224,8 +229,8 @@ public:
         this->v_Type=OUTPUT;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 class _Input:public Node{
@@ -235,8 +240,8 @@ public:
         this->vars=variables;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 class _Output:public  Node{
@@ -246,8 +251,8 @@ public:
         this->vars=variables;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 
@@ -258,8 +263,8 @@ public:
         this->expr=expression;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 class _Definition: public Node{
@@ -282,8 +287,8 @@ public:
         this->variable=var;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 class _Expression: public Node{
@@ -314,8 +319,8 @@ public:
         this->v_Type=FUNCTIONCALL;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 class _singleExpression:public Node{
@@ -347,9 +352,7 @@ public:
        this->OP=OP;
        this->v_Type=EXPRESSION;
    }
-
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-
+   virtual string JsonGen() override;
 };
 
 class _Term:public Node{
@@ -380,7 +383,7 @@ public:
         this->v_Type=SINGLE;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     // virtual string JsonGen() override;
 };
 
@@ -415,8 +418,8 @@ public:
         this->v_Type=VOID;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 class _complexExpression: public Node{
@@ -447,8 +450,8 @@ public:
         this->v_Type=IF;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 class _functionCall: public Node{
@@ -460,8 +463,8 @@ public:
         this->args=arg;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 
@@ -478,8 +481,8 @@ public:
         this->statements=ss;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 class _whileStatement: public Node{
@@ -491,8 +494,8 @@ public:
         this->statements=ss;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 class _ifStatement: public Node{
@@ -506,8 +509,8 @@ public:
         this->elsePart=elseP;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 class _elsePart: public Node{
@@ -535,8 +538,8 @@ public:
         this->v_Type=NONE;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 
@@ -550,8 +553,8 @@ public:
         this->arg_Type=type;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 class _Data:public Node{
@@ -561,7 +564,7 @@ class _Data:public Node{
 class _Variable: public _Data{
 public:
     std::string *ID_Name;
-    _singleExpression *expr;
+    _Expression *expr;
 
     enum u_Type{
         CONST,
@@ -573,14 +576,14 @@ public:
         this->expr=NULL;
         this->v_Type=CONST;
     }
-    _Variable(std::string* name,_singleExpression* expression){
+    _Variable(std::string* name,_Expression* expression){
         this->ID_Name=name;
         this->expr=expression;
         this->v_Type=ARRAY;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
 
 class _Value:public _Data{
@@ -607,8 +610,6 @@ public:
         this->var_type=C_BOOLEAN;
     }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 };
-
-#endif

@@ -1,9 +1,9 @@
 %{
 // 待补充头文件
-#include "ast.hh"
+#include "ast_json.h"
 #include <string>
 #include <iostream>
-#include "compiler.tab.h"
+#include "parser.hpp"
 
 #define SAVE_TOKEN yylval.sVal = new std::string(yytext);
 %}

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include "ast.hh"
+#include "ast_json.h"
 
 void yyerror(const char *s) { 
     std::printf("Error: %s\n", s);
@@ -13,10 +13,10 @@ void yyerror(const char *s) {
 int yylex(void);
 
 
-int main()
-{
-	int yyparse (void);
-}
+// int main()
+// {
+// 	int yyparse (void);
+// }
 
 _Program *root;
 %}
@@ -120,6 +120,7 @@ _Program *root;
 Program: 
 functionList{
     $$=new _Program($1);
+    root = $$;
 }
 
 
@@ -203,7 +204,7 @@ RETURN singleExpression SEMI{
 
 
 Definition:
-SYS_TYPE IDENTIFIER SEMI{
+SYS_TYPE Variable SEMI{
     $$=new _Definition($1,$2);
 }
 
@@ -273,10 +274,10 @@ singleExpression  GE  expr {
     $$ = new _singleExpression($1, C_LT, $3);
 }
 |singleExpression  EQUAL  expr {
-    $$ = new _singleExpression($1, C_EQUAL, $3);
+    $$ = new _singleExpression($1, C_EQ, $3);
 }
 |singleExpression  NOEQUAL  expr {
-    $$ = new _singleExpression($1, C_NOEQUAL, $3);
+    $$ = new _singleExpression($1, C_NE, $3);
 }
 |expr {
     $$ = $1;
@@ -377,7 +378,7 @@ FOR LP assignExpression SEMI singleExpression SEMI assignExpression RP LCB State
 
 
 whileSTMT:
-WHILE LP singleExpression RB LCB StatementList RCB{
+WHILE LP singleExpression RP LCB StatementList RCB{
     $$=new _whileStatement($3,$6);
 }
 
@@ -436,26 +437,3 @@ SYS_TYPE Variable{
         $$=new _argsDefinition(C_BOOLEAN,$2);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
