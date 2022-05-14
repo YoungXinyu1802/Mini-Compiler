@@ -10,15 +10,15 @@ LDFLAGS = `$(LLVM_CONFIG) --ldflags`
 LIBS = `$(LLVM_CONFIG) --libs --system-libs`
 
 NAME = compiler
-OBJS = parser.o tokenizer.o ast_json.o  main.o 
+OBJS = parser.o tokenizer.o ast.o  main.o codeGen.o
 
 all : $(NAME)
 
 $(NAME): $(OBJS)
-	g++ -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
+	g++ -g -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
-%.o: %.cpp ast_json.h 
-	g++ -c $(CXXFLAGS) -o $@ $< 
+%.o: %.cpp ast.hh codeGen.h 
+	g++ -g -c $(CXXFLAGS) -o $@ $< 
 
 parser.cpp: ${NAME}.y
 	bison -d -o parser.cpp ${NAME}.y
