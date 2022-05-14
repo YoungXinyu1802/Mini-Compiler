@@ -33,23 +33,21 @@
 
 static llvm::LLVMContext TheContext;
 static llvm::IRBuilder<> TheBuilder(TheContext);
-static std::unique_ptr<llvm::Module> TheModule;
 class CodeGenerator 
 {
 public:
     llvm::Function *mainFunction;
     std::vector<llvm::Function*> funcStack;
-    
-    CodeGenerator(){
+    std::unique_ptr<llvm::Module> TheModule;
 
-    }    
+    CodeGenerator();
     llvm::GenericValue run();
     llvm::ExecutionEngine* genExeEngine();
     llvm::Value* getValue(const std::string & name);
     llvm::Function* getCurFunc();
     void pushFunc(llvm::Function* func);
     void popFunc();
-
+    void generate(_Program& Root);
 };
 
 #endif

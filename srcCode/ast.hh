@@ -117,7 +117,25 @@ public:
     _FunctionList *myFuncs;
     _Program(_FunctionList *Funcs){
         this->myFuncs=Funcs;
+        std::cout<<"Program\n";
+        if(this->myFuncs==NULL){
+            cout<<"NULL"<<endl;
+        }
+        else{
+            cout<<"Not NULL"<<endl;
+            _Function* f=(*this->myFuncs).front();
+            if(f==NULL){
+                cout<<"f is null"<<endl;
+            }
+            else{
+                cout<<"f is not null"<<endl;
+            }
+        }
     }
+
+    // _Program(_FunctionList *Funcs){
+    //     this->myFuncs=Funcs;
+    // }
     _Program(){
         this->myFuncs=NULL;
     }

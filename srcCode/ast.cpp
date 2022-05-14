@@ -48,6 +48,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
         bool isDouble = lhsVal->getType()->isDoubleTy() || rhsVal->getType()->isDoubleTy();
         switch(this->OP){
             case C_ADD:{
+                Debug("C_ADD");
                 if(isDouble){
                     return TheBuilder.CreateFAdd(lhsVal, rhsVal, "addtmpf");
                 }
@@ -56,6 +57,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
                 }
             }
             case C_SUB:{
+                Debug("C_SUB");
                 if(isDouble){
                     return TheBuilder.CreateFSub(lhsVal, rhsVal, "subtmpf");
                 }
@@ -64,6 +66,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
                 }
             }
             case C_MUL:{
+                Debug("C_MUL");
                 if(isDouble){
                     return TheBuilder.CreateFMul(lhsVal, rhsVal, "multmpf");
                 }
@@ -72,6 +75,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
                 }
             }
             case C_DIV:{
+                Debug("C_DIV");
                 if(isDouble){
                     return TheBuilder.CreateFDiv(lhsVal, rhsVal, "divtmpf");
                 }
@@ -80,6 +84,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
                 }
             }
             case C_GE:{
+                Debug("C_GE");
                 if(isDouble){
                     return TheBuilder.CreateFCmpOGE(lhsVal, rhsVal, "cmptmpf");
                 }
@@ -88,6 +93,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
                 }
             }
             case C_GT:{
+                Debug("C_GT");
                 if(isDouble){
                     return TheBuilder.CreateFCmpOGT(lhsVal, rhsVal, "cmptmpf");
                 }
@@ -96,6 +102,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
                 }
             }
             case C_LT:{
+                Debug("C_LT");
                 if(isDouble){
                     return TheBuilder.CreateFCmpOLT(lhsVal, rhsVal, "cmptmpf");
                 }
@@ -104,6 +111,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
                 }
             }
             case C_LE:{
+                Debug("C_LE");
                 if(isDouble){
                     return TheBuilder.CreateFCmpOLE(lhsVal, rhsVal, "cmptmpf");
                 }
@@ -112,6 +120,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
                 }
             }        
             case C_EQ:{
+                Debug("C_EQ");
                 if(isDouble){
                     return TheBuilder.CreateFCmpOEQ(lhsVal, rhsVal, "cmptmpf");
                 }
@@ -120,6 +129,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
                 }
             }
             case C_NE:{
+                Debug("C_NE");
                 if(isDouble){
                     return TheBuilder.CreateFCmpONE(lhsVal, rhsVal, "cmptmpf");
                 }
@@ -128,6 +138,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
                 }
             }
             case C_OR:{
+                Debug("C_OR");
                 if(isDouble){
                     Debug("TYPE ERROR");
                     return nullptr;
@@ -135,6 +146,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
                 return TheBuilder.CreateOr(lhsVal, rhsVal, "ortmp");
             }
             case C_MOD:{
+                Debug("C_MOD");
                 if(isDouble){
                     return TheBuilder.CreateFRem(lhsVal, rhsVal, "modtmpf");
                 }
@@ -143,6 +155,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
                 }
             }
             case C_AND:{
+                Debug("C_AND");
                 if(isDouble){
                     Debug("TYPE ERROR");
                     return nullptr;
@@ -150,6 +163,7 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
                 return TheBuilder.CreateAnd(lhsVal, rhsVal, "andtmp");
             }
             case C_XOR:{
+                Debug("C_XOR");
                 if(isDouble){
                     Debug("TYPE ERROR");
                     return nullptr;
@@ -311,7 +325,9 @@ llvm::Value *_Term::codeGen(CodeGenerator & generator){
 
 llvm::Value *_Program::codeGen(CodeGenerator & generator){
     Debug("_Program::codeGen");
-    for (auto & func : *this->myFuncs){
+
+    for (auto func : *this->myFuncs){
+        std::cout << "hello" << std::endl;
         func->codeGen(generator);
     }
 }
@@ -331,7 +347,7 @@ llvm::Value *_Function::codeGen(CodeGenerator & generator){
 
 llvm::Value *_functionCall::codeGen(CodeGenerator & generator){
     Debug("_functionCall::codeGen");
-    llvm::Function *function = TheModule->getFunction(*this->func_Name);
+    llvm::Function *function = generator.TheModule->getFunction(*this->func_Name);
     if (!function) {
         std::cerr << "No such function " << this->func_Name << std::endl;
     }
@@ -350,23 +366,34 @@ llvm::Value *_functionCall::codeGen(CodeGenerator & generator){
 llvm::Type *llvmType(const BuildInType & type){
     switch(type){
         case C_INTEGER:{
-            return TheBuilder.getInt32Ty();
+            Debug("llvmType::C_INTEGER");
+            return llvm::Type::getInt32Ty(TheContext);
         }
         case C_REAL:{
-            return TheBuilder.getDoubleTy();
+            Debug("llvmType::C_REAL");
+            return llvm::Type::getDoubleTy(TheContext);
         }
         case C_BOOLEAN:{
-            return TheBuilder.getInt1Ty();
+            Debug("llvmType::C_BOOLEAN");
+            return llvm::Type::getInt1Ty(TheContext);
         }
         case C_CHAR:{
-            return TheBuilder.getInt8Ty();
+            Debug("llvmType::C_CHAR");
+            return llvm::Type::getInt8Ty(TheContext);
         }
     }
 
 }
 
 llvm::AllocaInst *createTempAlloca(llvm::Function * TheFunction, llvm::StringRef varName, llvm::Type * varType){
+    if(&TheFunction->getEntryBlock().begin() == nullptr){
+        std::cout << "No entry block" << std::endl;
+    }
+    else{
+        std::cout << "Entry block" << std::endl;
+    }
     llvm::IRBuilder<> tmpBuilder(&TheFunction->getEntryBlock(), TheFunction->getEntryBlock().begin());
+    Debug("in createTempAlloca");
     return tmpBuilder.CreateAlloca(varType, nullptr, varName);
 }
 
@@ -427,7 +454,7 @@ llvm::Value *_Definition::codeGen(CodeGenerator & generator){
     Debug("_Definition::codeGen");
     llvm::Type *defType;
     llvm::Function *TheFunction = generator.getCurFunc();
-
+    std::cout << TheFunction->getName().str() << std::endl;
     bool isArray = (variable->v_Type == _Variable::ARRAY);
 
     if (isArray){
@@ -440,8 +467,12 @@ llvm::Value *_Definition::codeGen(CodeGenerator & generator){
         defType = llvmType(this->def_Type);
         // auto alloc = createTempAlloca(TheFunction, *variable->ID_Name, defType);
     }
-    auto alloc = createTempAlloca(TheFunction, *variable->ID_Name, defType);
-    return alloc;
+
+
+    llvm::Value* alloca = TheBuilder.CreateAlloca(defType, nullptr, *variable->ID_Name);
+    // auto alloc = createTempAlloca(generator.getCurFunc(), *variable->ID_Name, defType);
+    // TheBuilder.CreateAlloca(defType);
+    return alloca;
 }
 
 // confusing...
@@ -481,9 +512,21 @@ llvm::Value *_Variable::codeGen(CodeGenerator & generator){
 
 llvm::Value *_mainFunction::codeGen(CodeGenerator & generator){
     Debug("_mainFunction::codeGen");
+    
+    llvm::FunctionType *funcType = llvm::FunctionType::get(TheBuilder.getVoidTy(), nullptr, false);
+    generator.mainFunction = llvm::Function::Create(funcType, llvm::GlobalValue::InternalLinkage, "main", generator.TheModule.get());
+    llvm::BasicBlock *basicBlock = llvm::BasicBlock::Create(TheContext, "entry", generator.mainFunction, 0);
+    generator.pushFunc(generator.mainFunction);
+    TheBuilder.SetInsertPoint(basicBlock);
+    // llvm::Function *function = llvm::Function::Create(funcType, llvm::GlobalValue::InternalLinkage, *this->Func_Id, TheModule.get());
+    // generator.pushFunc(function);    
     for (auto & statement : *this->statements){
         statement->codeGen(generator);
     }
+
+    //Pop back
+    generator.popFunc();
+    // TheBuilder.SetInsertPoint(&(generator.getCurFunc())->getBasicBlockList().back());
 }
 
 llvm::Value *_Subroutine::codeGen(CodeGenerator & generator){
@@ -506,7 +549,7 @@ llvm::Value *_Subroutine::codeGen(CodeGenerator & generator){
         retType=C_BOOLEAN;
     }
     llvm::FunctionType *funcType = llvm::FunctionType::get(llvmType(retType), argsType, false);
-    llvm::Function *function = llvm::Function::Create(funcType, llvm::GlobalValue::InternalLinkage, *this->Func_Id, TheModule.get());
+    llvm::Function *function = llvm::Function::Create(funcType, llvm::GlobalValue::InternalLinkage, *this->Func_Id, generator.TheModule.get());
     generator.pushFunc(function);
 
     // create a basic block
@@ -561,7 +604,7 @@ llvm::Value *_Input::codeGen(CodeGenerator & generator){
     params.insert(params.begin(), TheBuilder.CreateGlobalStringPtr(format));
     
     auto scanf_type = llvm::FunctionType::get(TheBuilder.getInt32Ty(), true);
-    auto func = llvm::Function::Create(scanf_type, llvm::Function::ExternalLinkage, llvm::Twine("scanf"), TheModule.get());
+    auto func = llvm::Function::Create(scanf_type, llvm::Function::ExternalLinkage, llvm::Twine("scanf"), generator.TheModule.get());
     
     return TheBuilder.CreateCall(func, params, "scanf");
 
@@ -595,5 +638,5 @@ llvm::Value *_Output::codeGen(CodeGenerator & generator){
     std::vector<llvm::Type*> argsType;
     argsType.push_back(TheBuilder.getInt8PtrTy());
     auto outputType = llvm::FunctionType::get(TheBuilder.getInt32Ty(), llvm::makeArrayRef(argsType), true);
-    auto func = llvm::Function::Create(outputType, llvm::Function::ExternalLinkage, llvm::Twine("printf"), TheModule.get());
+    auto func = llvm::Function::Create(outputType, llvm::Function::ExternalLinkage, llvm::Twine("printf"), generator.TheModule.get());
 }

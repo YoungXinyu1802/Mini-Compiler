@@ -15,10 +15,10 @@ OBJS = parser.o tokenizer.o ast.o  main.o codeGen.o
 all : $(NAME)
 
 $(NAME): $(OBJS)
-	g++ -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
+	g++ -g -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
 %.o: %.cpp ast.hh codeGen.h 
-	g++ -c $(CXXFLAGS) -o $@ $< 
+	g++ -g -c $(CXXFLAGS) -o $@ $< 
 
 parser.cpp: ${NAME}.y
 	bison -d -o parser.cpp ${NAME}.y
