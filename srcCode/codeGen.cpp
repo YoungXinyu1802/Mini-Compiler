@@ -25,7 +25,8 @@ llvm::Value* CodeGenerator::getValue(const std::string & name){
 }
 
 llvm::Function* CodeGenerator::getCurFunc(){
-    std::cout << "getCurFunc" << std::endl;
+    llvm::Function * func = funcStack.back();
+    std::cout << "get function: " << func->getName().str() << std::endl;
     return funcStack.back();
 }
 
@@ -43,22 +44,4 @@ void CodeGenerator::generate(_Program& root){
     cout << "[Finish IR]" << endl;
 
     TheModule->print(llvm::outs(), nullptr);
-}
-
-llvm::ExecutionEngine* CodeGenerator::genExeEngine(){
-    std::string err;
-    auto RTDyldMM = unique_ptr<llvm::SectionMemoryManager>(new llvm::SectionMemoryManager());
-    llvm::ExecutionEngine* engine = llvm::EngineBuilder(std::move(TheModule))
-        .setEngineKind(llvm::EngineKind::JIT)
-        .setErrorStr(&err)
-        .setVerifyModules(true)
-        .setMCJITMemoryManager(move(RTDyldMM))
-        .setOptLevel(llvm::CodeGenOpt::Default)
-        .create();
-    if (!engine){
-        throw std::logic_error("Create Engine Error: " + err);
-    }
-    engine->addModule(std::move(TheModule));
-    engine->finalizeObject();
-    return engine;
 }
