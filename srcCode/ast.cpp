@@ -187,7 +187,7 @@ llvm::Value *_whileStatement::codeGen(CodeGenerator & generator){
     llvm::Function *TheFunction = generator.getCurFunc();
     llvm::BasicBlock *condBlock = llvm::BasicBlock::Create(TheContext, "cond", TheFunction);
     llvm::BasicBlock *loopBlock = llvm::BasicBlock::Create(TheContext, "loop", TheFunction);
-    llvm::BasicBlock *endBlock = llvm::BasicBlock::Create(TheContext, "end", TheFunction);
+    llvm::BasicBlock *endBlock = llvm::BasicBlock::Create(TheContext, "loopend", TheFunction);
 
     // condtion block
     TheBuilder.CreateBr(condBlock);
@@ -273,7 +273,7 @@ llvm::Value *_ifStatement::codeGen(CodeGenerator & generator){
     llvm::Function *TheFunction = generator.getCurFunc();
     llvm::BasicBlock *thenBlock = llvm::BasicBlock::Create(TheContext, "then", TheFunction);
     llvm::BasicBlock *elseBlock = llvm::BasicBlock::Create(TheContext, "else", TheFunction);
-    llvm::BasicBlock *mergeBlock = llvm::BasicBlock::Create(TheContext, "merge", TheFunction);
+    llvm::BasicBlock *endBlock = llvm::BasicBlock::Create(TheContext, "ifend", TheFunction);
 
     TheBuilder.CreateCondBr(condValue, thenBlock, elseBlock);
     // Then
@@ -281,17 +281,17 @@ llvm::Value *_ifStatement::codeGen(CodeGenerator & generator){
     for (auto & statement : *this->statements){
         statement->codeGen(generator);
     }
-    TheBuilder.CreateBr(mergeBlock);
+    TheBuilder.CreateBr(endBlock);
     thenBlock = TheBuilder.GetInsertBlock();
 
     // Else
     TheBuilder.SetInsertPoint(elseBlock);
     this->elsePart->codeGen(generator);
-    TheBuilder.CreateBr(mergeBlock);
+    TheBuilder.CreateBr(endBlock);
     elseBlock = TheBuilder.GetInsertBlock();
 
     // Merge
-    TheBuilder.SetInsertPoint(mergeBlock);
+    TheBuilder.SetInsertPoint(endBlock);
 
     return nullptr;
 }
@@ -509,6 +509,7 @@ llvm::Value *_argsDefinition::codeGen(CodeGenerator & generator){
 llvm::Value *_Variable::codeGen(CodeGenerator & generator){
     Debug("_Variable::codeGen");
     llvm::Value *value = generator.getValue(*this->ID_Name);
+    value = TheBuilder.CreateLoad(value);
     if(this->v_Type == CONST){
         return value;
     }

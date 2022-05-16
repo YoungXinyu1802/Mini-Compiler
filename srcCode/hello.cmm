@@ -11,8 +11,12 @@ int main(){
     for (i = 1; i < 10; i = i + 1){
         if (i == 1) {
             c = 1;
-        } else {
+        } else if(i == 2) {
             c = 2;
+        } else if (i==3){
+            c = 3;
+        } else {
+            c = 4;
         }
     }
     while(a < 10){

@@ -15,7 +15,7 @@ llvm::Value* CodeGenerator::getValue(const std::string & name){
 
             if ((result = it->getValueSymbolTable()->lookup(name)) != nullptr){
                 std::cout << "Find " << name << std::endl;
-                result = TheBuilder.CreateLoad(result);
+                // result = TheBuilder.CreateLoad(result);
                 return result;
             }
             else{
