@@ -13,6 +13,7 @@
 #include <map>
 #include <ostream>
 #include <climits>
+#include <algorithm>
 
 using namespace std;
 /* class declaration */ 
@@ -116,6 +117,7 @@ class _Program: public Node{
 public:
     _FunctionList *myFuncs;
     _Program(_FunctionList *Funcs){
+        reverse(Funcs->begin(),Funcs->end());
         this->myFuncs=Funcs;
         std::cout<<"Program\n";
         if(this->myFuncs==NULL){
@@ -178,8 +180,14 @@ public:
     _StatementList* statements;
     _ArgsDefinitionList* args;
     _mainFunction(_ArgsDefinitionList* _args, _StatementList* _statements){
-        this->args=_args;
+        reverse(_statements->begin(),_statements->end());
         this->statements=_statements;
+
+        if(_args!=NULL){
+            reverse(_args->begin(),_args->end());
+        }
+        this->args=_args;
+        std::cout<<"Main\n";
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
@@ -195,8 +203,14 @@ public:
     _Subroutine(std::string* Type,std::string* Identifier,_ArgsDefinitionList* _args, _StatementList* _statements){
         this->Type=Type;
         this->Func_Id=Identifier;
-        this->args=_args;
-        this->statements=_statements;    
+        reverse(_statements->begin(),_statements->end());
+        this->statements=_statements;
+
+        if(_args!=NULL){
+            reverse(_args->begin(),_args->end());
+        }
+        this->args=_args;   
+        std::cout<<"Sub\n";
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
@@ -250,7 +264,9 @@ class _Input:public Node{
 public:
     _DataList* vars;
     _Input(_DataList* variables){
+        reverse(variables->begin(),variables->end());
         this->vars=variables;
+        std::cout<<"Input\n";
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
@@ -261,7 +277,9 @@ class _Output:public  Node{
 public:
     _DataList* vars;
     _Output(_DataList* variables){
+        reverse(variables->begin(),variables->end());
         this->vars=variables;
+        std::cout<<"Output\n";
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
@@ -283,8 +301,8 @@ public:
 class _Definition: public Node{
 public:
     BuildInType def_Type;
-    _Variable* variable;
-    _Definition(std::string* type, _Variable* var){
+    _DataList* data;
+    _Definition(std::string* type, _DataList* var){
         if(*type=="int"){
             def_Type=C_INTEGER;
         }
@@ -297,8 +315,9 @@ public:
         else{
             def_Type=C_BOOLEAN;
         }
-        this->variable=var;
-    }
+        reverse(var->begin(),var->end());
+        this->data=var;
+        std::cout<<"Definition\n";    }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     // virtual string JsonGen() override;
@@ -493,6 +512,7 @@ public:
         this->startExpr=s1;
         this->condExpr=s2;
         this->stepExpr=s3;
+        reverse(ss->begin(),ss->end());
         this->statements=ss;
     }
 
@@ -506,6 +526,7 @@ public:
     _StatementList *statements;
     _whileStatement(_singleExpression *con, _StatementList *ss){
         this->condition=con;
+        reverse(ss->begin(),ss->end());
         this->statements=ss;
     }
 
@@ -520,6 +541,7 @@ public:
     _elsePart *elsePart;
     _ifStatement(_singleExpression *condition, _StatementList *s1,_elsePart *elseP){
         this->condition=condition;
+        reverse(s1->begin(),s1->end());
         this->statements=s1;
         this->elsePart=elseP;
     }
@@ -542,6 +564,7 @@ public:
     }v_Type;
 
     _elsePart(_StatementList *ss){
+        reverse(ss->begin(),ss->end());
         this->v_Else.statements=ss;
         this->v_Type=ELSE;
     }

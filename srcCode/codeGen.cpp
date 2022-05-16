@@ -9,19 +9,24 @@ CodeGenerator::CodeGenerator(){
 
 llvm::Value* CodeGenerator::getValue(const std::string & name){
     llvm::Value * result = nullptr;
-    for (llvm::Function * it : funcStack){
-        llvm::ValueSymbolTable * symTab = it->getValueSymbolTable();
-        std::cout << symTab->size() << endl;
+    try{
+        for (llvm::Function * it : funcStack){
+            llvm::ValueSymbolTable * symTab = it->getValueSymbolTable();
 
-        if ((result = it->getValueSymbolTable()->lookup(name)) != nullptr){
-            std::cout << "Find " << std::endl;
-            return result;
-        }
-        else{
-            std::cout << "Not Find " << std::endl;
-        }
+            if ((result = it->getValueSymbolTable()->lookup(name)) != nullptr){
+                std::cout << "Find " << name << std::endl;
+                result = TheBuilder.CreateLoad(result);
+                return result;
+            }
+            else{
+                throw name;
+            }
+        }        
     }
-    return nullptr;
+    catch(const std::string msg){
+        std::cout << "error: '" << msg << "' is not declared. " << std::endl;
+    }
+    assert(result != nullptr);
 }
 
 llvm::Function* CodeGenerator::getCurFunc(){

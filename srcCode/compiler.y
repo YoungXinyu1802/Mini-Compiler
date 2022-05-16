@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include "ast_json.h"
+#include "ast.hh"
 
 void yyerror(const char *s) { 
     std::printf("Error: %s\n", s);
@@ -204,7 +204,7 @@ RETURN singleExpression SEMI{
 
 
 Definition:
-SYS_TYPE Variable SEMI{
+SYS_TYPE DataList SEMI{
     $$=new _Definition($1,$2);
 }
 
@@ -234,7 +234,7 @@ Variable:
 IDENTIFIER{
     $$=new _Variable($1);
 }
-|IDENTIFIER LB Expression RB{
+|IDENTIFIER LB singleExpression RB{
     $$=new _Variable($1,$3);
 }
 
