@@ -454,23 +454,28 @@ llvm::Value *_Definition::codeGen(CodeGenerator & generator){
     Debug("_Definition::codeGen");
     llvm::Type *defType;
     llvm::Function *TheFunction = generator.getCurFunc();
-    bool isArray = (variable->v_Type == _Variable::ARRAY);
+    llvm::Value* alloca = nullptr;
+    for (auto var : *this->data){
+        _Variable * variable = dynamic_cast<_Variable*>(var);
+        bool isArray = (variable->v_Type == _Variable::ARRAY);
 
-    if (isArray){
-        llvm::Value *size = this->variable->expr->codeGen(generator);
-        llvm::ConstantInt *sizeInt = llvm::dyn_cast<llvm::ConstantInt>(size);
-        // uint64_t size_int = size->getUniqueInteger().getZextValue();
-        llvm::Type *arrayType = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
+        if (isArray){
+            llvm::Value *size = variable->expr->codeGen(generator);
+            llvm::ConstantInt *sizeInt = llvm::dyn_cast<llvm::ConstantInt>(size);
+            // uint64_t size_int = size->getUniqueInteger().getZextValue();
+            llvm::Type *arrayType = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
+        }
+        else{
+            defType = llvmType(this->def_Type);
+            // auto alloc = createTempAlloca(TheFunction, *variable->ID_Name, defType);
+        }
+
+        alloca = TheBuilder.CreateAlloca(defType, nullptr, *variable->ID_Name);
+        // auto alloc = createTempAlloca(generator.getCurFunc(), *variable->ID_Name, defType);
+        // TheBuilder.CreateAlloca(defType);
     }
-    else{
-        defType = llvmType(this->def_Type);
-        // auto alloc = createTempAlloca(TheFunction, *variable->ID_Name, defType);
-    }
 
 
-    llvm::Value* alloca = TheBuilder.CreateAlloca(defType, nullptr, *variable->ID_Name);
-    // auto alloc = createTempAlloca(generator.getCurFunc(), *variable->ID_Name, defType);
-    // TheBuilder.CreateAlloca(defType);
     return alloca;
 }
 
