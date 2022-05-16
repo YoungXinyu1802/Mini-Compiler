@@ -246,15 +246,18 @@ llvm::Value *_elsePart::codeGen(CodeGenerator & generator){
     llvm::Value *value = nullptr;
     switch(this->v_Type){
         case NONE:{
+            Debug("NONE");
             return value;
         }
-        case ELSEIF:{
+        case ELSE:{
+            Debug("ELSE");
             for (auto & statement : *this->v_Else.statements){
                 value = statement->codeGen(generator);
             }
             return value;
         }
-        case ELSE:{
+        case ELSEIF:{
+            Debug("ELSEIF");
             return this->v_Else.ifBody->codeGen(generator);
         }
     }
@@ -367,6 +370,7 @@ llvm::Type *llvmType(const BuildInType & type){
     switch(type){
         case C_INTEGER:{
             Debug("llvmType::C_INTEGER");
+            cout << llvm::Type::getInt32Ty(TheContext)->getTypeID() << endl;
             return llvm::Type::getInt32Ty(TheContext);
         }
         case C_REAL:{
