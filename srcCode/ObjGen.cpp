@@ -1,4 +1,4 @@
-#include "CodeGen.h"
+#include "codeGen.h"
 #include "ObjGen.h"
 
 using namespace llvm;
@@ -33,8 +33,8 @@ int ObjGen(CodeGenerator& generator)
     auto TargetMachine = Target->createTargetMachine(TargetTriple, CPU, Features, opt, RM);
 
     //配置我们的模块，以指定目标和数据布局
-    generator.Module->setDataLayout(TargetMachine->createDataLayout());
-    generator.Module->setTargetTriple(TargetTriple);
+    generator.TheModule->setDataLayout(TargetMachine->createDataLayout());
+    generator.TheModule->setTargetTriple(TargetTriple);
 
     //定义我们要将文件写入的位置：
     auto Filename = "output.o";
@@ -52,8 +52,10 @@ int ObjGen(CodeGenerator& generator)
         errs() << "TargetMachine can't emit a file of this type";
         return 1;
     }
-    pass.run(*(generator.module));
+    pass.run(*(generator.TheModule));
     dest.flush();
-
+	
+	outs() << "Wrote " << Filename << "\n";
     return 0;
 }
+

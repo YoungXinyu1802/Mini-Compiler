@@ -2,6 +2,7 @@
 #include "ast.hh"
 #include "parser.hpp"
 #include "codeGen.h"
+#include "ObjGen.h"
 extern int yyparse();
 extern _Program *root;
 
@@ -16,6 +17,6 @@ int main(int argc, char **argv) {
  
     CodeGenerator generator;
     generator.generate(*root);
-
+	ObjGen(generator);
     return 0;
 }

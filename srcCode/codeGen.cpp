@@ -48,5 +48,5 @@ void CodeGenerator::generate(_Program& root){
     root.codeGen(*this);
     cout << "[Finish IR]" << endl;
 
-    TheModule->print(llvm::outs(), nullptr);
+    //TheModule->print(llvm::outs(), nullptr);
 }

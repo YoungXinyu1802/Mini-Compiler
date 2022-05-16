@@ -1,5 +1,5 @@
 LLVM_CONFIG = /usr/bin/llvm-config
-
+#LLVM_CONFIG = --cxxflags --ldflags --system-libs --libs all
 NO_WARNING =  -Wno-return-type \
 	-Wno-c++11-compat-deprecated-writable-strings \
 	-Wno-deprecated-register \
@@ -10,14 +10,14 @@ LDFLAGS = `$(LLVM_CONFIG) --ldflags`
 LIBS = `$(LLVM_CONFIG) --libs --system-libs`
 
 NAME = compiler
-OBJS = parser.o tokenizer.o ast.o  main.o codeGen.o
+OBJS = parser.o tokenizer.o ast.o  main.o codeGen.o ObjGen.o
 
 all : $(NAME)
 
 $(NAME): $(OBJS)
 	g++ -g -o $@ $(OBJS) $(LIBS) $(LDFLAGS)
 
-%.o: %.cpp ast.hh codeGen.h 
+%.o: %.cpp ast.hh codeGen.h ObjGen.h
 	g++ -g -c $(CXXFLAGS) -o $@ $< 
 
 parser.cpp: ${NAME}.y
