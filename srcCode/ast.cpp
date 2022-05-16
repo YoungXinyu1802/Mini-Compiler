@@ -454,7 +454,6 @@ llvm::Value *_Definition::codeGen(CodeGenerator & generator){
     Debug("_Definition::codeGen");
     llvm::Type *defType;
     llvm::Function *TheFunction = generator.getCurFunc();
-    std::cout << TheFunction->getName().str() << std::endl;
     bool isArray = (variable->v_Type == _Variable::ARRAY);
 
     if (isArray){
@@ -512,21 +511,18 @@ llvm::Value *_Variable::codeGen(CodeGenerator & generator){
 
 llvm::Value *_mainFunction::codeGen(CodeGenerator & generator){
     Debug("_mainFunction::codeGen");
-    
-    llvm::FunctionType *funcType = llvm::FunctionType::get(TheBuilder.getVoidTy(), nullptr, false);
+    vector<llvm::Type*> argTypes;
+    llvm::FunctionType *funcType = llvm::FunctionType::get(TheBuilder.getVoidTy(), argTypes, false);
     generator.mainFunction = llvm::Function::Create(funcType, llvm::GlobalValue::InternalLinkage, "main", generator.TheModule.get());
     llvm::BasicBlock *basicBlock = llvm::BasicBlock::Create(TheContext, "entry", generator.mainFunction, 0);
     generator.pushFunc(generator.mainFunction);
     TheBuilder.SetInsertPoint(basicBlock);
-    // llvm::Function *function = llvm::Function::Create(funcType, llvm::GlobalValue::InternalLinkage, *this->Func_Id, TheModule.get());
-    // generator.pushFunc(function);    
+   
     for (auto & statement : *this->statements){
         statement->codeGen(generator);
     }
-
     //Pop back
     generator.popFunc();
-    // TheBuilder.SetInsertPoint(&(generator.getCurFunc())->getBasicBlockList().back());
 }
 
 llvm::Value *_Subroutine::codeGen(CodeGenerator & generator){
