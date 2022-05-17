@@ -392,7 +392,7 @@ llvm::AllocaInst *createTempAlloca(llvm::Function * TheFunction, llvm::StringRef
     else{
         std::cout << "Entry block" << std::endl;
     }
-    llvm::IRBuilder<> tmpBuilder(&TheFunction->getEntryBlock(), TheFunction->getEntryBlock().begin());
+    llvm::IRBuilder<> tmpBuilder(&TheFunction->getEntryBlock(), TheFunction->getEntryBlock().end());
     Debug("in createTempAlloca");
     return tmpBuilder.CreateAlloca(varType, nullptr, varName);
 }
