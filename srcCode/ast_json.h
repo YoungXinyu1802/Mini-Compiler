@@ -1,8 +1,7 @@
-#ifndef AST_H
-#define AST_H
+#ifndef AST_JSON_H
+#define AST_JSON_H
 #endif
 
-// #include <llvm/IR/Value.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -11,6 +10,7 @@
 #include <string.h>
 #include <vector>
 #include <map>
+#include <algorithm>
 #include <ostream>
 #include <climits>
 
@@ -44,6 +44,7 @@ class _ifStatement;
 class _Data;
 class _elsePart;
 class _argsDefinition;
+class _String;
 class _returnStatement;
 class _Term;
 class _Value;
@@ -84,7 +85,8 @@ enum BuildInType {
     C_INTEGER,
     C_REAL,
     C_CHAR,
-    C_BOOLEAN
+    C_BOOLEAN,
+    C_STRING
 };
 enum C_Operator {
     C_ADD,
@@ -95,8 +97,8 @@ enum C_Operator {
     C_GT, 
     C_LT,
     C_LE,
-    C_EQ,
-    C_NE,
+    C_EQUAL,
+    C_NOEQUAL,
     C_OR,
     C_MOD,
     C_AND,
@@ -111,7 +113,6 @@ public:
         this->type=type;
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) = 0;
     virtual string JsonGen()=0;
 private:
     int type;
@@ -121,16 +122,30 @@ class _Program: public Node{
 public:
     _FunctionList *myFuncs;
     _Program(_FunctionList *Funcs){
+        reverse( Funcs->begin(),Funcs->end());
         this->myFuncs=Funcs;
+        std::cout<<"Program\n";
+        if(this->myFuncs==NULL){
+            cout<<"NULL"<<endl;
+        }
+        else{
+            cout<<"Not NULL"<<endl;
+            _Function* f=(*this->myFuncs).front();
+            if(f==NULL){
+                cout<<"f is null"<<endl;
+            }
+            else{
+                cout<<"f is not null"<<endl;
+            }
+        }
+
     }
     _Program(){
         this->myFuncs=NULL;
+        std::cout<<"Program\n";
     }
-
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
-
 
 //基类 1
 class _Function:public Node{
@@ -149,27 +164,33 @@ public:
     _Function(_mainFunction* mainFunc){
         this->v_Type=MAIN;
         this->v_Function.mainFunc=mainFunc;
+        std::cout<<"Func\n";
     }
     _Function(_Subroutine* subFunc){
         this->v_Type=SUB;
         this->v_Function.subFunc=subFunc;
+        std::cout<<"Func\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
-
 
 class _mainFunction: public Node{
 public:
     _StatementList* statements;
-    _ArgsDefinitionList* args;
+    _ArgsDefinitionList*  args;
     _mainFunction(_ArgsDefinitionList* _args, _StatementList* _statements){
-        this->args=_args;
+
+        reverse(_statements->begin(),_statements->end());
         this->statements=_statements;
+
+        if(_args!=NULL){
+            reverse(_args->begin(),_args->end());
+        }
+        this->args=_args;
+        std::cout<<"Main\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
@@ -182,17 +203,23 @@ public:
     _Subroutine(std::string* Type,std::string* Identifier,_ArgsDefinitionList* _args, _StatementList* _statements){
         this->Type=Type;
         this->Func_Id=Identifier;
-        this->args=_args;
-        this->statements=_statements;    
+        reverse(_statements->begin(),_statements->end());
+        this->statements=_statements;
+
+        if(_args!=NULL){
+            reverse(_args->begin(),_args->end());
+        }
+        this->args=_args;   
+        std::cout<<"Sub\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
 //基类 2
 class _Statement: public Node{
 public:
+
     union u_Statement{
         _Definition* definStatement;
         _Expression* exprStatement;
@@ -211,25 +238,29 @@ public:
     _Statement(_Definition* defin){
         this->v_Statement.definStatement=defin;
         this->v_Type=DEFINITION;
+        std::cout<<"Statement\n";
     }
     _Statement(_Expression* expr){
         this->v_Statement.exprStatement=expr;
         this->v_Type=EXPRESSION;
+        std::cout<<"Statement\n";
     }
     _Statement(_returnStatement* returnExpr){
         this->v_Statement.returnStatement=returnExpr;
         this->v_Type=RETURNSTATEMENT;
+        std::cout<<"Statement\n";
     }
     _Statement(_Input* inputExpr){
         this->v_Statement.inputExpr=inputExpr;
         this->v_Type=INPUT;
+        std::cout<<"Statement\n";
     }
     _Statement(_Output* outputExpr){
         this->v_Statement.outputExpr=outputExpr;
         this->v_Type=OUTPUT;
+        std::cout<<"Statement\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
@@ -237,10 +268,11 @@ class _Input:public Node{
 public:
     _DataList* vars;
     _Input(_DataList* variables){
+        reverse(variables->begin(),variables->end());
         this->vars=variables;
+        std::cout<<"Input\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
@@ -248,10 +280,11 @@ class _Output:public  Node{
 public:
     _DataList* vars;
     _Output(_DataList* variables){
+        reverse(variables->begin(),variables->end());
         this->vars=variables;
+        std::cout<<"Output\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
@@ -261,17 +294,17 @@ public:
     _singleExpression *expr;
     _returnStatement(_singleExpression* expression){
         this->expr=expression;
+        std::cout<<"return\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
 class _Definition: public Node{
 public:
     BuildInType def_Type;
-    _Variable* variable;
-    _Definition(std::string* type, _Variable* var){
+    _DataList* data;
+    _Definition(std::string* type, _DataList* var){
         if(*type=="int"){
             def_Type=C_INTEGER;
         }
@@ -281,13 +314,18 @@ public:
         else if (*type=="double"){
             def_Type=C_REAL;
         }
+        else if(*type=="string"){
+            def_Type=C_STRING;
+        }
         else{
             def_Type=C_BOOLEAN;
         }
-        this->variable=var;
+        cout<<*type<<endl;
+        reverse(var->begin(),var->end());
+        this->data=var;
+        std::cout<<"Definition\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
@@ -309,17 +347,18 @@ public:
     _Expression(_assignExpression* assignExpr){
         this->v_Expression.assignExpression=assignExpr;
         this->v_Type=ASSIGNMENT;
+        std::cout<<"Expression\n";
     }
     _Expression(_complexExpression* complexExpr){
         this->v_Expression.complexExpression=complexExpr;
         this->v_Type=COMPLEX;
+        std::cout<<"Expression\n";
     }
     _Expression(_functionCall* func){
         this->v_Expression.functionCall;
         this->v_Type=FUNCTIONCALL;
+        std::cout<<"Expression\n";
     }
-
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
@@ -341,51 +380,25 @@ public:
    _singleExpression(_Value* value){
        this->v_single.val=value;
        this->v_Type=VALUE;
+       std::cout<<"Single1\n";
    }
    _singleExpression(_Variable* value){
        this->v_single.var=value;
        this->v_Type=VARIABLE;
+       std::cout<<"Single2\n";
    }
    _singleExpression(_singleExpression* lhs,C_Operator OP,_singleExpression* rhs){
        this->lhs=lhs;
        this->rhs=rhs;
        this->OP=OP;
        this->v_Type=EXPRESSION;
+       cout<<OP;
+       std::cout<<"Single3\n";
    }
+
    virtual string JsonGen() override;
 };
 
-class _Term:public Node{
-public:
-    int Type;
-    union u_Term{
-        _Value* val;
-        _Variable* var;
-        _singleExpression* singleExpr;
-    }v_Term;
-
-    enum u_Type{ 
-        VALUE,
-        VARIABLE,
-        SINGLE
-    }v_Type;
-
-    _Term(_Value* value){
-        this->v_Term.val=value;
-        this->v_Type=VALUE;
-    }
-    _Term(_Variable* value){
-        this->v_Term.var=value;
-        this->v_Type=VARIABLE;
-    }
-    _Term(_singleExpression* single){
-        this->v_Term.singleExpr=single;
-        this->v_Type=SINGLE;
-    }
-
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
-};
 
 class _assignExpression: public Node{
 public: 
@@ -393,32 +406,40 @@ public:
     union u_assignExpression{
         _singleExpression* rhs;
         _functionCall* function;
+        _DataList* data;
     }v_assignExpression;
 
     enum u_Type{
         SINGLE,
         FUNCTION,
-        VOID
+        VOID,
+        ARRAY
     }v_Type;
 
     int type;
     _assignExpression(_Variable* value,_singleExpression* stas){
         this->v_assignExpression.rhs=stas;
         this->v_Type=SINGLE;
-        this->val=value;        
+        this->val=value;
+        std::cout<<"assign\n";
     }
     _assignExpression(_Variable* value,_functionCall* func){
         this->v_assignExpression.function=func;
         this->val=value;
         this->v_Type=FUNCTION;
+        std::cout<<"assign\n";
     }
-    // buhuixie
     _assignExpression(_functionCall* func){
         this->v_assignExpression.function=func;
         this->v_Type=VOID;
+        std::cout<<"VOID\n";
+    }
+    _assignExpression(_Variable* value,_DataList* datas){
+        this->val=value;
+        this->v_assignExpression.data=datas;
+        this->v_Type=ARRAY;
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
@@ -440,17 +461,19 @@ public:
     _complexExpression(_forStatement* forSTMT){
         this->v_complexExpression.forSTMT=forSTMT;
         this->v_Type=FOR;
+        std::cout<<"Complex\n";
     }
     _complexExpression(_whileStatement* whileSTMT){
         this->v_complexExpression.whileSTMT=whileSTMT;
         this->v_Type=WHILE;
+        std::cout<<"Complex\n";
     }
     _complexExpression(_ifStatement* ifSTMT){
         this->v_complexExpression.ifSTMT=ifSTMT;
         this->v_Type=IF;
+        std::cout<<"Complex\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
@@ -460,28 +483,30 @@ public:
     _DataList *args;
     _functionCall(std::string* func_Name,_DataList *arg){
         this->func_Name=func_Name;
+        reverse(arg->begin(),arg->end());
         this->args=arg;
+        std::cout<<"functionCall\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
 
 class _forStatement: public Node{
 public: 
-    _assignExpression *startExpr;
-    _singleExpression *condExpr;
-    _assignExpression *stepExpr;
+    _assignExpression *exprStart;
+    _singleExpression *exprCond;
+    _assignExpression *exprUpdate;
     _StatementList *statements;
     _forStatement(_assignExpression *s1,_singleExpression *s2, _assignExpression *s3, _StatementList *ss){
-        this->startExpr=s1;
-        this->condExpr=s2;
-        this->stepExpr=s3;
+        this->exprStart=s1;
+        this->exprCond=s2;
+        this->exprUpdate=s3;
+        reverse(ss->begin(),ss->end());
         this->statements=ss;
+        std::cout<<"For\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
@@ -491,25 +516,27 @@ public:
     _StatementList *statements;
     _whileStatement(_singleExpression *con, _StatementList *ss){
         this->condition=con;
+        reverse(ss->begin(),ss->end());
         this->statements=ss;
+        std::cout<<"While\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
 class _ifStatement: public Node{
 public:
-    _singleExpression *condition;
+    _singleExpression *condition1;
     _StatementList *statements;
     _elsePart *elsePart;
-    _ifStatement(_singleExpression *condition, _StatementList *s1,_elsePart *elseP){
-        this->condition=condition;
+    _ifStatement(_singleExpression *condition1, _StatementList *s1,_elsePart *elseP){
+        this->condition1=condition1;
+        reverse(s1->begin(),s1->end());
         this->statements=s1;
         this->elsePart=elseP;
+        std::cout<<"If\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
@@ -527,18 +554,21 @@ public:
     }v_Type;
 
     _elsePart(_StatementList *ss){
+        reverse(ss->begin(),ss->end());
         this->v_Else.statements=ss;
         this->v_Type=ELSE;
+        std::cout<<"Else\n";
     }
     _elsePart(_ifStatement *ifbody){
         this->v_Else.ifBody=ifbody;
         this->v_Type=ELSEIF;
+        std::cout<<"Else\n";
     }
     _elsePart(){
         this->v_Type=NONE;
+        std::cout<<"Else\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
@@ -551,9 +581,8 @@ public:
     _argsDefinition(BuildInType type,_Variable* name){
         this->args=name;
         this->arg_Type=type;
+        std::cout<<"argsDefin\n";
     }
-
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
@@ -564,7 +593,7 @@ class _Data:public Node{
 class _Variable: public _Data{
 public:
     std::string *ID_Name;
-    _Expression *expr;
+    _singleExpression *expr;
 
     enum u_Type{
         CONST,
@@ -575,14 +604,15 @@ public:
         this->ID_Name=name;
         this->expr=NULL;
         this->v_Type=CONST;
+        std::cout<<"Variable"<<" "<<*name<<endl;
     }
-    _Variable(std::string* name,_Expression* expression){
+    _Variable(std::string* name,_singleExpression* expression){
         this->ID_Name=name;
         this->expr=expression;
         this->v_Type=ARRAY;
+        std::cout<<"Array\n";
     }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };
 
@@ -592,6 +622,7 @@ public:
     double f_val;
     std::string s_val;
     bool b_val;
+    char c_val;
     BuildInType var_type;
     _Value(int value){
         this->i_val=value;
@@ -601,15 +632,21 @@ public:
         this->f_val=value;
         this->var_type=C_REAL;
     }
-    _Value(std::string value){
-        this->s_val=value;
+    _Value(std::string* value){
+    
+        this->s_val=*value;
+        this->var_type=C_STRING;
+    }
+    // _Value(bool value){
+    //     cout<<"boolvalue: "<<value<<endl;
+    //     this->b_val=value;
+    //     this->var_type=C_BOOLEAN;
+    // }
+    _Value(char value){
+        cout<<"charvalue: "<<value<<endl;
+        this->c_val=value;
         this->var_type=C_CHAR;
     }
-    _Value(bool value){
-        this->b_val=value;
-        this->var_type=C_BOOLEAN;
-    }
 
-    // virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     virtual string JsonGen() override;
 };

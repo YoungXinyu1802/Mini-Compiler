@@ -20,7 +20,7 @@ POINT "."{DIGITS}
 EXPONENT (e|E)("+"|"-")?{DIGITS}
 INTNUM {DIGITS}
 REALNUM {DIGITS}({POINT})?({EXPONENT})?
-STRING "\""({LETTER}|{DIGIT})*"\""
+STRING "\""({LETTER}|{DIGIT}|{ANY})*"\""
 
 %%
 "//".*                                                   ;   //comments
@@ -110,7 +110,7 @@ cout                                                    {return COUT;}
 
 
 
-"int"|"char"|"double"|"boolean"                         SAVE_TOKEN; return SYS_TYPE;  
+"int"|"char"|"double"|"boolean" |"string"               SAVE_TOKEN; return SYS_TYPE;  
 "false"|"true"                                          SAVE_TOKEN; return SYS_BOOL;                                               
 
 

@@ -22,6 +22,9 @@ string getJsonString(string name, vector<string> children) {
 }
 
 string getJsonString(string name, string value){
+    if(name=="STRING"){
+        return "{\"name\":\"" +name +"\", \"value\":"+ value+" }";
+    }
     return "{\"name\":\"" +name +"\", \"value\":\""+ value+"\" }";
 }
 
@@ -57,6 +60,7 @@ string _Program::JsonGen(){
 string _Function::JsonGen(){
     std::vector<string> children;
     if(this->v_Type==MAIN){
+        cout<<"cpp main"<<endl;
         children.push_back(this->v_Function.mainFunc->JsonGen());
     }
     if(this->v_Type==SUB){
@@ -74,6 +78,7 @@ string _mainFunction::JsonGen(){
     children.push_back(getJsonString("ArgsDefinitionList",funcArgs));
 
     std::vector<string>stas;
+    cout<<this->statements->size()<<"cpp"<<endl;
     for(auto sta:*this->statements){
         stas.push_back(sta->JsonGen());
     }
@@ -160,10 +165,18 @@ string _Definition::JsonGen(){
     else if(this->def_Type==C_CHAR){
         type="char";
     }
+    else if(this->def_Type==C_STRING){
+        type="string";
+    }
     else if(this->def_Type==C_BOOLEAN){
         type="boolean";
     }
-    children.push_back(this->variable->JsonGen());
+    std::vector<string>vars;
+    for(auto sta: *this->data){
+        vars.push_back(sta->JsonGen());
+    }
+    
+    children.push_back(getJsonString("DataList",vars));
     return getJsonString("Definition",type,children);
 }
 
@@ -207,10 +220,10 @@ string getOPString(C_Operator OP){
     else if(OP==C_LE){
         res="LE";
     }
-    else if(OP==C_EQ){
+    else if(OP==C_EQUAL){
         res="EQUAL";
     }
-    else if(OP==C_NE){
+    else if(OP==C_NOEQUAL){
         res="NOEQUAL";
     }
     else if(OP==C_OR){
@@ -261,6 +274,15 @@ string _assignExpression::JsonGen(){
     else if(this->v_Type==VOID){
         children.push_back(this->v_assignExpression.function->JsonGen());
     }
+    else if(this->v_Type==ARRAY){
+        children.push_back(this->val->JsonGen());
+        std::vector<string>datas;
+        for(auto var: *this->v_assignExpression.data){
+            datas.push_back(var->JsonGen());
+        }
+    children.push_back(getJsonString("DataList",datas));
+
+    }
     return getJsonString("Assignment",children);
 }
 
@@ -290,9 +312,9 @@ string _functionCall::JsonGen(){
 
 string _forStatement::JsonGen(){
     std::vector<string>children;
-    children.push_back(this->startExpr->JsonGen());
-    children.push_back(this->condExpr->JsonGen());
-    children.push_back(this->stepExpr->JsonGen());
+    children.push_back(this->exprStart->JsonGen());
+    children.push_back(this->exprCond->JsonGen());
+    children.push_back(this->exprUpdate->JsonGen());
     std::vector<string>stas;
     for(auto sta: *this->statements){
         stas.push_back(sta->JsonGen());
@@ -315,7 +337,7 @@ string _whileStatement::JsonGen(){
 
 string _ifStatement::JsonGen(){
     std::vector<string>children;
-    children.push_back(this->condition->JsonGen());
+    children.push_back(this->condition1->JsonGen());
     std::vector<string>stas;
     for(auto sta: *this->statements){
         stas.push_back(sta->JsonGen());
@@ -391,13 +413,17 @@ string _Value::JsonGen(){
         return getJsonString("Double",s);
     }
     else if(this->var_type==C_CHAR ){
-        string s=this->s_val;
-        //cout<<s;
-        return getJsonString("Char",s);
+        char c=this->c_val;
+        string t="";
+        t.push_back(c);
+        cout<<"c:"<<c<<endl;
+        cout<<"t:"<<t<<endl;
+        return getJsonString("Char",t);
     }
-    else if(this->var_type==C_BOOLEAN){
-        string s=std::to_string(this->b_val);
-        return getJsonString("Boolean",s);
+    else if(this->var_type==C_STRING){
+        string s=this->s_val;
+        cout<<"ssval"<<s<<endl;
+        return getJsonString("STRING",s);
     }
 }
 

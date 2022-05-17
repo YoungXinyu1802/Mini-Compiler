@@ -85,6 +85,7 @@ _Program *root;
 %type<sVal>SYS_TYPE  IDENTIFIER STRING
 %type<intVal>INTEGER
 %type<floatVal>REAL
+%type<cVal>CHAR
 //中间变量类型定义 暂略
 
 %type<c_Program>                     Program
@@ -259,6 +260,9 @@ Variable ASSIGN singleExpression{
 |Variable ASSIGN functionCall{
     $$= new _assignExpression($1,$3);
 }
+|Variable ASSIGN  LCB DataList RCB{
+    $$= new _assignExpression($1,$4);
+}
 
 singleExpression : 
 singleExpression  GE  expr {
@@ -346,6 +350,10 @@ REAL{
     $$=new _Value($1);
 }
 |STRING{
+    $$=new _Value($1);
+}
+|CHAR{
+    cout<<"char"<<endl;
     $$=new _Value($1);
 }
 

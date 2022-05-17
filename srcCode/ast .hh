@@ -80,7 +80,8 @@ enum BuildInType {
     C_INTEGER,
     C_REAL,
     C_CHAR,
-    C_BOOLEAN
+    C_BOOLEAN,
+    C_STRING
 };
 enum C_Operator {
     C_ADD,
@@ -312,6 +313,9 @@ public:
         else if (*type=="double"){
             def_Type=C_REAL;
         }
+        else if(*type=="string"){
+            def_Type=C_STRING;
+        }
         else{
             def_Type=C_BOOLEAN;
         }
@@ -427,13 +431,14 @@ public:
     union u_assignExpression{
         _singleExpression* rhs;
         _functionCall* function;
+        _DataList* data;
     }v_assignExpression;
 
     enum u_Type{
         SINGLE,
         FUNCTION,
         VOID,
-	ARRAY
+	    ARRAY
     }v_Type;
 
     int type;
@@ -451,6 +456,11 @@ public:
     _assignExpression(_functionCall* func){
         this->v_assignExpression.function=func;
         this->v_Type=VOID;
+    }
+    _assignExpression(_Variable* value,_DataList* datas){
+        this->val=value;
+        this->v_assignExpression.data=datas;
+        this->v_Type=ARRAY;
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
@@ -631,6 +641,7 @@ public:
     double f_val;
     std::string s_val;
     bool b_val;
+    char c_val;
     BuildInType var_type;
     _Value(int value){
         this->i_val=value;
@@ -640,15 +651,16 @@ public:
         this->f_val=value;
         this->var_type=C_REAL;
     }
-    _Value(std::string value){
-        this->s_val=value;
+    _Value(std::string* value){
+    
+        this->s_val=*value;
+        this->var_type=C_STRING;
+    }
+    _Value(char value){
+        cout<<"charvalue: "<<value<<endl;
+        this->c_val=value;
         this->var_type=C_CHAR;
     }
-    _Value(bool value){
-        this->b_val=value;
-        this->var_type=C_BOOLEAN;
-    }
-
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     // virtual string JsonGen() override;
 };
