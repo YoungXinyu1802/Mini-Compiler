@@ -439,13 +439,31 @@ llvm::Value *_assignExpression::codeGen(CodeGenerator & generator){
     switch(this->v_Type){
         case SINGLE:{
             value = this->v_assignExpression.rhs->codeGen(generator);
+            if(*this->val->v_Type==_Variable::Const)
+                TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
+            else{
+                llvm::Value *vindex =val->expr->codeGen(generator);
+
+                llvm::ConstantInt *indexInt = llvm::dyn_cast<llvm::ConstantInt>(vindex);        
+                //llvm::Type *arrayType = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
+                int index=indexInt->getZExtValue();
+                llvm::Value * array= generator.getValue(*this->val->ID_Name);
+                llvm::Type * arrayType = array->getType();
+                //TheBuilder.CreateStore(value,TheBuilder.CreateConstGEP2_32(arrayType)
+            }
         }
         case FUNCTION:{
             value = this->v_assignExpression.function->codeGen(generator);
+
+            TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
         }
+        case ARRAY:{
+
+        }
+        
     }
     // 还需要区分是不是数组，有点问题
-    TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
+    
     return value;
 }
 
@@ -465,7 +483,7 @@ llvm::Value *_Definition::codeGen(CodeGenerator & generator){
             // uint64_t size_int = size->getUniqueInteger().getZextValue();
             defType = llvmType(this->def_Type);
             llvm::Type *arrayType = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
-            auto alloc = createTempAlloca(generator.getCurFunc(), *variable->ID_Name, defType);
+            auto alloc = createTempAlloca(generator.getCurFunc(), *variable->ID_Name, arrayType);
         }
         else{
             defType = llvmType(this->def_Type);
