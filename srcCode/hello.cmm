@@ -6,6 +6,7 @@ int f(int m, int n){
 
 int main(){
     int a, b, c;
+	int array[10];
     a = 1;
     b = a;
     if (a == 1) {

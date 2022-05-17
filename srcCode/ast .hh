@@ -432,7 +432,8 @@ public:
     enum u_Type{
         SINGLE,
         FUNCTION,
-        VOID
+        VOID,
+	ARRAY
     }v_Type;
 
     int type;

@@ -463,15 +463,18 @@ llvm::Value *_Definition::codeGen(CodeGenerator & generator){
             llvm::Value *size = variable->expr->codeGen(generator);
             llvm::ConstantInt *sizeInt = llvm::dyn_cast<llvm::ConstantInt>(size);
             // uint64_t size_int = size->getUniqueInteger().getZextValue();
+            defType = llvmType(this->def_Type);
             llvm::Type *arrayType = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
+            auto alloc = createTempAlloca(generator.getCurFunc(), *variable->ID_Name, defType);
         }
         else{
             defType = llvmType(this->def_Type);
             // auto alloc = createTempAlloca(TheFunction, *variable->ID_Name, defType);
+            auto alloc = createTempAlloca(generator.getCurFunc(), *variable->ID_Name, defType);
         }
 
         // alloca = TheBuilder.CreateAlloca(defType, nullptr, *variable->ID_Name);
-        auto alloc = createTempAlloca(generator.getCurFunc(), *variable->ID_Name, defType);
+        //auto alloc = createTempAlloca(generator.getCurFunc(), *variable->ID_Name, defType);
         std::cout << "alloca: " << *variable->ID_Name << std::endl;
         // TheBuilder.CreateAlloca(defType);
     }
