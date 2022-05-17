@@ -210,9 +210,6 @@ llvm::Value *_whileStatement::codeGen(CodeGenerator & generator){
 
 llvm::Value *_forStatement::codeGen(CodeGenerator & generator){
     llvm::Function *TheFunction = generator.getCurFunc();
-    // llvm::Value *startValue = this->start->codeGen(generator);
-    // llvm::Value *endValue = this->end->codeGen(generator);
-    // llvm::Value *stepValue = this->step->codeGen(generator);
 
     llvm::BasicBlock *condBlock = llvm::BasicBlock::Create(TheContext, "forcond", TheFunction);
     llvm::BasicBlock *endBlock = llvm::BasicBlock::Create(TheContext, "forend", TheFunction);
@@ -370,7 +367,6 @@ llvm::Type *llvmType(const BuildInType & type){
     switch(type){
         case C_INTEGER:{
             Debug("llvmType::C_INTEGER");
-            cout << llvm::Type::getInt32Ty(TheContext)->getTypeID() << endl;
             return llvm::Type::getInt32Ty(TheContext);
         }
         case C_REAL:{
@@ -474,11 +470,11 @@ llvm::Value *_Definition::codeGen(CodeGenerator & generator){
             // auto alloc = createTempAlloca(TheFunction, *variable->ID_Name, defType);
         }
 
-        alloca = TheBuilder.CreateAlloca(defType, nullptr, *variable->ID_Name);
-        // auto alloc = createTempAlloca(generator.getCurFunc(), *variable->ID_Name, defType);
+        // alloca = TheBuilder.CreateAlloca(defType, nullptr, *variable->ID_Name);
+        auto alloc = createTempAlloca(generator.getCurFunc(), *variable->ID_Name, defType);
+        std::cout << "alloca: " << *variable->ID_Name << std::endl;
         // TheBuilder.CreateAlloca(defType);
     }
-
 
     return alloca;
 }
@@ -568,7 +564,6 @@ llvm::Value *_Subroutine::codeGen(CodeGenerator & generator){
         llvm::AllocaInst *alloc = createTempAlloca(function, *arg->args->ID_Name, llvmType(arg->arg_Type));
         TheBuilder.CreateStore(argIter++, alloc);
     }
-
     // // return
     // llvm::Value *res = nullptr;
     // res = createTempAlloca(function, "res", llvmType(retType));
@@ -580,7 +575,6 @@ llvm::Value *_Subroutine::codeGen(CodeGenerator & generator){
     
     //Pop back
     generator.popFunc();
-    TheBuilder.SetInsertPoint(&(generator.getCurFunc())->getBasicBlockList().back());
     return function;    
 
 }
