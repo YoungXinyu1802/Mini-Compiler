@@ -439,18 +439,18 @@ llvm::Value *_assignExpression::codeGen(CodeGenerator & generator){
     switch(this->v_Type){
         case SINGLE:{
             value = this->v_assignExpression.rhs->codeGen(generator);
-            if(*this->val->v_Type==_Variable::Const)
-                TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
-            else{
-                llvm::Value *vindex =val->expr->codeGen(generator);
+            // if(*this->val->v_Type==_Variable::Const)
+            //     TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
+            // else{
+            //     llvm::Value *vindex =val->expr->codeGen(generator);
 
-                llvm::ConstantInt *indexInt = llvm::dyn_cast<llvm::ConstantInt>(vindex);        
-                //llvm::Type *arrayType = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
-                int index=indexInt->getZExtValue();
-                llvm::Value * array= generator.getValue(*this->val->ID_Name);
-                llvm::Type * arrayType = array->getType();
+            //     llvm::ConstantInt *indexInt = llvm::dyn_cast<llvm::ConstantInt>(vindex);        
+            //     //llvm::Type *arrayType = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
+            //     int index=indexInt->getZExtValue();
+            //     llvm::Value * array= generator.getValue(*this->val->ID_Name);
+            //     llvm::Type * arrayType = array->getType();
                 //TheBuilder.CreateStore(value,TheBuilder.CreateConstGEP2_32(arrayType)
-            }
+            // }
         }
         case FUNCTION:{
             value = this->v_assignExpression.function->codeGen(generator);
