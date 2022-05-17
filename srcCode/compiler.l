@@ -1,6 +1,6 @@
 %{
 // 待补充头文件
-#include "ast_json.h"
+#include "ast.hh"
 #include <string>
 #include <iostream>
 #include "parser.hpp"
@@ -110,7 +110,7 @@ cout                                                    {return COUT;}
 
 
 
-"int"|"char"|"double"|"boolean" |"string"               SAVE_TOKEN; return SYS_TYPE;  
+"int"|"char"|"double"|"boolean"|"string"                SAVE_TOKEN; return SYS_TYPE;  
 "false"|"true"                                          SAVE_TOKEN; return SYS_BOOL;                                               
 
 
@@ -118,6 +118,7 @@ cout                                                    {return COUT;}
 {ID}                                                    SAVE_TOKEN; return IDENTIFIER;
 {DIGITS}\.{DIGITS}                                      SAVE_TOKEN; yylval.floatVal=atof(yylval.sVal->c_str()); return REAL; 
 {DIGITS}                                                SAVE_TOKEN; yylval.intVal=atoi(yylval.sVal->c_str()); return INTEGER;
+
 {STRING}                                                SAVE_TOKEN; yylval.sVal=yylval.sVal; return STRING;
 
 %%
