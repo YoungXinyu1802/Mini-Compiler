@@ -5,6 +5,22 @@ using namespace std;
 
 CodeGenerator::CodeGenerator(){
     TheModule = std::unique_ptr<llvm::Module>(new llvm::Module("main", TheContext));
+    // createPrintFunc();
+    // createScanFunc();
+
+    // create print function
+    std::vector<llvm::Type*> argsType;
+    argsType.push_back(TheBuilder.getInt8PtrTy());
+    llvm::FunctionType* printType = llvm::FunctionType::get(TheBuilder.getInt32Ty(), llvm::makeArrayRef(argsType), true);
+    llvm::Function* printFunc = llvm::Function::Create(printType, llvm::Function::ExternalLinkage, llvm::Twine("printf"), TheModule.get());
+    printFunc->setCallingConv(llvm::CallingConv::C);
+    this->printFunction = printFunc;
+
+    // create scan function
+    llvm::FunctionType* scanType = llvm::FunctionType::get(TheBuilder.getInt32Ty(), true);
+    llvm::Function* scanFunc = llvm::Function::Create(scanType, llvm::Function::ExternalLinkage, llvm::Twine("scanf"), TheModule.get());
+    scanFunc->setCallingConv(llvm::CallingConv::C);    
+    this->scanFunction = scanFunc;
 }
 
 llvm::Value* CodeGenerator::getValue(const std::string & name){

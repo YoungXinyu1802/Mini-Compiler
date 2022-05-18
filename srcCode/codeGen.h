@@ -37,7 +37,7 @@ static llvm::IRBuilder<> TheBuilder(TheContext);
 class CodeGenerator 
 {
 public:
-    llvm::Function *mainFunction;
+    llvm::Function *mainFunction, *printFunction, *scanFunction;
     std::vector<llvm::Function*> funcStack;
     std::unique_ptr<llvm::Module> TheModule;
 

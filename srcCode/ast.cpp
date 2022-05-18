@@ -539,11 +539,13 @@ llvm::Value *_Variable::codeGen(CodeGenerator & generator){
 llvm::Value *_mainFunction::codeGen(CodeGenerator & generator){
     Debug("_mainFunction::codeGen");
     vector<llvm::Type*> argTypes;
-    llvm::FunctionType *funcType = llvm::FunctionType::get(TheBuilder.getVoidTy(), argTypes, false);
+    llvm::FunctionType *funcType = llvm::FunctionType::get(TheBuilder.getInt32Ty(), argTypes, false);
     generator.mainFunction = llvm::Function::Create(funcType, llvm::GlobalValue::InternalLinkage, "main", generator.TheModule.get());
     llvm::BasicBlock *basicBlock = llvm::BasicBlock::Create(TheContext, "entry", generator.mainFunction, 0);
     generator.pushFunc(generator.mainFunction);
     TheBuilder.SetInsertPoint(basicBlock);
+
+    // TheBuilder.CreateCall(generator.printFunction, {TheBuilder.CreateGlobalStringPtr("in llvm fun, value = %d\n"), llvm::Value*}, "printf");
    
     for (auto & statement : *this->statements){
         statement->codeGen(generator);
@@ -659,5 +661,5 @@ llvm::Value *_Output::codeGen(CodeGenerator & generator){
     std::vector<llvm::Type*> argsType;
     argsType.push_back(TheBuilder.getInt8PtrTy());
     auto outputType = llvm::FunctionType::get(TheBuilder.getInt32Ty(), llvm::makeArrayRef(argsType), true);
-    auto func = llvm::Function::Create(outputType, llvm::Function::ExternalLinkage, llvm::Twine("printf"), generator.TheModule.get());
+    TheBuilder.CreateCall(generator.printFunction, params, "printf");
 }

@@ -17,6 +17,6 @@ int main(int argc, char **argv) {
  
     CodeGenerator generator;
     generator.generate(*root);
-    ObjGen(generator);
+    // ObjGen(generator);
     return 0;
 }
