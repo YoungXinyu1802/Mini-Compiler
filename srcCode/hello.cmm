@@ -1,9 +1,6 @@
 int main(){
-    int a;
-    int b;
+    int a, b, i;
     a = 3;
-    char c;
-    c = '1';
     if(a == 1){
         a = a + 1;
     }
@@ -13,6 +10,16 @@ int main(){
     else{
         b = a + 3;
     }
-    cout << c;
+    while(a < 10){
+        cout << a;
+        b = b + 3;
+        a = a + 1;
+    }
+    for(i = 0; i < 10; i = i + 1){
+        cout << i;
+    }
+    cout << a;
+    cout << b;
+    cout << a[2];
     return 0;
 }

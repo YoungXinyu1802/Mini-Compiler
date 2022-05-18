@@ -210,6 +210,7 @@ llvm::Value *_whileStatement::codeGen(CodeGenerator & generator){
 
 llvm::Value *_forStatement::codeGen(CodeGenerator & generator){
     llvm::Function *TheFunction = generator.getCurFunc();
+    this->startExpr->codeGen(generator);
 
     llvm::BasicBlock *condBlock = llvm::BasicBlock::Create(TheContext, "forcond", TheFunction);
     llvm::BasicBlock *endBlock = llvm::BasicBlock::Create(TheContext, "forend", TheFunction);
@@ -385,15 +386,8 @@ llvm::Type *llvmType(const BuildInType & type){
 
 }
 
-llvm::AllocaInst *createTempAlloca(llvm::Function * TheFunction, llvm::StringRef varName, llvm::Type * varType){
-    if(&TheFunction->getEntryBlock().begin() == nullptr){
-        std::cout << "No entry block" << std::endl;
-    }
-    else{
-        std::cout << "Entry block" << std::endl;
-    }
-    llvm::IRBuilder<> tmpBuilder(&TheFunction->getEntryBlock(), TheFunction->getEntryBlock().end());
-    Debug("in createTempAlloca");
+llvm::AllocaInst *createDefAlloca(llvm::Function * TheFunction, llvm::StringRef varName, llvm::Type * varType){
+    llvm::IRBuilder<> tmpBuilder(&TheFunction->getEntryBlock(), TheFunction->getEntryBlock().begin());
     return tmpBuilder.CreateAlloca(varType, nullptr, varName);
 }
 
@@ -451,6 +445,8 @@ llvm::Value *_assignExpression::codeGen(CodeGenerator & generator){
             //     llvm::Type * arrayType = array->getType();
                 //TheBuilder.CreateStore(value,TheBuilder.CreateConstGEP2_32(arrayType)
             // }
+            TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
+            break;
         }
         case FUNCTION:{
             value = this->v_assignExpression.function->codeGen(generator);
@@ -483,12 +479,12 @@ llvm::Value *_Definition::codeGen(CodeGenerator & generator){
             // uint64_t size_int = size->getUniqueInteger().getZextValue();
             defType = llvmType(this->def_Type);
             llvm::Type *arrayType = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
-            auto alloc = createTempAlloca(generator.getCurFunc(), *variable->ID_Name, arrayType);
+            auto alloc = createDefAlloca(generator.getCurFunc(), *variable->ID_Name, arrayType);
         }
         else{
             defType = llvmType(this->def_Type);
             // auto alloc = createTempAlloca(TheFunction, *variable->ID_Name, defType);
-            auto alloc = createTempAlloca(generator.getCurFunc(), *variable->ID_Name, defType);
+            auto alloc = createDefAlloca(generator.getCurFunc(), *variable->ID_Name, defType);
         }
 
         // alloca = TheBuilder.CreateAlloca(defType, nullptr, *variable->ID_Name);
@@ -518,7 +514,7 @@ llvm::Value *_argsDefinition::codeGen(CodeGenerator & generator){
         defType = llvmType(this->arg_Type);
         // auto alloc = createTempAlloca(TheFunction, *variable->ID_Name, defType);
     }
-    auto alloc = createTempAlloca(TheFunction, *args->ID_Name, defType);
+    auto alloc = createDefAlloca(TheFunction, *args->ID_Name, defType);
     return alloc;
 }
 
@@ -584,7 +580,7 @@ llvm::Value *_Subroutine::codeGen(CodeGenerator & generator){
     // create a function argument iterator
     llvm::Function::arg_iterator argIter = function->arg_begin();
     for (auto & arg : *this->args){
-        llvm::AllocaInst *alloc = createTempAlloca(function, *arg->args->ID_Name, llvmType(arg->arg_Type));
+        llvm::AllocaInst *alloc = createDefAlloca(function, *arg->args->ID_Name, llvmType(arg->arg_Type));
         TheBuilder.CreateStore(argIter++, alloc);
     }
     // // return
@@ -656,13 +652,17 @@ llvm::Value *_Output::codeGen(CodeGenerator & generator){
         format += "\n";
         params.push_back(varValue);
     }
-    
-    auto formatConst = llvm::ConstantDataArray::getString(TheContext, format.c_str());
-    auto formatStrVar = new llvm::GlobalVariable(*(generator.TheModule), llvm::ArrayType::get(TheBuilder.getInt8Ty(), format.size() + 1), true, llvm::GlobalValue::ExternalLinkage, formatConst, ".str");
-    auto zero = llvm::Constant::getNullValue(TheBuilder.getInt32Ty());
-    llvm::Constant* indices[] = {zero, zero};
-    auto varRef = llvm::ConstantExpr::getGetElementPtr(formatStrVar->getType()->getElementType(), formatStrVar, indices);
-    params.insert(params.begin(), varRef);    
+    params.insert(params.begin(), TheBuilder.CreateGlobalStringPtr(format));
+
+    // std::vector<llvm::Type*> argsType;
+    // argsType.push_back(TheBuilder.getInt8PtrTy());
+    // auto outputType = llvm::FunctionType::get(TheBuilder.getInt32Ty(), llvm::makeArrayRef(argsType), true);
+    // auto formatConst = llvm::ConstantDataArray::getString(TheContext, format.c_str());
+    // auto formatStrVar = new llvm::GlobalVariable(*(generator.TheModule), llvm::ArrayType::get(TheBuilder.getInt8Ty(), format.size() + 1), true, llvm::GlobalValue::ExternalLinkage, formatConst, ".str");
+    // auto zero = llvm::Constant::getNullValue(TheBuilder.getInt32Ty());
+    // llvm::Constant* indices[] = {zero, zero};
+    // auto varRef = llvm::ConstantExpr::getGetElementPtr(formatStrVar->getType()->getElementType(), formatStrVar, indices);
+    // params.insert(params.begin(), varRef);    
     
     TheBuilder.CreateCall(generator.printFunction, llvm::makeArrayRef(params), "printf");
 }
