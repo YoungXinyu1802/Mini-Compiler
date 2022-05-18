@@ -35,7 +35,6 @@ clean:
 	-rm -f parser.hpp parser.cpp tokenizer.cpp spl
 	-rm -f tree.json
 	-rm -f *.s
-	-rm -f *.ll
 	-rm -f test/*.txt test/*.ll
 
 run :

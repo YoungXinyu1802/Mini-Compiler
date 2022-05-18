@@ -1,9 +1,13 @@
 int main(){
+    cout << "hello" << endl;
     int a, b, i;
     a = 3;
     int array[5];
     array[2]=10;
     char str[10];
+    char c;
+    c = 'a';
+    cout << c;
     str[10]={'h','e','l','l','o','w','o','r','l','d'};
     if(a == 1){
         a = a + 1;
@@ -15,15 +19,13 @@ int main(){
         b = a + 3;
     }
     while(a < 10){
-        cout << a;
+        cout << a << ' ';
         b = b + 3;
         a = a + 1;
     }
     for(i = 0; i < 10; i = i + 1){
-        cout << i;
+        cout << i << endl;
     }
-    cout << a;
-    cout << b;
-    cout << a[2];
+    cout << b << endl;
     return 0;
 }

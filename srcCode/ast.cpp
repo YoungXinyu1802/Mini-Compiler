@@ -20,10 +20,18 @@ llvm::Value *_Value::codeGen(CodeGenerator & generator){
         case C_CHAR:
             Debug("C_CHAR");
             // string ?
-            return TheBuilder.getInt8(this->s_val[0]);
+            return TheBuilder.getInt8(this->c_val);
         case C_BOOLEAN:
             Debug("C_BOOLEAN");
             return TheBuilder.getInt1(this->b_val);
+        case C_STRING:
+            Debug("C_STRING");
+            std::string s = this->s_val.substr(1, this->s_val.size()-2);
+            Debug(this->s_val);
+            // llvm::Value* str = TheBuilder.CreateGlobalStringPtr(this->s_val);
+            // TheBuilder.CreateCall(generator.printFunction, str, "printf");
+            // TheBuilder.CreateGlobalStringPtr(this->s_val);
+            return TheBuilder.CreateGlobalStringPtr(s);
     }
 }
 
@@ -566,8 +574,6 @@ llvm::Value *_mainFunction::codeGen(CodeGenerator & generator){
     generator.pushFunc(generator.mainFunction);
     TheBuilder.SetInsertPoint(basicBlock);
 
-    // TheBuilder.CreateCall(generator.printFunction, {TheBuilder.CreateGlobalStringPtr("in llvm fun, value = %d\n"), llvm::Value*}, "printf");
-   
     for (auto & statement : *this->statements){
         statement->codeGen(generator);
     }
@@ -659,8 +665,11 @@ llvm::Value *_Output::codeGen(CodeGenerator & generator){
 
     string format = "";
     vector<llvm::Value*> params;
+    bool isString;
+    llvm::Value * varValue;
+    llvm::Value * strValue;
     for (auto & var : *this->vars){
-        llvm::Value *varValue = var->codeGen(generator);
+        varValue = var->codeGen(generator);
         llvm::Type *varType = varValue->getType();
         if(varType == TheBuilder.getInt8Ty()){
             format += "%c";
@@ -674,20 +683,13 @@ llvm::Value *_Output::codeGen(CodeGenerator & generator){
         else if(varType == TheBuilder.getInt8Ty()){
             format += "%d";
         }
-        format += "\n";
+        else{
+            format += "%s";
+        }
         params.push_back(varValue);
     }
     params.insert(params.begin(), TheBuilder.CreateGlobalStringPtr(format));
 
-    // std::vector<llvm::Type*> argsType;
-    // argsType.push_back(TheBuilder.getInt8PtrTy());
-    // auto outputType = llvm::FunctionType::get(TheBuilder.getInt32Ty(), llvm::makeArrayRef(argsType), true);
-    // auto formatConst = llvm::ConstantDataArray::getString(TheContext, format.c_str());
-    // auto formatStrVar = new llvm::GlobalVariable(*(generator.TheModule), llvm::ArrayType::get(TheBuilder.getInt8Ty(), format.size() + 1), true, llvm::GlobalValue::ExternalLinkage, formatConst, ".str");
-    // auto zero = llvm::Constant::getNullValue(TheBuilder.getInt32Ty());
-    // llvm::Constant* indices[] = {zero, zero};
-    // auto varRef = llvm::ConstantExpr::getGetElementPtr(formatStrVar->getType()->getElementType(), formatStrVar, indices);
-    // params.insert(params.begin(), varRef);    
-    
+
     TheBuilder.CreateCall(generator.printFunction, llvm::makeArrayRef(params), "printf");
 }
