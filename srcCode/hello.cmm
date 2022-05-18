@@ -1,5 +1,4 @@
 int main(){
-    cout << "hello" << endl;
     int a, b, i;
     a = 3;
     int array[5];
@@ -19,12 +18,12 @@ int main(){
         b = a + 3;
     }
     while(a < 10){
-        cout << a << ' ';
+        cout << a << endl;
         b = b + 3;
         a = a + 1;
     }
     for(i = 0; i < 10; i = i + 1){
-        cout << i << endl;
+        cout << i;
     }
     cout << b << endl;
     return 0;

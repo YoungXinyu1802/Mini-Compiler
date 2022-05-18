@@ -5,8 +5,6 @@ using namespace std;
 
 CodeGenerator::CodeGenerator(){
     TheModule = std::unique_ptr<llvm::Module>(new llvm::Module("main", TheContext));
-    // createPrintFunc();
-    // createScanFunc();
 
     // create print function
     std::vector<llvm::Type*> argsType;

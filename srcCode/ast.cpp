@@ -19,7 +19,6 @@ llvm::Value *_Value::codeGen(CodeGenerator & generator){
             return llvm::ConstantFP::get(TheContext, llvm::APFloat(this->f_val));
         case C_CHAR:
             Debug("C_CHAR");
-            // string ?
             return TheBuilder.getInt8(this->c_val);
         case C_BOOLEAN:
             Debug("C_BOOLEAN");
@@ -28,9 +27,6 @@ llvm::Value *_Value::codeGen(CodeGenerator & generator){
             Debug("C_STRING");
             std::string s = this->s_val.substr(1, this->s_val.size()-2);
             Debug(this->s_val);
-            // llvm::Value* str = TheBuilder.CreateGlobalStringPtr(this->s_val);
-            // TheBuilder.CreateCall(generator.printFunction, str, "printf");
-            // TheBuilder.CreateGlobalStringPtr(this->s_val);
             return TheBuilder.CreateGlobalStringPtr(s);
     }
 }
@@ -637,6 +633,7 @@ llvm::Value *_Input::codeGen(CodeGenerator & generator){
     for (auto & var : *this->vars){
         llvm::Value *varValue = var->codeGen(generator);
         llvm::Type *varType = varValue->getType();
+        llvm::Value *varAddr = generator.getValue(dynamic_cast<_Variable*>(var)->ID_Name->c_str());
         if(varType == TheBuilder.getInt8Ty()){
             format += "%c";
         }
@@ -644,19 +641,18 @@ llvm::Value *_Input::codeGen(CodeGenerator & generator){
             format += "%d";
         }
         else if(varType == TheBuilder.getDoubleTy()){
-            format += "%f";
+            format += "%lf";
         }
         else if(varType == TheBuilder.getInt8Ty()){
             format += "%d";
         }
-        params.push_back(varValue);
+        params.push_back(varAddr);
     }
     params.insert(params.begin(), TheBuilder.CreateGlobalStringPtr(format));
     
-    auto scanf_type = llvm::FunctionType::get(TheBuilder.getInt32Ty(), true);
-    auto func = llvm::Function::Create(scanf_type, llvm::Function::ExternalLinkage, llvm::Twine("scanf"), generator.TheModule.get());
-    
-    return TheBuilder.CreateCall(func, params, "scanf");
+    // return TheBuilder.CreateCall(func, params, "scanf");
+    TheBuilder.CreateCall(generator.scanFunction, params, "scanf");
+
 
 }
 
@@ -678,7 +674,7 @@ llvm::Value *_Output::codeGen(CodeGenerator & generator){
             format += "%d";
         }
         else if(varType == TheBuilder.getDoubleTy()){
-            format += "%f";
+            format += "%lf";
         }
         else if(varType == TheBuilder.getInt8Ty()){
             format += "%d";
