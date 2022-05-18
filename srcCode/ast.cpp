@@ -433,32 +433,42 @@ llvm::Value *_assignExpression::codeGen(CodeGenerator & generator){
     switch(this->v_Type){
         case SINGLE:{
             value = this->v_assignExpression.rhs->codeGen(generator);
-            // if(*this->val->v_Type==_Variable::Const)
-            //     TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
-            // else{
-            //     llvm::Value *vindex =val->expr->codeGen(generator);
+            if(val->v_Type==_Variable::CONST)
+                TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
+            else{
+                llvm::Value *vindex =val->expr->codeGen(generator);
 
-            //     llvm::ConstantInt *indexInt = llvm::dyn_cast<llvm::ConstantInt>(vindex);        
-            //     //llvm::Type *arrayType = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
-            //     int index=indexInt->getZExtValue();
-            //     llvm::Value * array= generator.getValue(*this->val->ID_Name);
-            //     llvm::Type * arrayType = array->getType();
-                //TheBuilder.CreateStore(value,TheBuilder.CreateConstGEP2_32(arrayType)
-            // }
-            TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
+                llvm::ConstantInt *indexInt = llvm::dyn_cast<llvm::ConstantInt>(vindex);        
+                int index=indexInt->getZExtValue();
+                auto array= generator.getValue(*this->val->ID_Name);
+                llvm::Type * arrayType = TheBuilder.CreateLoad(array)->getType();//->getArrayElementType();
+                //arrayType->print(llvm::outs());
+                //cout<<endl<<arrayType->getTypeID()<<endl;
+                TheBuilder.CreateStore(value,TheBuilder.CreateConstGEP2_32(arrayType,array,0,index));
+            }
             break;
         }
         case FUNCTION:{
             value = this->v_assignExpression.function->codeGen(generator);
 
             TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
+            break;
         }
         case ARRAY:{
-
+            auto array= generator.getValue(*this->val->ID_Name);
+            llvm::Type * arrayType = TheBuilder.CreateLoad(array)->getType();
+            int index=0;
+            for (auto var : *this->v_assignExpression.data){
+                _Value * _value = dynamic_cast<_Value*>(var);
+                llvm::Value* value=_value->codeGen(generator);
+                TheBuilder.CreateStore(value,TheBuilder.CreateConstGEP2_32(arrayType,array,0,index));
+                index++;
+            }
+            break;
         }
         
     }
-    // 还需要区分是不是数组，有点问题
+    
     
     return value;
 }
@@ -480,6 +490,21 @@ llvm::Value *_Definition::codeGen(CodeGenerator & generator){
             defType = llvmType(this->def_Type);
             llvm::Type *arrayType = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
             auto alloc = createDefAlloca(generator.getCurFunc(), *variable->ID_Name, arrayType);
+            
+            // llvm::Type * arrayT=alloc->getType()->getElementType();
+            // llvm::Value *value = generator.getValue(*variable->ID_Name);
+            // value = TheBuilder.CreateLoad(value);
+            // auto arrayT1=value->getType();
+
+            // arrayType->print(llvm::outs());
+            // cout<<" "<<arrayType->getTypeID()<<endl;
+            // arrayT->print(llvm::outs());
+            // cout<<" "<<arrayT->getTypeID()<<endl;
+            // arrayT1->print(llvm::outs());
+            // cout<<" "<<arrayT1->getTypeID()<<" "<<arrayT1->isArrayTy()<<endl;
+
+            // llvm::Constant* con_5 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 5);
+            // TheBuilder.CreateStore(con_5,TheBuilder.CreateConstGEP2_32(arrayT1,alloc,0,1));
         }
         else{
             defType = llvmType(this->def_Type);
@@ -536,7 +561,7 @@ llvm::Value *_mainFunction::codeGen(CodeGenerator & generator){
     Debug("_mainFunction::codeGen");
     vector<llvm::Type*> argTypes;
     llvm::FunctionType *funcType = llvm::FunctionType::get(TheBuilder.getInt32Ty(), argTypes, false);
-    generator.mainFunction = llvm::Function::Create(funcType, llvm::GlobalValue::InternalLinkage, "main", generator.TheModule.get());
+    generator.mainFunction = llvm::Function::Create(funcType, llvm::GlobalValue::ExternalLinkage, "Main", generator.TheModule.get());
     llvm::BasicBlock *basicBlock = llvm::BasicBlock::Create(TheContext, "entry", generator.mainFunction, 0);
     generator.pushFunc(generator.mainFunction);
     TheBuilder.SetInsertPoint(basicBlock);

@@ -1,6 +1,10 @@
 int main(){
     int a, b, i;
     a = 3;
+    int array[5];
+    array[2]=10;
+    char str[10];
+    str[10]={'h','e','l','l','o','w','o','r','l','d'};
     if(a == 1){
         a = a + 1;
     }
