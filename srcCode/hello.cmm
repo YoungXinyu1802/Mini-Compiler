@@ -1,6 +1,8 @@
 int main(){
     int a, b, i;
-    a = 3;
+    cout << "hello" << endl;
+    cout << "input a: ";
+    cin >> a;
     int array[5];
     array[2]=10;
     char str[10];
