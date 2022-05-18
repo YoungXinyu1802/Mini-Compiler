@@ -55,6 +55,8 @@ typedef std::vector<_argsDefinition*> _ArgsDefinitionList;
 typedef std::vector<_Function*> _FunctionList;
 typedef std::vector<_Statement*> _StatementList;
 typedef std::vector<_Data*> _DataList;
+typedef std::vector<_Data*> _InputList;
+typedef std::vector<_Data*> _OutputList;
 typedef std::vector<_singleExpression*>_SingleExpressionList;
 //待完善 变量存储相关
 
@@ -597,7 +599,8 @@ public:
 
     enum u_Type{
         CONST,
-        ARRAY
+        ARRAY,
+        ArrayPtr
     }v_Type;
 
     _Variable(std::string *name){
@@ -611,6 +614,12 @@ public:
         this->expr=expression;
         this->v_Type=ARRAY;
         std::cout<<"Array\n";
+    }
+    _Variable(std::string* name,std::string arrayNULL){
+        this->ID_Name=name;
+        this->expr=NULL;
+        this->v_Type=ArrayPtr;
+        cout<<"Arrayptr\n";
     }
 
     virtual string JsonGen() override;

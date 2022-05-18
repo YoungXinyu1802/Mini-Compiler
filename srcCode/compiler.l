@@ -107,6 +107,7 @@ scanf                                                   {return SCANF;}
 main                                                    {return MAIN;}
 cin                                                     {return CIN;}
 cout                                                    {return COUT;}
+endl                                                    {return ENDL;}
 
 
 

@@ -56,6 +56,8 @@ _Program *root;
     _Value *c_Value;
     _Input *c_Input;
     _Output *c_Output;
+    _InputList *c_InputList;
+    _OutputList *c_OutputList;
 }
 
 
@@ -73,7 +75,7 @@ _Program *root;
 %token FLOAT BREAK AUTO CLASS OPERATOR CASE DO LONG TYPEDEF STATIC FRIEND
 %token TEMPLATE DEFAULT NEW VOID REGISTER RETURN ENUM INLINE TRY SHORT CONTINUE 
 %token SIZEOF SWITCH PRIVATE PROTECTED ASM WHILE CATCH DELETE PUBLIC VOLATILE 
-%token STRUCT PRINTF SCANF MAIN CHAR CIN COUT
+%token STRUCT PRINTF SCANF MAIN CHAR CIN COUT ENDL
 
 
 
@@ -113,6 +115,8 @@ _Program *root;
 %type<c_returnStatement>             returnStatement
 %type<c_Input>                       Input
 %type<c_Output>                      Output
+%type<c_InputList>                   InputList
+%type<c_OutputList>                  OutputList
 
 
 %start Program
@@ -188,13 +192,47 @@ Definition{
 
 
 Input:
-CIN RD DataList{
+CIN RD InputList{
     $$=new _Input($3);
 }
 
 Output:
-COUT LD DataList{
+COUT LD OutputList{
     $$=new _Output($3);
+}
+
+OutputList:
+Variable LD OutputList{
+    $3->push_back($1);
+    $$=$3;
+}
+|Value LD OutputList{
+    $3->push_back($1);
+    $$=$3;
+}
+|Value{
+    $$=new _OutputList();
+    $$->push_back($1);
+}
+|Variable{
+    $$=new _OutputList();
+    $$->push_back($1);
+}
+|ENDL{
+    char c='\n';
+    _Value* temp= new _Value(c);
+    $$=new _OutputList();
+    $$->push_back(temp);
+}
+
+InputList:
+Variable RD InputList{
+    $3->push_back($1);
+    $$=$3;
+}
+|Variable{
+    $$=new _InputList();
+    $$->push_back($1);
 }
 
 returnStatement:
@@ -237,6 +275,10 @@ IDENTIFIER{
 }
 |IDENTIFIER LB singleExpression RB{
     $$=new _Variable($1,$3);
+}
+|IDENTIFIER LB RB{
+    string a="nullTest";
+    $$=new _Variable($1,a);
 }
 
 
