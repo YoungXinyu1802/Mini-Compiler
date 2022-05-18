@@ -2,6 +2,8 @@ int main(){
     int a;
     int b;
     a = 3;
+    char c;
+    c = '1';
     if(a == 1){
         a = a + 1;
     }
@@ -11,6 +13,6 @@ int main(){
     else{
         b = a + 3;
     }
-    cout << b;
+    cout << c;
     return 0;
 }

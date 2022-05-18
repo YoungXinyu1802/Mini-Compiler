@@ -653,13 +653,16 @@ llvm::Value *_Output::codeGen(CodeGenerator & generator){
         else if(varType == TheBuilder.getInt8Ty()){
             format += "%d";
         }
+        format += "\n";
         params.push_back(varValue);
     }
-    params.insert(params.begin(), TheBuilder.CreateGlobalStringPtr(format));
-
-
-    std::vector<llvm::Type*> argsType;
-    argsType.push_back(TheBuilder.getInt8PtrTy());
-    auto outputType = llvm::FunctionType::get(TheBuilder.getInt32Ty(), llvm::makeArrayRef(argsType), true);
-    TheBuilder.CreateCall(generator.printFunction, params, "printf");
+    
+    auto formatConst = llvm::ConstantDataArray::getString(TheContext, format.c_str());
+    auto formatStrVar = new llvm::GlobalVariable(*(generator.TheModule), llvm::ArrayType::get(TheBuilder.getInt8Ty(), format.size() + 1), true, llvm::GlobalValue::ExternalLinkage, formatConst, ".str");
+    auto zero = llvm::Constant::getNullValue(TheBuilder.getInt32Ty());
+    llvm::Constant* indices[] = {zero, zero};
+    auto varRef = llvm::ConstantExpr::getGetElementPtr(formatStrVar->getType()->getElementType(), formatStrVar, indices);
+    params.insert(params.begin(), varRef);    
+    
+    TheBuilder.CreateCall(generator.printFunction, llvm::makeArrayRef(params), "printf");
 }
