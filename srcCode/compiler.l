@@ -1,6 +1,6 @@
 %{
 // 待补充头文件
-#include "ast.hh"
+#include "ast_json.h"
 #include <string>
 #include <iostream>
 #include "parser.hpp"
@@ -45,14 +45,14 @@ STRING "\""({LETTER}|{DIGIT}|{ANY})*"\""
 "~"                                                     {return NOT;}
 "+"                                                     {return ADD;}
 "-"                                                     {return SUB;}
-"!="                                                    {return NOEQUAL;}
+"!="                                                    {return NE;}
 "&&"                                                    {return AND;}
 "||"                                                    {return OR;}
 ">="                                                    {return GE;}
 ">"                                                     {return GT; }
 "<="                                                    {return LE;} 
 "<"                                                     {return LT;} 
-"=="                                                    {return EQUAL;} 
+"=="                                                    {return EQ;} 
 "="                                                     {return ASSIGN;} 
 ";"                                                     {return SEMI;} 
 "<<"                                                    {return LD;}
@@ -84,7 +84,7 @@ friend                                                  {return FRIEND;}
 template                                                {return TEMPLATE;}
 default                                                 {return DEFAULT;}
 new                                                     {return NEW;}
-void                                                    {return VOID;}
+
 register                                                {return REGISTER;}
 return                                                  {return RETURN;}
 enum                                                    {return ENUM;}
@@ -111,7 +111,7 @@ endl                                                    {return ENDL;}
 
 
 
-"int"|"char"|"double"|"boolean"|"string"                SAVE_TOKEN; return SYS_TYPE;  
+"int"|"char"|"double"|"boolean"|"string"|"void"         SAVE_TOKEN; return SYS_TYPE;  
 "false"|"true"                                          SAVE_TOKEN; return SYS_BOOL;                                               
 
 

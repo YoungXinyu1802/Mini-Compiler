@@ -1,0 +1,38 @@
+int main(){
+    int a[8];
+    a[]={6,1,2,8,4,9,5,3};
+    cout<<a;
+    quicksort(a,0,7);
+    cout<<a;
+}
+
+void quicksort(int a[],int start,int end){
+    int i,j,temp,x,k;
+    i=start;
+    j=end;
+    x=a[start];
+    while(i<j){
+        while(i<j && x<a[j]){
+            j=j-1;
+        }
+        while(i<j&&x>a[i]){
+            i=i+1;
+        }
+        if(i<j){
+            temp=a[j];
+            a[j]=a[i];
+            a[i]=temp;
+        }
+    }
+    temp=x;
+    x=a[i];
+    a[i]=temp;
+    if(start<j){
+        k=j-1;
+        quicksort(a,start,k);
+    }
+    if(i<end){
+        k=j+1;
+        quicksort(a,k,end);
+    }
+}

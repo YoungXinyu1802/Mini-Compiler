@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include "ast.hh"
+#include "ast_json.h"
 
 void yyerror(const char *s) { 
     std::printf("Error: %s\n", s);
@@ -64,8 +64,8 @@ _Program *root;
 
 //特殊符号
 
-%token LP RP LB RB RCB LCB DOT COMMA COLON MUL DIV NOT ADD SUB NOEQUAL
-%token AND OR GE GT LE LT EQUAL ASSIGN SEMI LD RD MOD
+%token LP RP LB RB RCB LCB DOT COMMA COLON MUL DIV NOT ADD SUB NE
+%token AND OR GE GT LE LT EQ ASSIGN SEMI LD RD MOD
 
 
 
@@ -319,10 +319,10 @@ singleExpression  GE  expr {
 |singleExpression  LT  expr {
     $$ = new _singleExpression($1, C_LT, $3);
 }
-|singleExpression  EQUAL  expr {
+|singleExpression  EQ expr {
     $$ = new _singleExpression($1, C_EQ, $3);
 }
-|singleExpression  NOEQUAL  expr {
+|singleExpression  NE  expr {
     $$ = new _singleExpression($1, C_NE, $3);
 }
 |expr {

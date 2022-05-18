@@ -83,7 +83,7 @@ string _mainFunction::JsonGen(){
         stas.push_back(sta->JsonGen());
     }
     children.push_back(getJsonString("StatementList",stas));
-
+    cout<<"finish main json"<<endl;
     return getJsonString("mainFunc",children);
 }
 
@@ -106,10 +106,12 @@ string _Subroutine::JsonGen(){
 
 string _Statement::JsonGen(){
     std::vector<string>children;
+    cout<<"in json statement"<<endl;
     if(this->v_Type==DEFINITION){
         children.push_back(this->v_Statement.definStatement->JsonGen());
     }
     else if(this->v_Type==EXPRESSION){
+        cout<<"in statement expression json"<<endl;
         children.push_back(this->v_Statement.exprStatement->JsonGen());
     }
     else if(this->v_Type==RETURNSTATEMENT){
@@ -189,6 +191,11 @@ string _Expression::JsonGen(){
         children.push_back(this->v_Expression.complexExpression->JsonGen());
     }
     else if(this->v_Type==FUNCTIONCALL){
+        cout<<"in functioncall json"<<endl;
+        if(this->v_Expression.functionCall==NULL){
+            cout<<"func ptr is null"<<endl;
+
+        }
         children.push_back(this->v_Expression.functionCall->JsonGen());
     }
 
@@ -220,10 +227,10 @@ string getOPString(C_Operator OP){
     else if(OP==C_LE){
         res="LE";
     }
-    else if(OP==C_EQUAL){
+    else if(OP==C_EQ){
         res="EQUAL";
     }
-    else if(OP==C_NOEQUAL){
+    else if(OP==C_NE){
         res="NOEQUAL";
     }
     else if(OP==C_OR){
@@ -303,9 +310,11 @@ string _complexExpression::JsonGen(){
 string _functionCall::JsonGen(){
     std::vector<string> children;
     std::vector<string> argsJson;
+    cout<<"functioncall begin json"<<endl;
     for(auto arg: *this->args){
         argsJson.push_back(arg->JsonGen());
     }
+    cout<<"functioncall end json"<<endl;
     children.push_back(getJsonString("ArgsList",argsJson));
     return getJsonString("functionCall",*this->func_Name,children);
 }
@@ -398,6 +407,9 @@ string _Variable::JsonGen(){
         std::vector<string> children;
         children.push_back(this->expr->JsonGen());
         return getJsonString("Array",*this->ID_Name,children);
+    }
+    else if(this->v_Type==ArrayPtr){
+        return getJsonString("ArrayPtr",*this->ID_Name);
     }
 }
 

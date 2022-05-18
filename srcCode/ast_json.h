@@ -99,8 +99,8 @@ enum C_Operator {
     C_GT, 
     C_LT,
     C_LE,
-    C_EQUAL,
-    C_NOEQUAL,
+    C_EQ,
+    C_NE,
     C_OR,
     C_MOD,
     C_AND,
@@ -357,7 +357,7 @@ public:
         std::cout<<"Expression\n";
     }
     _Expression(_functionCall* func){
-        this->v_Expression.functionCall;
+        this->v_Expression.functionCall=func;
         this->v_Type=FUNCTIONCALL;
         std::cout<<"Expression\n";
     }
