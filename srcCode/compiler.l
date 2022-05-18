@@ -11,6 +11,7 @@
 %option noyywrap 
 
 ANY .
+NQUOTE  [^"']
 COMMENT "{"{ANY}*"}" 
 DIGIT [0-9]
 DIGITS {DIGIT}+
@@ -20,7 +21,7 @@ POINT "."{DIGITS}
 EXPONENT (e|E)("+"|"-")?{DIGITS}
 INTNUM {DIGITS}
 REALNUM {DIGITS}({POINT})?({EXPONENT})?
-STRING "\""({LETTER}|{DIGIT}|{ANY})*"\""
+STRING "\""({LETTER}|{DIGIT}|{NQUOTE})*"\""
 
 %%
 "//".*                                                   ;   //comments

@@ -1,6 +1,12 @@
 int f(int a, int b){
+    cout << "f" << endl;
     cout << a << b << endl;
     return a + b;
+}
+
+void ff(int a, int b){
+    cout << "ff" << endl;
+    cout << a << b << endl;
 }
 
 int main(){
@@ -32,7 +38,9 @@ int main(){
     for(i = 0; i < 10; i = i + 1){
         cout << i;
     }
+    cout << endl;
     b = f(1, 2);
+    ff(1, 2);
     cout << b << endl;
     return 0;
 }

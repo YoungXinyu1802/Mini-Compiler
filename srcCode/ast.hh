@@ -83,7 +83,8 @@ enum BuildInType {
     C_REAL,
     C_CHAR,
     C_BOOLEAN,
-    C_STRING
+    C_STRING,
+    C_VOID
 };
 enum C_Operator {
     C_ADD,
@@ -200,7 +201,7 @@ public:
 class _Subroutine:public Node{
 public:
     _StatementList* statements;
-    std::string* Type; /* "int"|"char"|"double"|"boolean" */
+    std::string* Type; /* "int"|"char"|"double"|"boolean"|"void" */
     std::string* Func_Id;  /* Function Identifier */
     _ArgsDefinitionList* args; 
     _Subroutine(std::string* Type,std::string* Identifier,_ArgsDefinitionList* _args, _StatementList* _statements){

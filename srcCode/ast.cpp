@@ -384,6 +384,10 @@ llvm::Type *llvmType(const BuildInType & type){
             Debug("llvmType::C_CHAR");
             return llvm::Type::getInt8Ty(TheContext);
         }
+        case C_VOID:{
+            Debug("llvmType::C_VOID");
+            return llvm::Type::getVoidTy(TheContext);
+        }
     }
 
 }
@@ -591,8 +595,11 @@ llvm::Value *_Subroutine::codeGen(CodeGenerator & generator){
     else if (*Type=="double"){
         retType=C_REAL;
     }
-    else{
+    else if (*Type == "boolean"){
         retType=C_BOOLEAN;
+    }
+    else if (*Type == "void"){
+        retType=C_VOID;
     }
     llvm::FunctionType *funcType = llvm::FunctionType::get(llvmType(retType), argsType, false);
     llvm::Function *function = llvm::Function::Create(funcType, llvm::GlobalValue::InternalLinkage, *this->Func_Id, generator.TheModule.get());
@@ -617,6 +624,10 @@ llvm::Value *_Subroutine::codeGen(CodeGenerator & generator){
         stmt->codeGen(generator);
     }
     
+    if (retType == C_VOID){
+        TheBuilder.CreateRetVoid();
+    }
+
     //Pop back
     generator.popFunc();
     return function;    
