@@ -209,9 +209,9 @@ public:
         reverse(_statements->begin(),_statements->end());
         this->statements=_statements;
 
-        if(_args!=NULL){
-            reverse(_args->begin(),_args->end());
-        }
+        // if(_args!=NULL){
+        //     reverse(_args->begin(),_args->end());
+        // }
         this->args=_args;   
         std::cout<<"Sub\n";
     }

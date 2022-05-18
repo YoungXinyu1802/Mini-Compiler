@@ -363,8 +363,6 @@ llvm::Value *_functionCall::codeGen(CodeGenerator & generator){
     }
 
     llvm::Value * ret = TheBuilder.CreateCall(function, funcArgs, "call");
-    TheBuilder.CreateRet(ret);
-
     return ret;
 }
 
@@ -685,7 +683,5 @@ llvm::Value *_Output::codeGen(CodeGenerator & generator){
         params.push_back(varValue);
     }
     params.insert(params.begin(), TheBuilder.CreateGlobalStringPtr(format));
-
-
     TheBuilder.CreateCall(generator.printFunction, llvm::makeArrayRef(params), "printf");
 }

@@ -1,3 +1,8 @@
+int f(int a, int b){
+    cout << a << b << endl;
+    return a + b;
+}
+
 int main(){
     int a, b, i;
     cout << "hello" << endl;
@@ -27,6 +32,7 @@ int main(){
     for(i = 0; i < 10; i = i + 1){
         cout << i;
     }
+    b = f(1, 2);
     cout << b << endl;
     return 0;
 }
