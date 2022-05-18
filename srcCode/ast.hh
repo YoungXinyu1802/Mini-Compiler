@@ -510,6 +510,10 @@ public:
         this->func_Name=func_Name;
         this->args=arg;
     }
+    _functionCall(std::string* func_Name){
+        this->func_Name=func_Name;
+        this->args=NULL;
+    }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     // virtual string JsonGen() override;

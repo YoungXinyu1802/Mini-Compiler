@@ -4,9 +4,8 @@ int f(int a, int b){
     return a + b;
 }
 
-void ff(int a, int b){
+void ff(){
     cout << "ff" << endl;
-    cout << a << b << endl;
 }
 
 int main(){
@@ -40,7 +39,7 @@ int main(){
     }
     cout << endl;
     b = f(1, 2);
-    ff(1, 2);
+    ff();
     cout << b << endl;
     return 0;
 }

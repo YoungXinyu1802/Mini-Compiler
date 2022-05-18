@@ -358,10 +358,11 @@ llvm::Value *_functionCall::codeGen(CodeGenerator & generator){
     }
 
     std::vector<llvm::Value *> funcArgs;
-    for (auto & arg : *this->args){
-        funcArgs.push_back(arg->codeGen(generator));
+    if (this->args){
+        for (auto & arg : *this->args){
+            funcArgs.push_back(arg->codeGen(generator));
+        }
     }
-
     llvm::Value * ret = TheBuilder.CreateCall(function, funcArgs, "call");
     return ret;
 }

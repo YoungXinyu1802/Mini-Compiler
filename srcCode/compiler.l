@@ -1,6 +1,6 @@
 %{
 // 待补充头文件
-#include "ast_json.h"
+#include "ast.hh"
 #include <string>
 #include <iostream>
 #include "parser.hpp"

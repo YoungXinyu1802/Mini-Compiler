@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include "ast_json.h"
+#include "ast.hh"
 
 void yyerror(const char *s) { 
     std::printf("Error: %s\n", s);
@@ -403,6 +403,9 @@ REAL{
 functionCall:
 IDENTIFIER LP DataList RP{
     $$=new _functionCall($1,$3);
+}
+|IDENTIFIER LP RP{
+    $$=new _functionCall($1);
 }
 
 
