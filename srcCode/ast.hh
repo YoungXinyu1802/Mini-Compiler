@@ -606,6 +606,8 @@ public:
     _Variable* args;
     BuildInType arg_Type;
     _argsDefinition(BuildInType type,_Variable* name){
+        std::cout << "argsdefinition" << std::endl;
+        std::cout << arg_Type << std::endl;
         this->args=name;
         this->arg_Type=type;
     }

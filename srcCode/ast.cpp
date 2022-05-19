@@ -550,10 +550,12 @@ llvm::Value *_Variable::codeGen(CodeGenerator & generator){
     llvm::Value *value = nullptr;
 
     if(this->v_Type == CONST){
+        cout << "const" << endl;
         value = generator.getValue(*this->ID_Name);
         value = TheBuilder.CreateLoad(value);
     }
     else if (this->v_Type == ARRAY){
+        cout << "array" << endl;
         llvm::Value *index = this->expr->codeGen(generator);
         llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
         llvm::Value *Idxs[]={con_0,index};
@@ -563,6 +565,7 @@ llvm::Value *_Variable::codeGen(CodeGenerator & generator){
     }
     else if (this->v_Type == ArrayPtr){
         value = generator.getValue(*this->ID_Name);
+        cout << "variable type" << value->getType()->getTypeID() << endl;
     }
     return value;
 }
@@ -585,10 +588,6 @@ llvm::Value *_mainFunction::codeGen(CodeGenerator & generator){
 
 llvm::Value *_Subroutine::codeGen(CodeGenerator & generator){
     Debug("_Subroutine::codeGen");
-    vector<llvm::Type *> argsType;
-    for (auto & arg : *this->args){
-        argsType.push_back(llvmType(arg->arg_Type));
-    }
     BuildInType retType;
     if(*Type=="int"){
         retType=C_INTEGER;
@@ -605,6 +604,25 @@ llvm::Value *_Subroutine::codeGen(CodeGenerator & generator){
     else if (*Type == "void"){
         retType=C_VOID;
     }
+
+    vector<llvm::Type *> argsType;
+    for (auto & arg : *this->args){
+        if (arg->args->v_Type == _Variable::ArrayPtr){
+            switch(arg->arg_Type){
+                case C_INTEGER:
+                    cout << "int array point" << endl;
+                    argsType.push_back(llvm::Type::getInt32PtrTy(TheContext));
+                    break;
+                case C_CHAR:
+                    argsType.push_back(llvm::Type::getInt8PtrTy(TheContext));
+                    break;
+            }
+        }
+        else{
+            argsType.push_back(llvmType(arg->arg_Type));
+        }
+        // argsType.push_back(llvmType(arg->arg_Type));
+    }
     llvm::FunctionType *funcType = llvm::FunctionType::get(llvmType(retType), argsType, false);
     llvm::Function *function = llvm::Function::Create(funcType, llvm::GlobalValue::InternalLinkage, *this->Func_Id, generator.TheModule.get());
     generator.pushFunc(function);
@@ -615,8 +633,10 @@ llvm::Value *_Subroutine::codeGen(CodeGenerator & generator){
 
     // create a function argument iterator
     llvm::Function::arg_iterator argIter = function->arg_begin();
+    vector<llvm::Type*>::iterator argsTypeIter = argsType.begin();
     for (auto & arg : *this->args){
-        llvm::AllocaInst *alloc = createDefAlloca(function, *arg->args->ID_Name, llvmType(arg->arg_Type));
+        cout << "argType: " << (*argsTypeIter)->getTypeID() << endl;
+        llvm::AllocaInst *alloc = createDefAlloca(function, *arg->args->ID_Name, *argsTypeIter++);
         TheBuilder.CreateStore(argIter++, alloc);
     }
     // // return
