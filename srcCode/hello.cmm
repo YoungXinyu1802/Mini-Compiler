@@ -5,7 +5,8 @@ int f(int a[]){
 
 int main(){
     int a[5];
-    a[1] = 1;
-    cout << a[1] << endl;
+    int i;
+    cin >> i;
+    cout << i;
     return 0;
 }

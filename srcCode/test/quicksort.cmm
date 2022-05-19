@@ -1,10 +1,16 @@
 int main(){
-    int arr[6];
-    arr[6] = {2, 5, 3, 6, 1, 0};
+    int arr[10000];
+    int stack[10000];
+    int n;
+    cin >> n;
     int p, r;
     p = 0;
-    r = 5;
-    int stack[6];
+    r = n - 1;
+    int i, j, temp;
+    for(i = 0; i < n; i = i + 1){
+        cin >> temp;
+        arr[i] = temp;
+    }
     if (p < r){
         int pointer;
         pointer = -1;
@@ -21,11 +27,9 @@ int main(){
             pointer = pointer - 1;
             left = stack[pointer];
             pointer = pointer - 1;
-            int i;
             i = left - 1;
             int pivot;
             pivot = arr[right];
-            int j;
             for (j = left; j < right; j = j + 1){
                 if (arr[j] < pivot){
                     i = i + 1;
@@ -48,16 +52,12 @@ int main(){
                 pointer = pointer + 1;
                 stack[pointer] = right;
             }        
-        
         }
-
-
-        int m;
-        for (m = 0; m < r; m = m + 1){
-            stack[m] = 0;
+        for (i = 0; i < r; i = i + 1){
+            stack[i] = 0;
         }
     }
-    for (i = 0; i < 6; i = i + 1){
+    for (i = 0; i < n; i = i + 1){
         cout << arr[i] << endl;
     }
     

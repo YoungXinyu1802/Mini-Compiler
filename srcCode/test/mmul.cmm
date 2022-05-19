@@ -3,7 +3,7 @@ int main(){
     cin>>M1>>N1;
     int n1;
     n1=M1*N1;
-    int A[n1];
+    int A[625];
     int i,j,k,temp;
     for(i=0;i<M1;i=i+1){
         for(j=0;j<N1;j=j+1){
@@ -15,7 +15,7 @@ int main(){
     cin>>M2>>N2;
     int n2;
     n2=M2*N2;
-    int B[n2];
+    int B[625];
     for(i=0;i<M2;i=i+1){
         for(j=0;j<N2;j=j+1){
             k=i*M2+j;
@@ -24,16 +24,14 @@ int main(){
         }
     }
 
-    int n3=M1*N2;
-    int C[n3];
-
-    int x,y,z;
-
+    int n3;
+    n3=M1*N2;
+    int C[625];
+    int x,y,z, t;
     if(N1!=M2){
         cout<<"Incomptible Dimensions"<<endl;
     }
     else{
-
         for(i=0;i<M1;i=i+1){
             for(j=0;j<N2;j=j+1){
                 for(k=0;k<N1;k=k+1){
@@ -55,8 +53,6 @@ int main(){
             }
             cout<<endl;
         }
-
-
     }
     return 0;
 
