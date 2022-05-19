@@ -544,7 +544,7 @@ llvm::Value *_argsDefinition::codeGen(CodeGenerator & generator){
     return alloc;
 }
 
-// unfinished
+
 llvm::Value *_Variable::codeGen(CodeGenerator & generator){
     Debug("_Variable::codeGen");
     llvm::Value *value = nullptr;
