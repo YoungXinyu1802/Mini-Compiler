@@ -547,11 +547,11 @@ llvm::Value *_argsDefinition::codeGen(CodeGenerator & generator){
 // unfinished
 llvm::Value *_Variable::codeGen(CodeGenerator & generator){
     Debug("_Variable::codeGen");
-    llvm::Value *value = generator.getValue(*this->ID_Name);
-    value = TheBuilder.CreateLoad(value);
+    llvm::Value *value = nullptr;
+
     if(this->v_Type == CONST){
-        std::cout << "const: " << *this->ID_Name << std::endl;
-        return value;
+        value = generator.getValue(*this->ID_Name);
+        value = TheBuilder.CreateLoad(value);
     }
     else if (this->v_Type == ARRAY){
         llvm::Value *index = this->expr->codeGen(generator);
@@ -561,6 +561,10 @@ llvm::Value *_Variable::codeGen(CodeGenerator & generator){
         llvm::Value *array_i = TheBuilder.CreateGEP(array,Idxs);
         value = TheBuilder.CreateLoad(array_i);
     }
+    else if (this->v_Type == ArrayPtr){
+        value = generator.getValue(*this->ID_Name);
+    }
+    return value;
 }
 
 llvm::Value *_mainFunction::codeGen(CodeGenerator & generator){
