@@ -1,45 +1,10 @@
-int f(int a, int b){
-    cout << "f" << endl;
-    cout << a << b << endl;
-    return a + b;
-}
-
-void ff(){
-    cout << "ff" << endl;
-}
-
 int main(){
-    int a, b, i;
-    cout << "hello" << endl;
-    cout << "input a: ";
-    cin >> a;
-    int array[5];
-    array[2]=10;
-    char str[10];
-    char c;
-    c = 'a';
-    cout << c;
-    str[10]={'h','e','l','l','o','w','o','r','l','d'};
-    if(a == 1){
-        a = a + 1;
-    }
-    else if(a == 2){
-        a = a + 2;
-    }
-    else{
-        b = a + 3;
-    }
-    while(a < 10){
-        cout << a << endl;
-        b = b + 3;
-        a = a + 1;
-    }
-    for(i = 0; i < 10; i = i + 1){
-        cout << i;
-    }
-    cout << endl;
-    b = f(1, 2);
-    ff();
-    cout << b << endl;
+    int a[10];
+    a[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    int i;
+    cout << a[2+6] << endl;
+    i = 5;
+    cout << i << endl;
+    cout << a[i+1] << endl;
     return 0;
 }

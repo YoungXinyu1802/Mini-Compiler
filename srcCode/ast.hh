@@ -462,6 +462,7 @@ public:
     }
     _assignExpression(_Variable* value,_DataList* datas){
         this->val=value;
+        reverse(datas->begin(),datas->end());
         this->v_assignExpression.data=datas;
         this->v_Type=ARRAY;
     }

@@ -444,13 +444,10 @@ llvm::Value *_assignExpression::codeGen(CodeGenerator & generator){
                 TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
             else{
                 llvm::Value *vindex =val->expr->codeGen(generator);
-
                 llvm::ConstantInt *indexInt = llvm::dyn_cast<llvm::ConstantInt>(vindex);        
                 int index=indexInt->getZExtValue();
                 auto array= generator.getValue(*this->val->ID_Name);
                 llvm::Type * arrayType = TheBuilder.CreateLoad(array)->getType();//->getArrayElementType();
-                //arrayType->print(llvm::outs());
-                //cout<<endl<<arrayType->getTypeID()<<endl;
                 TheBuilder.CreateStore(value,TheBuilder.CreateConstGEP2_32(arrayType,array,0,index));
             }
             break;
@@ -472,11 +469,8 @@ llvm::Value *_assignExpression::codeGen(CodeGenerator & generator){
                 index++;
             }
             break;
-        }
-        
-    }
-    
-    
+        }     
+    }   
     return value;
 }
 
@@ -556,12 +550,17 @@ llvm::Value *_Variable::codeGen(CodeGenerator & generator){
     llvm::Value *value = generator.getValue(*this->ID_Name);
     value = TheBuilder.CreateLoad(value);
     if(this->v_Type == CONST){
+        std::cout << "const: " << *this->ID_Name << std::endl;
         return value;
     }
     else if (this->v_Type == ARRAY){
         llvm::Value *index = this->expr->codeGen(generator);
+        llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
+        llvm::Value *Idxs[]={con_0,index};
+        auto array= generator.getValue(*this->ID_Name);
+        llvm::Value *array_i = TheBuilder.CreateGEP(array,Idxs);
+        value = TheBuilder.CreateLoad(array_i);
     }
-
 }
 
 llvm::Value *_mainFunction::codeGen(CodeGenerator & generator){
