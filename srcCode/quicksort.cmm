@@ -1,0 +1,65 @@
+int main(){
+    int arr[6];
+    arr[6] = {2, 5, 3, 6, 1, 0};
+    int p, r;
+    p = 0;
+    r = 5;
+    int stack[6];
+    if (p < r){
+        int pointer;
+        pointer = -1;
+        pointer = pointer + 1;
+        stack[pointer] = p;
+        pointer = pointer + 1;
+        stack[pointer] = r;
+        int ex, left, right;
+        ex = 0;
+        left = 0;
+        right = 0;
+        while(pointer != -1){
+            right = stack[pointer];
+            pointer = pointer - 1;
+            left = stack[pointer];
+            pointer = pointer - 1;
+            int i;
+            i = left - 1;
+            int pivot;
+            pivot = arr[right];
+            int j;
+            for (j = left; j < right; j = j + 1){
+                if (arr[j] < pivot){
+                    i = i + 1;
+                    ex = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = ex;
+                }
+            }
+            arr[right] = arr[i + 1];
+            arr[i + 1] = pivot;
+            if(left < i){
+                pointer = pointer + 1;
+                stack[pointer] = left;
+                pointer = pointer + 1;
+                stack[pointer] = i;
+            }
+            if(i + 2 < right){
+                pointer = pointer + 1;
+                stack[pointer] = i + 2;
+                pointer = pointer + 1;
+                stack[pointer] = right;
+            }        
+        
+        }
+
+
+        int m;
+        for (m = 0; m < r; m = m + 1){
+            stack[m] = 0;
+        }
+    }
+    for (i = 0; i < 6; i = i + 1){
+        cout << arr[i] << endl;
+    }
+    
+    return 0;
+}
