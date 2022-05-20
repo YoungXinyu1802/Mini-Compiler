@@ -277,17 +277,101 @@ public:
     // virtual string JsonGen() override;
 };
 
+class _Data:public Node{
+
+};
+
+class _Variable: public _Data{
+public:
+    std::string *ID_Name;
+    _singleExpression *expr;
+
+    enum u_Type{
+        CONST,
+        ARRAY,
+        ArrayPtr
+    }v_Type;
+
+    _Variable(std::string *name){
+        this->ID_Name=name;
+        this->expr=NULL;
+        this->v_Type=CONST;
+    }
+    _Variable(std::string* name,_singleExpression* expression){
+        this->ID_Name=name;
+        this->expr=expression;
+        this->v_Type=ARRAY;
+    }
+    _Variable(std::string* name,std::string arrayNULL){
+        this->ID_Name=name;
+        this->expr=NULL;
+        this->v_Type=ArrayPtr;
+        cout<<"Arrayptr\n";
+    }
+
+    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    // virtual string JsonGen() override;
+};
+
+class _Value:public _Data{
+public:
+    int i_val;
+    double f_val;
+    std::string s_val;
+    bool b_val;
+    char c_val;
+    BuildInType var_type;
+    _Value(int value){
+        this->i_val=value;
+        this->var_type=C_INTEGER;
+    }
+    _Value(double value){
+        this->f_val=value;
+        this->var_type=C_REAL;
+    }
+    _Value(std::string* value){
+    
+        this->s_val=*value;
+        this->var_type=C_STRING;
+    }
+    _Value(char value){
+        cout<<"charvalue: "<<value<<endl;
+        this->c_val=value;
+        this->var_type=C_CHAR;
+    }
+    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    // virtual string JsonGen() override;
+};
+
+
 class _Output:public  Node{
 public:
     _DataList* vars;
+    int digit;
+    bool setD=false;
     _Output(_DataList* variables){
         reverse(variables->begin(),variables->end());
         this->vars=variables;
         std::cout<<"Output\n";
     }
+    void setDigit(_Value* val){
+        if(val->var_type!=C_INTEGER){
+            cout<<"error setDight type"<<endl;
+        }
+        else{
+            this->setD=true;
+            this->digit=val->i_val;
+            cout<<"success set digit"<<this->digit<<endl;
+        }
+    }
+    bool isSetD(){
+        return this->setD;
+    }
+    int getD(){
+        return this->digit;
+    }
 
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 
@@ -616,70 +700,5 @@ public:
     // virtual string JsonGen() override;
 };
 
-class _Data:public Node{
-
-};
-
-class _Variable: public _Data{
-public:
-    std::string *ID_Name;
-    _singleExpression *expr;
-
-    enum u_Type{
-        CONST,
-        ARRAY,
-        ArrayPtr
-    }v_Type;
-
-    _Variable(std::string *name){
-        this->ID_Name=name;
-        this->expr=NULL;
-        this->v_Type=CONST;
-    }
-    _Variable(std::string* name,_singleExpression* expression){
-        this->ID_Name=name;
-        this->expr=expression;
-        this->v_Type=ARRAY;
-    }
-    _Variable(std::string* name,std::string arrayNULL){
-        this->ID_Name=name;
-        this->expr=NULL;
-        this->v_Type=ArrayPtr;
-        cout<<"Arrayptr\n";
-    }
-
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
-};
-
-class _Value:public _Data{
-public:
-    int i_val;
-    double f_val;
-    std::string s_val;
-    bool b_val;
-    char c_val;
-    BuildInType var_type;
-    _Value(int value){
-        this->i_val=value;
-        this->var_type=C_INTEGER;
-    }
-    _Value(double value){
-        this->f_val=value;
-        this->var_type=C_REAL;
-    }
-    _Value(std::string* value){
-    
-        this->s_val=*value;
-        this->var_type=C_STRING;
-    }
-    _Value(char value){
-        cout<<"charvalue: "<<value<<endl;
-        this->c_val=value;
-        this->var_type=C_CHAR;
-    }
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
-};
 
 #endif

@@ -85,6 +85,8 @@ friend                                                  {return FRIEND;}
 template                                                {return TEMPLATE;}
 default                                                 {return DEFAULT;}
 new                                                     {return NEW;}
+setw                                                    {return SETW;}
+
 
 register                                                {return REGISTER;}
 return                                                  {return RETURN;}
