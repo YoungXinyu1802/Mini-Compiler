@@ -55,7 +55,6 @@
         "condition_variable": "cpp",
         "cstring": "cpp",
         "ctime": "cpp",
-        "set": "cpp",
         "ratio": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"

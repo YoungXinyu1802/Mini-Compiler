@@ -40,6 +40,9 @@ public:
     llvm::Function *mainFunction, *printFunction, *scanFunction;
     std::vector<llvm::Function*> funcStack;
     std::unique_ptr<llvm::Module> TheModule;
+    std::map<std::string, llvm::StructType *> TypeMap;
+    std::map<std::string, _Struct *> StructMap;
+    std::map<std::string, std::string> VarStructID;
 
     CodeGenerator();
     llvm::GenericValue run();

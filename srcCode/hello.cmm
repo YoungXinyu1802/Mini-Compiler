@@ -1,19 +1,17 @@
+struct Type1{
+    int a;
+    int b;
+    double c;
+    int A[10];
+};
+
 int main(){
-    char a[10000];
-    int flag, i;
-    flag = 1;
-    i = 0;
-    while(flag){
-        char temp;
-        cin >> temp;
-        if(temp != endl){
-            a[i] = temp;
-        }
-        else{
-            flag = 0;
-        }
-        cout << a[i] << endl;
-        i = i + 1;
-    }
+    struct Type1 t1,array[5];
+    t1.a = 1;
+    t1.A={1,2,3,4,5,6,7,8,9,10};
+    t1.A[0]=0;
+    int i;
+    i = t1.a;
+    cout << t1.A[0] <<endl;
     return 0;
 }
