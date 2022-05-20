@@ -1,12 +1,17 @@
-
+void ff(int b,int array[]){
+    cout << "ff" << endl;
+    cout << b << endl;
+}
 int main(){
-    int a;
-    if (1){
-        a = 2;
-    }
-    else{
-        a = 1;
-    }
-    cout << a << endl;
+    int a[5];
+    a[5] = {1, 2, 3, 4, 5};
+    int i;
+    ff(1,a[]);
+    a[0]=9;
+    i=a[1];
+    a[i]=0;
+    cout<<a[0];
+    cout<<a[i];
+    cout<<endl;
     return 0;
 }

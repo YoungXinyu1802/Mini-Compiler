@@ -443,12 +443,28 @@ llvm::Value *_assignExpression::codeGen(CodeGenerator & generator){
             if(val->v_Type==_Variable::CONST)
                 TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
             else{            
-                llvm::Value *index = val->expr->codeGen(generator);
-                llvm::Constant* con = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
-                llvm::Value *Idxs[]={con,index};
+                cout<<"single array assignment"<<endl;
+                llvm::Value *index =val->expr->codeGen(generator);
+                //llvm::ConstantInt *indexInt = llvm::dyn_cast<llvm::ConstantInt>(vindex);        
+                //int index=indexInt->getZExtValue();
                 auto array= generator.getValue(*this->val->ID_Name);
-                llvm::Value *arrayVal = TheBuilder.CreateGEP(array, Idxs);
-                value = TheBuilder.CreateStore(value, arrayVal);            
+                llvm::Type * arrayType = TheBuilder.CreateLoad(array)->getType();//->getArrayElementType();
+                llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
+                llvm::Value *Idxs[]={con_0,index};
+                llvm::Value *array_i;
+                if(generator.getCurFunc()->getName()=="Main")
+                {
+                    cout<<"Array in function main"<<endl;
+                    array_i = TheBuilder.CreateGEP(array,Idxs);
+                }
+                else
+                {
+                    cout<<"Array in function args"<<endl;
+                    array=TheBuilder.CreateLoad(array);
+                    array_i = TheBuilder.CreateGEP(array,index);
+                }             
+                //TheBuilder.CreateStore(value,TheBuilder.CreateConstGEP2_32(arrayType,array,0,index));
+                TheBuilder.CreateStore(value,array_i);       
             }
             break;
         }
@@ -555,13 +571,25 @@ llvm::Value *_Variable::codeGen(CodeGenerator & generator){
         value = TheBuilder.CreateLoad(value);
     }
     else if (this->v_Type == ARRAY){
-        cout << "array" << endl;
+         cout << "array" << endl;
         llvm::Value *index = this->expr->codeGen(generator);
-        llvm::Constant* con = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
-        llvm::Value *Idxs[]={con,index};
+        llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
+        llvm::Value *Idxs[]={con_0,index};
         auto array= generator.getValue(*this->ID_Name);
-        llvm::Value *arrayVal = TheBuilder.CreateGEP(array, Idxs);
-        value = TheBuilder.CreateLoad(arrayVal);
+        llvm::Value *array_i;
+        if(generator.getCurFunc()->getName()=="Main")
+        {
+            cout<<"Array in function main"<<endl;
+            array_i = TheBuilder.CreateGEP(array,Idxs);
+        }
+        else
+        {
+            cout<<"Array in function args"<<endl;
+            array=TheBuilder.CreateLoad(array);
+            array_i = TheBuilder.CreateGEP(array,index);
+        }
+        value = TheBuilder.CreateLoad(array_i);
+
     }
     else if (this->v_Type == ArrayPtr){
         value = generator.getValue(*this->ID_Name);
