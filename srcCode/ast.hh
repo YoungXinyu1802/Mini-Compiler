@@ -371,7 +371,8 @@ public:
         return this->digit;
     }
 
-    virtual string JsonGen() override;
+    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    // virtual string JsonGen() override;
 };
 
 

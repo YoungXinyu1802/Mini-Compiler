@@ -50,7 +50,7 @@ int main(){
         for(i=0;i<M1;i=i+1){
             for(j=0;j<N2;j=j+1){
                 t=i*N2+j;
-                cout<<C[t] << ' ';
+                cout<< setw(10) << C[t];
             }
             cout<<endl;
         }

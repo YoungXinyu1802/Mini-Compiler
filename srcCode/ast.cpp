@@ -705,7 +705,13 @@ llvm::Value *_Output::codeGen(CodeGenerator & generator){
             format += "%c";
         }
         else if(varType == TheBuilder.getInt32Ty()){
-            format += "%d";
+            if (setD){
+                string c = std::to_string(digit);
+                format += "%" + c + "d";
+            }
+            else{
+                format += "%d";
+            }
         }
         else if(varType == TheBuilder.getDoubleTy()){
             format += "%lf";
