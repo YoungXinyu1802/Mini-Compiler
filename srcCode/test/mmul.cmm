@@ -29,7 +29,7 @@ int main(){
     int C[625];
     int x,y,z,t;
     if(N1!=M2){
-        cout<<"Incomptible Dimensions"<<endl;
+        cout<<"Incompatible Dimensions"<<endl;
     }
     else{
         for(i=0;i<M1;i=i+1){
