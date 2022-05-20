@@ -58,6 +58,9 @@ _Program *root;
     _Output *c_Output;
     _InputList *c_InputList;
     _OutputList *c_OutputList;
+    _StructList *c_StructList;
+    _Struct *c_Struct;
+    _DefinitionList *c_DefinitionList;
 }
 
 
@@ -117,17 +120,47 @@ _Program *root;
 %type<c_Output>                      Output
 %type<c_InputList>                   InputList
 %type<c_OutputList>                  OutputList
+%type<c_StructList>                  structList
+%type<c_Struct>                      Struct
+%type<c_DefinitionList>              DefinitionList
 
 
 %start Program
 %%
 
 Program: 
-functionList{
-    $$=new _Program($1);
-    root = $$;
+structList functionList{
+    $$=new _Program($1,$2);
+    root=$$;
 }
 
+structList:
+Struct structList{
+    $2->push_back($1); //remain to complete
+    $$=$2;
+}
+|Struct{
+    $$=new _StructList();
+    $$->push_back($1);
+}
+|{
+    $$=new _StructList();
+}
+
+Struct:
+STRUCT IDENTIFIER LCB DefinitionList RCB SEMI{
+    $$=new _Struct($2,$4); //remain to complete
+}
+
+DefinitionList:
+Definition DefinitionList{
+    $$=$2;
+    $$->push_back($1); //remain to complete
+}
+|Definition{
+    $$=new _DefinitionList();
+    $$->push_back($1);
+}
 
 functionList:
 Function functionList{
@@ -250,6 +283,11 @@ Definition:
 SYS_TYPE DataList SEMI{
     $$=new _Definition($1,$2);
 }
+|STRUCT IDENTIFIER DataList SEMI{
+    int a=0;
+    cout<<"here"<<endl;
+    $$=new _Definition(a,$2,$3);
+}
 
 
 
@@ -283,6 +321,12 @@ IDENTIFIER{
 |IDENTIFIER LB RB{
     string a="nullTest";
     $$=new _Variable($1,a);
+}
+|IDENTIFIER DOT IDENTIFIER{
+    $$=new _Variable($1,$3);
+}
+|IDENTIFIER DOT IDENTIFIER LB singleExpression RB{
+    $$=new _Variable($1,$3,$5);   
 }
 
 
@@ -332,7 +376,7 @@ singleExpression  GE  expr {
 |expr {
     $$ = $1;
 }
-;
+
 
 expr : 
 expr  ADD  term{ 
@@ -347,7 +391,7 @@ expr  ADD  term{
 |term {
     $$ = $1; 
 }
-;
+
 
 
 term : 

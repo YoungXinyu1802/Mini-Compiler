@@ -45,6 +45,7 @@ class _Term;
 class _Value;
 class _Input;
 class _Output;
+class _Struct;
 
 typedef std::vector<_argsDefinition*> _ArgsDefinitionList;
 typedef std::vector<_Function*> _FunctionList;
@@ -53,6 +54,8 @@ typedef std::vector<_Data*> _DataList;
 typedef std::vector<_Data*> _InputList;
 typedef std::vector<_Data*> _OutputList;
 typedef std::vector<_singleExpression*>_SingleExpressionList;
+typedef std::vector<_Struct*> _StructList;
+typedef std::vector<_Definition*> _DefinitionList;
 //待完善 变量存储相关
 
 
@@ -84,7 +87,8 @@ enum BuildInType {
     C_CHAR,
     C_BOOLEAN,
     C_STRING,
-    C_VOID
+    C_VOID,
+    C_STRUCT
 };
 enum C_Operator {
     C_ADD,
@@ -112,31 +116,195 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) = 0;
-    // virtual string JsonGen()=0;
+    //virtual string JsonGen()=0;
 private:
     int type;
 };
 
+class _Data:public Node{
+
+};
+
+class _Variable: public _Data{
+public:
+    std::string *ID_Name;
+    std::string *member;
+    _singleExpression *expr;
+
+    enum u_Type{
+        CONST,
+        ARRAY,
+        ArrayPtr,
+        Struct,
+        structARRAY
+    }v_Type;
+
+    _Variable(std::string *name){
+        this->ID_Name=name;
+        this->expr=NULL;
+        this->v_Type=CONST;
+    }
+    _Variable(std::string* name,_singleExpression* expression){
+        this->ID_Name=name;
+        this->expr=expression;
+        this->v_Type=ARRAY;
+    }
+    _Variable(std::string* name,std::string arrayNULL){
+        this->ID_Name=name;
+        this->expr=NULL;
+        this->v_Type=ArrayPtr;
+        cout<<"Arrayptr\n";
+    }
+    _Variable(std::string* name, std::string*member){
+        this->ID_Name=name;
+        this->member=member;
+        this->v_Type=Struct;
+    }
+    _Variable(std::string* name, std::string*member,_singleExpression* expression){
+        this->ID_Name=name;
+        this->member=member;
+        this->v_Type=structARRAY;
+        this->expr=expression;
+    }
+
+
+    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    // virtual string JsonGen() override;
+};
+
+class _Value:public _Data{
+public:
+    int i_val;
+    double f_val;
+    std::string s_val;
+    bool b_val;
+    char c_val;
+    BuildInType var_type;
+    _Value(int value){
+        this->i_val=value;
+        this->var_type=C_INTEGER;
+    }
+    _Value(double value){
+        this->f_val=value;
+        this->var_type=C_REAL;
+    }
+    _Value(std::string* value){
+    
+        this->s_val=*value;
+        this->var_type=C_STRING;
+    }
+    _Value(char value){
+        cout<<"charvalue: "<<value<<endl;
+        this->c_val=value;
+        this->var_type=C_CHAR;
+    }
+    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    // virtual string JsonGen() override;
+};
+
+class _Definition: public Node{
+public:
+    BuildInType def_Type;
+    bool isStruct;
+    string* structID;
+    _DataList* data;
+    _Definition(std::string* type, _DataList* var){
+        isStruct=false;
+        if(*type=="int"){
+            def_Type=C_INTEGER;
+        }
+        else if(*type=="char"){
+            def_Type=C_CHAR;
+        }
+        else if (*type=="double"){
+            def_Type=C_REAL;
+        }
+        else if(*type=="string"){
+            def_Type=C_STRING;
+        }
+        else{
+            def_Type=C_BOOLEAN;
+        }
+        reverse(var->begin(),var->end());
+        this->data=var;
+        std::cout<<"Definition\n";    
+    }
+    _Definition(int type,std::string* ID,_DataList*var){
+        isStruct=true;
+        this->def_Type=C_STRUCT;
+        this->structID=ID;
+        reverse(var->begin(),var->end());
+        this->data=var;
+    }
+    string getStructID(){
+        return *this->structID;
+    }
+
+    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    // virtual string JsonGen() override;
+};
+
+class _Struct:public Node{
+public:
+    _DefinitionList* defins;
+    std::string* struct_ID;
+
+    _Struct(std::string* name,_DefinitionList* definitions ){
+        this->struct_ID=name;
+        this->defins=definitions;
+    }
+
+    int getIndex(std::string name){
+        int count=0;
+        for(auto defin:*this->defins){
+            //next pointer
+            for(auto var: *defin->data){
+                _Variable* tVar=dynamic_cast<_Variable*>(var);
+                if(*tVar->ID_Name==name){
+                    cout<<"find index"<<count<<endl;
+                    return count;
+                }
+                ++count;
+            }
+        }
+        return -1;// default: no matched ID_name
+    }
+
+    string getId(int index){
+        int count=0;
+        for(auto defin:*this->defins){
+            //next pointer
+            for(auto var: *defin->data){
+                _Variable* tVar=dynamic_cast<_Variable*>(var);
+                if(index==count){
+                    return *tVar->ID_Name;
+                }
+                ++count;
+            }
+        }
+        return NULL;
+    }
+    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    //virtual string JsonGen() override;
+};
+
+
 class _Program: public Node{
 public:
     _FunctionList *myFuncs;
-    _Program(_FunctionList *Funcs){
-        reverse(Funcs->begin(),Funcs->end());
-        this->myFuncs=Funcs;
-        std::cout<<"Program\n";
-        if(this->myFuncs==NULL){
-            cout<<"NULL"<<endl;
+    _StructList *myStructs;
+    _Program(_StructList *structs,_FunctionList *Funcs){
+        if(structs->size()>0){
+            reverse( structs->begin(),structs->end());
+            this->myStructs=structs;
         }
         else{
-            cout<<"Not NULL"<<endl;
-            _Function* f=(*this->myFuncs).front();
-            if(f==NULL){
-                cout<<"f is null"<<endl;
-            }
-            else{
-                cout<<"f is not null"<<endl;
-            }
+            this->myStructs=NULL;
         }
+        reverse( Funcs->begin(),Funcs->end());
+        this->myFuncs=Funcs;
+        std::cout<<"Program\n";
+
     }
 
     // _Program(_FunctionList *Funcs){
@@ -145,6 +313,22 @@ public:
     _Program(){
         this->myFuncs=NULL;
     }
+    bool hasStruct(){
+        if(this->myStructs==NULL){
+            cout<<"struct is NULL";
+            return false;
+        }
+        return true;
+    }
+
+    _Struct* getStructPtr(string* name){
+        for(auto stu :*this->myStructs){
+            if(*(stu->struct_ID)==*name){
+                return stu;
+            }
+        }
+    }
+
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
     // virtual string JsonGen() override;
@@ -277,71 +461,7 @@ public:
     // virtual string JsonGen() override;
 };
 
-class _Data:public Node{
 
-};
-
-class _Variable: public _Data{
-public:
-    std::string *ID_Name;
-    _singleExpression *expr;
-
-    enum u_Type{
-        CONST,
-        ARRAY,
-        ArrayPtr
-    }v_Type;
-
-    _Variable(std::string *name){
-        this->ID_Name=name;
-        this->expr=NULL;
-        this->v_Type=CONST;
-    }
-    _Variable(std::string* name,_singleExpression* expression){
-        this->ID_Name=name;
-        this->expr=expression;
-        this->v_Type=ARRAY;
-    }
-    _Variable(std::string* name,std::string arrayNULL){
-        this->ID_Name=name;
-        this->expr=NULL;
-        this->v_Type=ArrayPtr;
-        cout<<"Arrayptr\n";
-    }
-
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
-};
-
-class _Value:public _Data{
-public:
-    int i_val;
-    double f_val;
-    std::string s_val;
-    bool b_val;
-    char c_val;
-    BuildInType var_type;
-    _Value(int value){
-        this->i_val=value;
-        this->var_type=C_INTEGER;
-    }
-    _Value(double value){
-        this->f_val=value;
-        this->var_type=C_REAL;
-    }
-    _Value(std::string* value){
-    
-        this->s_val=*value;
-        this->var_type=C_STRING;
-    }
-    _Value(char value){
-        cout<<"charvalue: "<<value<<endl;
-        this->c_val=value;
-        this->var_type=C_CHAR;
-    }
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
-};
 
 
 class _Output:public  Node{
@@ -387,33 +507,6 @@ public:
     // virtual string JsonGen() override;
 };
 
-class _Definition: public Node{
-public:
-    BuildInType def_Type;
-    _DataList* data;
-    _Definition(std::string* type, _DataList* var){
-        if(*type=="int"){
-            def_Type=C_INTEGER;
-        }
-        else if(*type=="char"){
-            def_Type=C_CHAR;
-        }
-        else if (*type=="double"){
-            def_Type=C_REAL;
-        }
-        else if(*type=="string"){
-            def_Type=C_STRING;
-        }
-        else{
-            def_Type=C_BOOLEAN;
-        }
-        reverse(var->begin(),var->end());
-        this->data=var;
-        std::cout<<"Definition\n";    }
-
-    virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
-};
 
 class _Expression: public Node{
 public:
