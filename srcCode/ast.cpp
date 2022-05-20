@@ -565,6 +565,7 @@ llvm::Value *_Variable::codeGen(CodeGenerator & generator){
     }
     else if (this->v_Type == ArrayPtr){
         value = generator.getValue(*this->ID_Name);
+        // value = TheBuilder.CreateLoad(value);
         cout << "variable type" << value->getType()->getTypeID() << endl;
     }
     return value;

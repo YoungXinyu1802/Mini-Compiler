@@ -1,12 +1,8 @@
-int f(int a[]){
-    cout << "f" << endl;
-    return 0;
-}
 
 int main(){
-    int a[5];
-    int i;
-    cin >> i;
-    cout << i;
+    int a;
+    a = -1;
+    a = a + 1;
+    cout << a << endl;
     return 0;
 }

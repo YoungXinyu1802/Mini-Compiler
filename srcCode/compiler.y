@@ -378,7 +378,7 @@ LP singleExpression RP{
     $$=new _singleExpression(new _singleExpression(new _Value(1)),C_XOR,$2);
 }
 |SUB factor{
-    $$=new _singleExpression(new _singleExpression(new _Value(1)),C_SUB,$2);
+    $$=new _singleExpression(new _singleExpression(new _Value(0)),C_SUB,$2);
 }
 
 
