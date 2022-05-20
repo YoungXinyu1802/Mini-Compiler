@@ -11,6 +11,7 @@
 %option noyywrap 
 
 ANY .
+NQUOTE  [^"']
 COMMENT "{"{ANY}*"}" 
 DIGIT [0-9]
 DIGITS {DIGIT}+
@@ -20,7 +21,7 @@ POINT "."{DIGITS}
 EXPONENT (e|E)("+"|"-")?{DIGITS}
 INTNUM {DIGITS}
 REALNUM {DIGITS}({POINT})?({EXPONENT})?
-STRING "\""({LETTER}|{DIGIT})*"\""
+STRING "\""({LETTER}|{DIGIT}|{NQUOTE})*"\""
 
 %%
 "//".*                                                   ;   //comments
@@ -84,7 +85,8 @@ friend                                                  {return FRIEND;}
 template                                                {return TEMPLATE;}
 default                                                 {return DEFAULT;}
 new                                                     {return NEW;}
-void                                                    {return VOID;}
+setw                                                    {return SETW;}
+
 register                                                {return REGISTER;}
 return                                                  {return RETURN;}
 enum                                                    {return ENUM;}
@@ -107,10 +109,11 @@ scanf                                                   {return SCANF;}
 main                                                    {return MAIN;}
 cin                                                     {return CIN;}
 cout                                                    {return COUT;}
+endl                                                    {return ENDL;}
 
 
 
-"int"|"char"|"double"|"boolean"                         SAVE_TOKEN; return SYS_TYPE;  
+"int"|"char"|"double"|"boolean"|"string"|"void"         SAVE_TOKEN; return SYS_TYPE;  
 "false"|"true"                                          SAVE_TOKEN; return SYS_BOOL;                                               
 
 
@@ -118,6 +121,7 @@ cout                                                    {return COUT;}
 {ID}                                                    SAVE_TOKEN; return IDENTIFIER;
 {DIGITS}\.{DIGITS}                                      SAVE_TOKEN; yylval.floatVal=atof(yylval.sVal->c_str()); return REAL; 
 {DIGITS}                                                SAVE_TOKEN; yylval.intVal=atoi(yylval.sVal->c_str()); return INTEGER;
+
 {STRING}                                                SAVE_TOKEN; yylval.sVal=yylval.sVal; return STRING;
 
 %%

@@ -22,6 +22,9 @@ string getJsonString(string name, vector<string> children) {
 }
 
 string getJsonString(string name, string value){
+    if(name=="STRING"){
+        return "{\"name\":\"" +name +"\", \"value\":"+ value+" }";
+    }
     return "{\"name\":\"" +name +"\", \"value\":\""+ value+"\" }";
 }
 
@@ -46,6 +49,11 @@ string getJsonString(string name, string value ,string type){
 string _Program::JsonGen(){
     std::vector<string>children;
     std::vector<string>funcs;
+    std::vector<string>structs;
+    for(auto mystruct: *this->myStructs){
+        structs.push_back(mystruct->JsonGen());
+    }
+    children.push_back(getJsonString("structList",structs));
     std::cout<<"in Program"<<endl;
     for(auto func: *this->myFuncs){
         funcs.push_back(func->JsonGen());
@@ -57,12 +65,25 @@ string _Program::JsonGen(){
 string _Function::JsonGen(){
     std::vector<string> children;
     if(this->v_Type==MAIN){
+        cout<<"cpp main"<<endl;
         children.push_back(this->v_Function.mainFunc->JsonGen());
     }
     if(this->v_Type==SUB){
         children.push_back(this->v_Function.subFunc->JsonGen());
     }
     return getJsonString("Function",children);
+}
+
+string _Struct::JsonGen(){
+    std::vector<string> children;
+    std::vector<string>defins;
+    children.push_back(getJsonString("ID",*this->struct_ID));
+    for(auto defin:*this->defins){
+        defins.push_back(defin->JsonGen());
+    }
+    children.push_back(getJsonString("DefinitionList",defins));
+    cout<<"struct jsonGen"<<endl;
+    return getJsonString("Struct",children);    
 }
 
 string _mainFunction::JsonGen(){
@@ -74,11 +95,12 @@ string _mainFunction::JsonGen(){
     children.push_back(getJsonString("ArgsDefinitionList",funcArgs));
 
     std::vector<string>stas;
+    cout<<this->statements->size()<<"cpp"<<endl;
     for(auto sta:*this->statements){
         stas.push_back(sta->JsonGen());
     }
     children.push_back(getJsonString("StatementList",stas));
-
+    cout<<"finish main json"<<endl;
     return getJsonString("mainFunc",children);
 }
 
@@ -101,10 +123,12 @@ string _Subroutine::JsonGen(){
 
 string _Statement::JsonGen(){
     std::vector<string>children;
+    cout<<"in json statement"<<endl;
     if(this->v_Type==DEFINITION){
         children.push_back(this->v_Statement.definStatement->JsonGen());
     }
     else if(this->v_Type==EXPRESSION){
+        cout<<"in statement expression json"<<endl;
         children.push_back(this->v_Statement.exprStatement->JsonGen());
     }
     else if(this->v_Type==RETURNSTATEMENT){
@@ -160,10 +184,25 @@ string _Definition::JsonGen(){
     else if(this->def_Type==C_CHAR){
         type="char";
     }
+    else if(this->def_Type==C_STRING){
+        type="string";
+    }
     else if(this->def_Type==C_BOOLEAN){
         type="boolean";
     }
-    children.push_back(this->variable->JsonGen());
+    else if(this->def_Type==C_STRUCT){
+        type="struct";
+    }
+    children.push_back(getJsonString("type",type));
+    if(this->isStruct){
+        children.push_back(getJsonString("structID",this->getStructID()));
+    }
+    std::vector<string>vars;
+    for(auto sta: *this->data){
+        vars.push_back(sta->JsonGen());
+    }
+    
+    children.push_back(getJsonString("DataList",vars));
     return getJsonString("Definition",type,children);
 }
 
@@ -176,6 +215,11 @@ string _Expression::JsonGen(){
         children.push_back(this->v_Expression.complexExpression->JsonGen());
     }
     else if(this->v_Type==FUNCTIONCALL){
+        cout<<"in functioncall json"<<endl;
+        if(this->v_Expression.functionCall==NULL){
+            cout<<"func ptr is null"<<endl;
+
+        }
         children.push_back(this->v_Expression.functionCall->JsonGen());
     }
 
@@ -261,6 +305,15 @@ string _assignExpression::JsonGen(){
     else if(this->v_Type==VOID){
         children.push_back(this->v_assignExpression.function->JsonGen());
     }
+    else if(this->v_Type==ARRAY){
+        children.push_back(this->val->JsonGen());
+        std::vector<string>datas;
+        for(auto var: *this->v_assignExpression.data){
+            datas.push_back(var->JsonGen());
+        }
+    children.push_back(getJsonString("DataList",datas));
+
+    }
     return getJsonString("Assignment",children);
 }
 
@@ -281,10 +334,15 @@ string _complexExpression::JsonGen(){
 string _functionCall::JsonGen(){
     std::vector<string> children;
     std::vector<string> argsJson;
-    for(auto arg: *this->args){
-        argsJson.push_back(arg->JsonGen());
+    cout<<"functioncall begin json"<<endl;
+    if(this->v_Type==HasArgs){
+        for(auto arg: *this->args){
+            argsJson.push_back(arg->JsonGen());
+        }
+        cout<<"functioncall end json"<<endl;
+        children.push_back(getJsonString("ArgsList",argsJson));
     }
-    children.push_back(getJsonString("ArgsList",argsJson));
+    children.push_back(getJsonString("FuncName",*this->func_Name));
     return getJsonString("functionCall",*this->func_Name,children);
 }
 
@@ -377,6 +435,22 @@ string _Variable::JsonGen(){
         children.push_back(this->expr->JsonGen());
         return getJsonString("Array",*this->ID_Name,children);
     }
+    else if(this->v_Type==ArrayPtr){
+        return getJsonString("ArrayPtr",*this->ID_Name);
+    }
+    else if(this->v_Type==Struct){
+        std::vector<string> children;
+        children.push_back(getJsonString("ID",*this->ID_Name));
+        children.push_back(getJsonString("member",*this->member));
+        return getJsonString("StructV",children);
+    }
+    else if(this->v_Type==Struct){
+        std::vector<string> children;
+        children.push_back(getJsonString("ID",*this->ID_Name));
+        children.push_back(getJsonString("member",*this->member));
+        children.push_back(this->expr->JsonGen());
+        return getJsonString("StructA",children);
+    }
 }
 
 
@@ -391,13 +465,17 @@ string _Value::JsonGen(){
         return getJsonString("Double",s);
     }
     else if(this->var_type==C_CHAR ){
-        string s=this->s_val;
-        //cout<<s;
-        return getJsonString("Char",s);
+        char c=this->c_val;
+        string t="";
+        t.push_back(c);
+        cout<<"c:"<<c<<endl;
+        cout<<"t:"<<t<<endl;
+        return getJsonString("Char",t);
     }
-    else if(this->var_type==C_BOOLEAN){
-        string s=std::to_string(this->b_val);
-        return getJsonString("Boolean",s);
+    else if(this->var_type==C_STRING){
+        string s=this->s_val;
+        cout<<"ssval"<<s<<endl;
+        return getJsonString("STRING",s);
     }
 }
 

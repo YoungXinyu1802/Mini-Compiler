@@ -125,12 +125,14 @@ extern int yydebug;
     CHAR = 331,
     CIN = 332,
     COUT = 333,
-    SYS_TYPE = 334,
-    SYS_BOOL = 335,
-    IDENTIFIER = 336,
-    REAL = 337,
-    INTEGER = 338,
-    STRING = 339
+    ENDL = 334,
+    SETW = 335,
+    SYS_TYPE = 336,
+    SYS_BOOL = 337,
+    IDENTIFIER = 338,
+    REAL = 339,
+    INTEGER = 340,
+    STRING = 341
   };
 #endif
 
@@ -174,8 +176,13 @@ union YYSTYPE
     _Value *c_Value;
     _Input *c_Input;
     _Output *c_Output;
+    _InputList *c_InputList;
+    _OutputList *c_OutputList;
+    _StructList *c_StructList;
+    _Struct *c_Struct;
+    _DefinitionList *c_DefinitionList;
 
-#line 179 "parser.hpp"
+#line 186 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

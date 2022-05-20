@@ -1,14 +1,21 @@
-int main(){
-
-    int i;
-    cin>>i;
-    i=i+1;
-    i=testFunc(i);
-    cout<<i;
-}
-
-int testFunc(int a){
+struct Type1{
+    int a;
     int b;
-    b=a;
-    return b;
+    double c;
+    string s;
+    int A[10];
+};
+struct Type2{
+    int a;
+    int b;
+    double c;
+    string s;
+    int A[10];
+};
+
+int main(){
+    struct Type1 a,b;
+    a.c=1;
+    b.c=2;
 }
+

@@ -56,6 +56,11 @@ _Program *root;
     _Value *c_Value;
     _Input *c_Input;
     _Output *c_Output;
+    _InputList *c_InputList;
+    _OutputList *c_OutputList;
+    _StructList *c_StructList;
+    _Struct *c_Struct;
+    _DefinitionList *c_DefinitionList;
 }
 
 
@@ -73,7 +78,7 @@ _Program *root;
 %token FLOAT BREAK AUTO CLASS OPERATOR CASE DO LONG TYPEDEF STATIC FRIEND
 %token TEMPLATE DEFAULT NEW VOID REGISTER RETURN ENUM INLINE TRY SHORT CONTINUE 
 %token SIZEOF SWITCH PRIVATE PROTECTED ASM WHILE CATCH DELETE PUBLIC VOLATILE 
-%token STRUCT PRINTF SCANF MAIN CHAR CIN COUT
+%token STRUCT PRINTF SCANF MAIN CHAR CIN COUT ENDL SETW
 
 
 
@@ -85,6 +90,7 @@ _Program *root;
 %type<sVal>SYS_TYPE  IDENTIFIER STRING
 %type<intVal>INTEGER
 %type<floatVal>REAL
+%type<cVal>CHAR
 //中间变量类型定义 暂略
 
 %type<c_Program>                     Program
@@ -112,15 +118,51 @@ _Program *root;
 %type<c_returnStatement>             returnStatement
 %type<c_Input>                       Input
 %type<c_Output>                      Output
+%type<c_InputList>                   InputList
+%type<c_OutputList>                  OutputList
+%type<c_StructList>                  structList
+%type<c_Struct>                      Struct
+%type<c_DefinitionList>              DefinitionList
+
+
 
 
 %start Program
 %%
 
 Program: 
-functionList{
-    $$=new _Program($1);
+structList functionList{
+    $$=new _Program($1,$2);
     root=$$;
+}
+
+
+structList:
+Struct structList{
+    $2->push_back($1); //remain to complete
+    $$=$2;
+}
+|Struct{
+    $$=new _StructList();
+    $$->push_back($1);
+}
+|{
+    $$=new _StructList();
+}
+
+Struct:
+STRUCT IDENTIFIER LCB DefinitionList RCB SEMI{
+    $$=new _Struct($2,$4); //remain to complete
+}
+
+DefinitionList:
+Definition DefinitionList{
+    $$=$2;
+    $$->push_back($1); //remain to complete
+}
+|Definition{
+    $$=new _DefinitionList();
+    $$->push_back($1);
 }
 
 
@@ -187,13 +229,52 @@ Definition{
 
 
 Input:
-CIN RD DataList{
+CIN RD InputList{
     $$=new _Input($3);
 }
 
 Output:
-COUT LD DataList{
+COUT LD OutputList{
     $$=new _Output($3);
+}
+|COUT LD SETW LP Value RP LD OutputList{
+    $$=new _Output($8);
+    $$->setDigit($5);
+}
+
+OutputList:
+Variable LD OutputList{
+    $3->push_back($1);
+    $$=$3;
+}
+|Value LD OutputList{
+    $3->push_back($1);
+    $$=$3;
+}
+|Value{
+    $$=new _OutputList();
+    $$->push_back($1);
+}
+|Variable{
+    $$=new _OutputList();
+    $$->push_back($1);
+}
+|ENDL{
+    char c='\n';
+    _Value* temp= new _Value(c);
+    $$=new _OutputList();
+    $$->push_back(temp);
+}
+
+
+InputList:
+Variable RD InputList{
+    $3->push_back($1);
+    $$=$3;
+}
+|Variable{
+    $$=new _InputList();
+    $$->push_back($1);
 }
 
 returnStatement:
@@ -204,8 +285,13 @@ RETURN singleExpression SEMI{
 
 
 Definition:
-SYS_TYPE Variable SEMI{
+SYS_TYPE DataList SEMI{
     $$=new _Definition($1,$2);
+}
+|STRUCT IDENTIFIER DataList SEMI{
+    int a=0;
+    cout<<"here"<<endl;
+    $$=new _Definition(a,$2,$3);
 }
 
 
@@ -234,8 +320,18 @@ Variable:
 IDENTIFIER{
     $$=new _Variable($1);
 }
-|IDENTIFIER LB Expression RB{
+|IDENTIFIER LB singleExpression RB{
     $$=new _Variable($1,$3);
+}
+|IDENTIFIER LB RB{
+    string a="nullTest";
+    $$=new _Variable($1,a);
+}
+|IDENTIFIER DOT IDENTIFIER{
+    $$=new _Variable($1,$3);
+}
+|IDENTIFIER DOT IDENTIFIER LB singleExpression RB{
+    $$=new _Variable($1,$3,$5);   
 }
 
 
@@ -259,6 +355,10 @@ Variable ASSIGN singleExpression{
 |Variable ASSIGN functionCall{
     $$= new _assignExpression($1,$3);
 }
+|Variable ASSIGN  LCB DataList RCB{
+    $$= new _assignExpression($1,$4);
+}
+
 
 singleExpression : 
 singleExpression  GE  expr {
@@ -282,7 +382,7 @@ singleExpression  GE  expr {
 |expr {
     $$ = $1;
 }
-;
+
 
 expr : 
 expr  ADD  term{ 
@@ -297,7 +397,7 @@ expr  ADD  term{
 |term {
     $$ = $1; 
 }
-;
+
 
 
 term : 
@@ -332,7 +432,7 @@ LP singleExpression RP{
     $$=new _singleExpression(new _singleExpression(new _Value(1)),C_XOR,$2);
 }
 |SUB factor{
-    $$=new _singleExpression(new _singleExpression(new _Value(1)),C_SUB,$2);
+    $$=new _singleExpression(new _singleExpression(new _Value(0)),C_SUB,$2);
 }
 
 
@@ -351,11 +451,18 @@ REAL{
     cout<<"string";
     $$=new _Value($1);
 }
+|CHAR{
+    cout<<"char"<<endl;
+    $$=new _Value($1);
+}
 
 
 functionCall:
 IDENTIFIER LP DataList RP{
     $$=new _functionCall($1,$3);
+}
+|IDENTIFIER LP RP{
+    $$=new _functionCall($1); 
 }
 
 
@@ -452,6 +559,7 @@ SYS_TYPE Variable{
         cout<<"args";
     }
 }
+
 
 
 

@@ -1,0 +1,65 @@
+//
+int main(){
+    // cin M N 
+    int M1,N1,M2,N2;
+    cin>>M1>>N1;
+    int n1;
+    n1=M1*N1;
+    int A[n1];
+    int i,j,k,temp;
+    for(i=0;i<M1;i=i+1){
+        for(j=0;j<N1;j=j+1){
+            k=i*M1+j;
+            cin>>temp;
+            A[k]=temp;
+        }
+    }
+    cin>>M2>>N2;
+    int n2;
+    n2=M2*N2;
+    int B[n2];
+    for(i=0;i<M2;i=i+1){
+        for(j=0;j<N2;j=j+1){
+            k=i*M2+j;
+            cin>>temp;
+            B[k]=temp;
+        }
+    }
+
+    int n3=M1*N2;
+    int C[n3];
+
+    int x,y,z;
+
+    if(N1!=M2){
+        cout<<"Incomptible Dimensions"<<endl;
+    }
+    else{
+
+        for(i=0;i<M1;i=i+1){
+            for(j=0;j<N2;j=j+1){
+                for(k=0;k<N1;k=k+1){
+                    t=i*N1+k;
+                    x=A[t];
+                    t=k*M2+j;
+                    y=B[t];
+                    z=x*y;
+                    t=i*N2+j;
+                    C[t]=C[t]+z;
+                }
+            }
+        }
+
+        for(i=0;i<M1;i=i+1){
+            for(j=0;j<N2;j=j+1){
+                t=i*N2+j;
+                cout<<C[t];
+            }
+            cout<<endl;
+        }
+
+
+    }
+    return 0;
+
+}
