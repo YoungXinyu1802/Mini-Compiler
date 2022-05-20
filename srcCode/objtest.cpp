@@ -5,4 +5,3 @@ extern "C" {
 int main() {
     Main();
 }
-

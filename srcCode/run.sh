@@ -1,2 +1,2 @@
-clang++ objtest.cpp output.o -o quicksort
-# ./objtest
+clang++ objtest.cpp output.o -o objtest
+./objtest
