@@ -328,6 +328,12 @@ IDENTIFIER{
 |IDENTIFIER DOT IDENTIFIER LB singleExpression RB{
     $$=new _Variable($1,$3,$5);   
 }
+|IDENTIFIER LB singleExpression RB DOT IDENTIFIER LB singleExpression RB{
+    $$=new _Variable($1,$3,$6,$8);
+}
+|IDENTIFIER LB singleExpression RB DOT IDENTIFIER{
+    $$=new _Variable($1,$3,$6); 
+}
 
 
 

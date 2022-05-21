@@ -129,42 +129,70 @@ class _Variable: public _Data{
 public:
     std::string *ID_Name;
     std::string *member;
-    _singleExpression *expr;
+    _singleExpression *exprID;
+    _singleExpression *exprMem;
 
     enum u_Type{
         CONST,
         ARRAY,
         ArrayPtr,
         Struct,
-        structARRAY
+        StructMemARRAY,
+        MemARRAY,
+        StructARRAY
     }v_Type;
 
     _Variable(std::string *name){
         this->ID_Name=name;
-        this->expr=NULL;
+        this->exprID=NULL;
+        this->exprMem=NULL;
         this->v_Type=CONST;
+        std::cout<<"Variable"<<" "<<*name<<endl;
     }
     _Variable(std::string* name,_singleExpression* expression){
         this->ID_Name=name;
-        this->expr=expression;
+        this->exprID=expression;
+        this->exprMem=NULL;
         this->v_Type=ARRAY;
+        cout<<"Array\n";
+
     }
     _Variable(std::string* name,std::string arrayNULL){
         this->ID_Name=name;
-        this->expr=NULL;
+        this->exprID=NULL;
+        this->exprMem=NULL;
         this->v_Type=ArrayPtr;
         cout<<"Arrayptr\n";
     }
     _Variable(std::string* name, std::string*member){
         this->ID_Name=name;
+        this->exprID=NULL;
+        this->exprMem=NULL;
         this->member=member;
         this->v_Type=Struct;
     }
     _Variable(std::string* name, std::string*member,_singleExpression* expression){
         this->ID_Name=name;
         this->member=member;
-        this->v_Type=structARRAY;
-        this->expr=expression;
+        this->v_Type=MemARRAY;//modified
+        this->exprMem=expression;
+        this->exprID=NULL;
+    }
+    _Variable(std::string* name1,_singleExpression* expr1,std::string* name2,_singleExpression* expr2){
+        cout<<"in structMemArray"<<endl;
+        this->ID_Name=name1;
+        this->member=name2;
+        this->v_Type=StructMemARRAY;
+        this->exprMem=expr2;
+        this->exprID=expr1;
+    }
+    _Variable(std::string* name, _singleExpression* expression,std::string*member){
+        cout<<"in structArray"<<endl;
+        this->ID_Name=name;
+        this->member=member;
+        this->v_Type=StructARRAY;//modified
+        this->exprID=expression;
+        this->exprMem=NULL;
     }
 
 
