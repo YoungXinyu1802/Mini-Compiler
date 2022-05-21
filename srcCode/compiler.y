@@ -446,6 +446,10 @@ REAL{
     cout<<"char"<<endl;
     $$=new _Value($1);
 }
+|ENDL{
+    char c='\n';
+    $$=new _Value(c);
+}
 
 
 functionCall:

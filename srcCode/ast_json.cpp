@@ -49,6 +49,14 @@ string getJsonString(string name, string value ,string type){
 string _Program::JsonGen(){
     std::vector<string>children;
     std::vector<string>funcs;
+    std::vector<string>structs;
+    if(this->myStructs!=NULL){
+        for(auto mystruct: *this->myStructs){
+            structs.push_back(mystruct->JsonGen());
+        }
+        children.push_back(getJsonString("structList",structs));
+    }
+    
     std::cout<<"in Program"<<endl;
     for(auto func: *this->myFuncs){
         funcs.push_back(func->JsonGen());
