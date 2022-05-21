@@ -33,6 +33,7 @@ int main(){
         cin>>temp;
         if(temp!=endl){
             while(con==1){
+                index=0;
                 if(temp=='|'){
                     index=0;
                     con=0;
@@ -60,7 +61,7 @@ int main(){
                     con=0;
                 }
                 else{
-                    type1[count].conditions[index]=temp;
+                    type1[count].pre[index]=temp;
                     index=index+1;
                 }
             }
@@ -116,10 +117,11 @@ int main(){
         res1=1.0*totalScore/totalGot;
     }
     else{
-        res1=0;
+        res1=0.0;
     }
     cout<<"GPA:"<<res1<<endl;
     cout<<"Hours Attempted:"<<totalTried<<endl;
     cout<<"Hours Completed:"<<totalGot<<endl;
     cout<<"credits Remaining:"<<totalRemain<<endl;
+    return 0;
 }

@@ -1,23 +1,18 @@
-struct Type1{
-    int a;
-    int b;
-    double c;
-    int A[10];
+struct Course {
+    char course_name[5];
+    int credits;
+    char pre[500];
+    int grade;
 };
 
 int main(){
-    int a, b, c, d;
-    double a1, b1, c1, d1;
-    a1 = 1.0;
-    b1 = 2.0;
-    c1 = 3.0;
-    d1 = 4.0;
-    a = a1+b1;
-    b = 2;
-    c = 3;
-    d = 4;
-    a1 = c1/d1;
-    cout << a1;
-
+    struct Course type1[100];
+    char temp;
+    int index;
+    index=0;
+    int count,t;
+    count=0;
+    cin>>temp;
+    type1[count].course_name[index]=temp;
     return 0;
 }
