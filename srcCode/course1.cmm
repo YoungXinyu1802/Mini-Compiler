@@ -60,7 +60,7 @@ int main(){
                     con=0;
                 }
                 else{
-                    type1[count].conditions[index]=temp;
+                    type1[count].pre[index]=temp;
                     index=index+1;
                 }
             }
@@ -122,4 +122,5 @@ int main(){
     cout<<"Hours Attempted:"<<totalTried<<endl;
     cout<<"Hours Completed:"<<totalGot<<endl;
     cout<<"credits Remaining:"<<totalRemain<<endl;
+    return 0;
 }

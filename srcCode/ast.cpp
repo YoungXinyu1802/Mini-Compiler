@@ -384,7 +384,7 @@ llvm::Value *_Program::codeGen(CodeGenerator & generator){
                         llvm::Type* type;
                         _Variable * elemvariable = dynamic_cast<_Variable*>(elemvar);
                         if(elemvariable->v_Type == _Variable::ARRAY){
-                            llvm::Value *size = elemvariable->expr->codeGen(generator);
+                            llvm::Value *size = elemvariable->exprID->codeGen(generator);
                             llvm::ConstantInt *sizeInt = llvm::dyn_cast<llvm::ConstantInt>(size);                       
                             type = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
                         }
@@ -491,11 +491,9 @@ llvm::Value *_assignExpression::codeGen(CodeGenerator & generator){
                 TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
             else if(val->v_Type==_Variable::ARRAY){            
                 cout<<"single array assignment"<<endl;
-                llvm::Value *index =val->expr->codeGen(generator);
-                //llvm::ConstantInt *indexInt = llvm::dyn_cast<llvm::ConstantInt>(vindex);        
-                //int index=indexInt->getZExtValue();
+                llvm::Value *index =val->exprID->codeGen(generator);
                 auto array= generator.getValue(*this->val->ID_Name);
-                llvm::Type * arrayType = TheBuilder.CreateLoad(array)->getType();//->getArrayElementType();
+                
                 llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
                 llvm::Value *Idxs[]={con_0,index};
                 llvm::Value *array_i;
@@ -525,7 +523,7 @@ llvm::Value *_assignExpression::codeGen(CodeGenerator & generator){
                 auto alloc = generator.getValue(name);
                 TheBuilder.CreateStore(value,TheBuilder.CreateConstGEP2_32(structType,alloc,0,index));
             }
-            else if(val->v_Type==_Variable::structARRAY){
+            else if(val->v_Type==_Variable::MemARRAY){
                 std::string name=*val->ID_Name;
                 std::string mem=*val->member;
                 std::string struct_ID = generator.VarStructID[name];
@@ -536,8 +534,47 @@ llvm::Value *_assignExpression::codeGen(CodeGenerator & generator){
                 auto alloc = generator.getValue(name);
                 alloc = TheBuilder.CreateConstGEP2_32(structType,alloc,0,index1);
 
-                llvm::Value *index =val->expr->codeGen(generator);
+                llvm::Value *index =val->exprMem->codeGen(generator);
                 llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
+                llvm::Value *Idxs[]={con_0,index};
+                alloc = TheBuilder.CreateGEP(alloc,Idxs);
+                TheBuilder.CreateStore(value,alloc);
+            }
+            else if(val->v_Type==_Variable::StructARRAY){
+                cout<<"sing structarray assignment"<<endl;
+                llvm::Value *index1 =val->exprID->codeGen(generator);
+                auto array= generator.getValue(*this->val->ID_Name);
+                llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
+                llvm::Value *Idxs[]={con_0,index1};
+                array = TheBuilder.CreateGEP(array,Idxs);
+
+                std::string name=*val->ID_Name;
+                std::string mem=*val->member;
+                std::string struct_ID = generator.VarStructID[name];
+                _Struct* stru = generator.StructMap[struct_ID];
+                llvm::Type* structType = generator.TypeMap[struct_ID];
+                int index = stru->getIndex(mem);
+
+                TheBuilder.CreateStore(value,TheBuilder.CreateConstGEP2_32(structType,array,0,index));
+            }
+            else if(val->v_Type==_Variable::StructMemARRAY){
+                cout<<"sing structMemarray assignment"<<endl;
+                llvm::Value *index0 =val->exprID->codeGen(generator);
+                auto array= generator.getValue(*this->val->ID_Name);
+                llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
+                llvm::Value *Idxs0[]={con_0,index0};
+                array = TheBuilder.CreateGEP(array,Idxs0);
+
+                std::string name=*val->ID_Name;
+                std::string mem=*val->member;
+                std::string struct_ID = generator.VarStructID[name];
+                _Struct* stru = generator.StructMap[struct_ID];
+                llvm::Type* structType = generator.TypeMap[struct_ID];
+                int index1 = stru->getIndex(mem);
+
+                auto alloc = TheBuilder.CreateConstGEP2_32(structType,array,0,index1);
+
+                llvm::Value *index =val->exprMem->codeGen(generator);
                 llvm::Value *Idxs[]={con_0,index};
                 alloc = TheBuilder.CreateGEP(alloc,Idxs);
                 TheBuilder.CreateStore(value,alloc);
@@ -602,7 +639,7 @@ llvm::Value *_Definition::codeGen(CodeGenerator & generator){
         bool isArray = (variable->v_Type == _Variable::ARRAY);
 
         if (isArray){
-            llvm::Value *size = variable->expr->codeGen(generator);
+            llvm::Value *size = variable->exprID->codeGen(generator);
             llvm::ConstantInt *sizeInt = llvm::dyn_cast<llvm::ConstantInt>(size);
             // uint64_t size_int = size->getUniqueInteger().getZextValue();            
             llvm::Type *arrayType = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
@@ -645,7 +682,7 @@ llvm::Value *_argsDefinition::codeGen(CodeGenerator & generator){
     bool isArray = (args->v_Type == _Variable::ARRAY);
 
     if (isArray){
-        llvm::Value *size = this->args->expr->codeGen(generator);
+        llvm::Value *size = this->args->exprID->codeGen(generator);
         llvm::ConstantInt *sizeInt = llvm::dyn_cast<llvm::ConstantInt>(size);
         // uint64_t size_int = size->getUniqueInteger().getZextValue();
         llvm::Type *arrayType = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
@@ -670,7 +707,7 @@ llvm::Value *_Variable::codeGen(CodeGenerator & generator){
     }
     else if (this->v_Type == ARRAY){
          cout << "array" << endl;
-        llvm::Value *index = this->expr->codeGen(generator);
+        llvm::Value *index = this->exprID->codeGen(generator);
         llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
         llvm::Value *Idxs[]={con_0,index};
         auto array= generator.getValue(*this->ID_Name);
@@ -707,7 +744,7 @@ llvm::Value *_Variable::codeGen(CodeGenerator & generator){
         auto structaddr = TheBuilder.CreateConstGEP2_32(structType,alloc,0,index);
         value = TheBuilder.CreateLoad(structaddr);
     }
-    else if(this->v_Type == structARRAY){
+    else if(this->v_Type == MemARRAY){
         std::string name=*ID_Name;
         std::string mem=*member;
         std::string struct_ID = generator.VarStructID[name];
@@ -718,11 +755,50 @@ llvm::Value *_Variable::codeGen(CodeGenerator & generator){
         auto alloc = generator.getValue(name);
         auto structaddr = TheBuilder.CreateConstGEP2_32(structType,alloc,0,index1);
 
-        llvm::Value *index = this->expr->codeGen(generator);
+        llvm::Value *index = this->exprMem->codeGen(generator);
         llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
         llvm::Value *Idxs[]={con_0,index};
 
         auto arrayaddr = TheBuilder.CreateGEP(structaddr,Idxs);
+        value = TheBuilder.CreateLoad(arrayaddr);
+    }
+    else if(this->v_Type == StructARRAY){
+        llvm::Value *index = this->exprID->codeGen(generator);
+        llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
+        llvm::Value *Idxs[]={con_0,index};
+        auto array= generator.getValue(*this->ID_Name);
+        llvm::Value *array_i = TheBuilder.CreateGEP(array,Idxs);
+
+        std::string name=*ID_Name;
+        std::string mem=*member;
+        std::string struct_ID = generator.VarStructID[name];
+        _Struct* stru = generator.StructMap[struct_ID];
+        llvm::Type* structType = generator.TypeMap[struct_ID];
+        int index1 = stru->getIndex(mem);
+
+        auto structaddr = TheBuilder.CreateConstGEP2_32(structType,array_i,0,index1);
+        value = TheBuilder.CreateLoad(structaddr);
+    }
+    else if(this->v_Type == StructMemARRAY){
+        llvm::Value *index = this->exprID->codeGen(generator);
+        llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
+        llvm::Value *Idxs[]={con_0,index};
+        auto array= generator.getValue(*this->ID_Name);
+        llvm::Value *array_i = TheBuilder.CreateGEP(array,Idxs);
+
+        std::string name=*ID_Name;
+        std::string mem=*member;
+        std::string struct_ID = generator.VarStructID[name];
+        _Struct* stru = generator.StructMap[struct_ID];
+        llvm::Type* structType = generator.TypeMap[struct_ID];
+        int index1 = stru->getIndex(mem);
+
+        auto structaddr = TheBuilder.CreateConstGEP2_32(structType,array_i,0,index1);
+
+        llvm::Value *index2 = this->exprMem->codeGen(generator);
+        llvm::Value *Idxs2[]={con_0,index2};
+
+        auto arrayaddr = TheBuilder.CreateGEP(structaddr,Idxs2);
         value = TheBuilder.CreateLoad(arrayaddr);
     }
     return value;
