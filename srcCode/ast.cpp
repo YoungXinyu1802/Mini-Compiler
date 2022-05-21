@@ -49,7 +49,15 @@ llvm::Value *_singleExpression::codeGen(CodeGenerator & generator){
         llvm::Value *rhsVal = rhs->codeGen(generator);
 
         // conduct the operation
-        bool isDouble = lhsVal->getType()->isDoubleTy() || rhsVal->getType()->isDoubleTy();
+        bool lhsDouble, rhsDouble, isDouble;
+        lhsDouble = lhsVal->getType()->isDoubleTy();
+        rhsDouble = rhsVal->getType()->isDoubleTy();
+        isDouble = lhsDouble || rhsDouble;
+        if(isDouble){
+            lhsVal = TheBuilder.CreateSIToFP(lhsVal, llvm::Type::getDoubleTy(TheContext));
+            rhsVal = TheBuilder.CreateSIToFP(rhsVal, llvm::Type::getDoubleTy(TheContext));
+        }
+
         switch(this->OP){
             case C_ADD:{
                 Debug("C_ADD");
@@ -863,7 +871,7 @@ llvm::Value *_Output::codeGen(CodeGenerator & generator){
             }
         }
         else if(varType == TheBuilder.getDoubleTy()){
-            format += "%lf";
+            format += "%.1f";
         }
         else if(varType == TheBuilder.getInt8Ty()){
             format += "%d";

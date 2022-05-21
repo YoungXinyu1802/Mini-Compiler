@@ -1,0 +1,20 @@
+struct Type{
+    int a;
+    int b;
+    double c;
+    char d[600];
+};
+
+
+int main(){
+    struct Type t, t2[100];
+    t.d = {'a', 'b', 'c'};
+    char c;
+    c = t.d[0];
+    cout << c << endl;
+    t2[0] = t;
+    struct Type t3;
+    t3 = t2[0];
+    cout << t3.d[0] << endl;
+    return 0;
+}
