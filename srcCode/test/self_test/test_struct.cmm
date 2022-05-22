@@ -1,0 +1,26 @@
+struct Type{
+    int id;
+    char type;
+    char name[3];
+};
+
+int main(){
+    struct Type t, p[3];
+    int i;
+    for (i = 0; i < 3; i = i + 1){
+        p[i].id = i;
+        p[i].type = 'A';
+        p[i].name[0] = 'a';
+        p[i].name[1] = 'b';
+        p[i].name[2] = 'c';
+    }
+    t = p[1];
+    cout << "t.id = " << t.id << endl;
+    cout << "t.type = " << t.type << endl;
+    cout << "t.name = ";
+    for(i = 0; i < 3; i = i + 1){
+        cout << t.name[i];
+    }
+    cout << endl;
+    return 0;    
+}

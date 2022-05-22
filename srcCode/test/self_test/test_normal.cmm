@@ -1,0 +1,28 @@
+int main(){
+    int a;
+    a = 1;
+    char b;
+    b = 'b';
+    int i, n;
+    cout << "Input a number n: ";
+    cin >> n;
+    for(i = 0; i < n; i = i + 1){
+        if (i < n/2){
+            cout << "less than half: " << i << endl;
+        }
+        else if(i == n/2){
+            cout << "i is half, print b: " << b << endl;
+        }
+        else {
+            cout << "greater than half: " << i << endl;
+        }
+    }
+    cout << "reverse of n: " << endl;
+    while(i > 0){
+        cout << setw(5) << i << endl;
+        a = a * i;
+        i = i - 1;
+    }
+    cout << "fact n:" << a << endl;
+    return 0;
+}

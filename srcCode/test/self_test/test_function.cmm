@@ -1,0 +1,22 @@
+void voidFunc(int array[]){
+    array[1] = 1;
+}
+
+int addFunc(int a, int b)
+{
+    return a + b;
+}
+
+int main(){
+    int a, b, c;
+    a = 1;
+    b = 2;
+    c = addFunc(a, b);
+    cout << "call addFunc: " << c << endl;
+    int array[2];
+    array[2]= {1, 2};
+    cout << "before voidFunc: " << array[1] << endl;
+    voidFunc(array[]);
+    cout << "after voidFunc: " << array[1] << endl;
+    return 0;
+}

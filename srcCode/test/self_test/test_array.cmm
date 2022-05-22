@@ -1,0 +1,17 @@
+int main(){
+    char a[5];
+    a[5] = {'h', 'e', 'l', 'l', 'o'};
+    int i;
+    for(i = 0; i < 5; i = i + 1){
+        cout << a[i];
+    }
+    cout << endl;
+    int b[10];
+    for(i = 0; i < 10; i = i + 1){
+        b[i] = i * 2;
+    }
+    for(i = 0; i < 10; i = i + 1){
+        cout << "b[" << i << "]:" << b[i] << endl;
+    }
+    return 0;
+}

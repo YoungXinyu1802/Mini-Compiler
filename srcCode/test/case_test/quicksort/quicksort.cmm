@@ -1,0 +1,57 @@
+void quicksort(int a[], int low, int high){
+    int i, j, key, temp;
+    int flag;
+    flag = 0;
+    i = low;
+    j = high;
+    key = a[low];
+    if (low >= high){
+        flag = 1;
+    }
+    if (flag == 0){
+        while(low < high){
+            while((low < high) && (key <= a[high])){
+                high = high - 1;
+            }
+            if (key > a[high]){
+                temp = a[low];
+                a[low] = a[high];
+                a[high] = temp;
+                low = low + 1;
+            }
+            while((low < high) && (key >= a[low])){
+                low = low + 1;
+            }
+            if (key < a[low]){
+                temp = a[low];
+                a[low] = a[high];
+                a[high] = temp;
+                high = high - 1;
+            }
+        }
+
+        int newhigh, newlow;
+        newhigh = low - 1;
+        newlow = low + 1;
+        quicksort(a, i, newhigh);
+        quicksort(a, newlow, j);
+    }
+
+}
+
+int main(){
+    int a[10000];
+    int n;
+    cin >> n;
+    int i, temp;
+    for (i = 0; i < n; i = i + 1){
+        cin >> temp;
+        a[i] = temp;
+    }
+    temp = n - 1;
+    quicksort(a[], 0, temp);
+    for (i = 0; i < n; i = i + 1){
+        cout << a[i] << endl;
+    }
+    return 0;
+}
