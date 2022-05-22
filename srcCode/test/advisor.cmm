@@ -13,7 +13,7 @@ int HashFunc(char key[], int TableSize,int size){
     i=0;
     while(i!=size){
         int t;
-        t = 10;
+        t = key[i];
         HashVal = HashVal*32 + t;
         i = i+1;
     }
@@ -157,7 +157,7 @@ int main(){
     cout<<"Credits Remaining: "<<totalRemain<<endl;
     cout << endl;
 
-    cout<<"Possible Courses to Take Next"<<endl;
+    cout<<"Possible Courses to Take Next" << endl;
     int courseNum;
     courseNum=0;
     
@@ -196,10 +196,11 @@ int main(){
             if(type1[i].length==0){
                 courseNum=1;
                 cout << "  ";
-                for(j=0; j<nameSize; j=j+1){
+                for(j=0; j<type1[i].courseNameSize; j=j+1){
                     cout << type1[i].courseName[j];
                 }
                 cout << endl;
+                
             }
             else{
                 isOk=1;
@@ -314,7 +315,7 @@ int main(){
                     
                     courseNum=1;
                     cout << "  ";
-                    for(j=0; j<nameSize; j=j+1){
+                    for(j=0; j<type1[i].courseNameSize; j=j+1){
                         cout << type1[i].courseName[j];
                     }
                     cout << endl;
