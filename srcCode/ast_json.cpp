@@ -1,4 +1,4 @@
-#include "ast_json.h"
+#include "ast.hh"
 
 
 using namespace std;
@@ -70,7 +70,7 @@ string _Function::JsonGen(){
     if(this->v_Type==MAIN){
         cout<<"cpp main"<<endl;
         children.push_back(this->v_Function.mainFunc->JsonGen());
-    }
+    }s
     if(this->v_Type==SUB){
         children.push_back(this->v_Function.subFunc->JsonGen());
     }
@@ -181,6 +181,9 @@ string _Definition::JsonGen(){
     else if(this->def_Type==C_BOOLEAN){
         type="boolean";
     }
+    else if(this->def_Type==C_STRUCT){
+        type="struct";
+    }
     std::vector<string>vars;
     for(auto sta: *this->data){
         vars.push_back(sta->JsonGen());
@@ -188,6 +191,12 @@ string _Definition::JsonGen(){
     
     children.push_back(getJsonString("DataList",vars));
     return getJsonString("Definition",type,children);
+}
+
+string _Struct:public Node{
+    std::vector<string>children;
+    children.push_back(this->defins->JsonGen());
+    return getJsonString("Struct",this->struct_ID,children);
 }
 
 string _Expression::JsonGen(){
@@ -418,6 +427,37 @@ string _Variable::JsonGen(){
     }
     else if(this->v_Type==ArrayPtr){
         return getJsonString("ArrayPtr",*this->ID_Name);
+    }
+    else if(this->v_Type==Struct){
+        std::vector<string> children;
+        children.push_back(getJsonString("memberName",*this->member));
+        return getJsonString("Struct",*this->ID_Name,children);
+    }
+    else if(this->v_Type==MemARRAY){
+        std::vector<string> children;
+        children.push_back(getJsonString("memberName",*this->member));
+        children.push_back(getJsonString("memExpr",*this->exprMem));
+        return getJsonString("memArray",*this->ID_Name,children);
+    }
+    else if(this->v_Type==StructMemARRAY){
+        std::vector<string> children;
+        children.push_back(getJsonString("varibleExpr",*this->exprID));
+        children.push_back(getJsonString("memberName",*this->member));
+        children.push_back(getJsonString("memExpr",*this->exprMem));
+        return getJsonString("structMemArray"*this->ID_Name,children);
+    }
+    else if(this->v_Type==StructARRAY){
+        std::vector<string> children;
+        children.push_back(getJsonString("varibleExpr",*this->exprID));
+        children.push_back(getJsonString("memberName",*this->member));
+        children.push_back(getJsonString("memExpr",*this->exprMem));
+        return getJsonString("structARRAY"*this->ID_Name,children);
+    }
+    else if(this->v_Type==StructARRAY){
+        std::vector<string> children;
+        children.push_back(getJsonString("varibleExpr",*this->exprID));
+        children.push_back(getJsonString("memberName",*this->member));
+        return getJsonString("structARRAY"*this->ID_Name,children);
     }
 }
 

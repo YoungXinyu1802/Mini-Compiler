@@ -116,7 +116,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) = 0;
-    //virtual string JsonGen()=0;
+    virtual string JsonGen()=0;
 private:
     int type;
 };
@@ -197,7 +197,7 @@ public:
 
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 class _Value:public _Data{
@@ -227,7 +227,7 @@ public:
         this->var_type=C_CHAR;
     }
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 class _Definition: public Node{
@@ -269,7 +269,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 class _Struct:public Node{
@@ -313,7 +313,7 @@ public:
         return NULL;
     }
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    //virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 
@@ -359,7 +359,7 @@ public:
 
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 
@@ -387,7 +387,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 
@@ -407,7 +407,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 class _Subroutine:public Node{
@@ -430,7 +430,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 //基类 2
@@ -473,7 +473,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 class _Input:public Node{
@@ -486,7 +486,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 
@@ -520,7 +520,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 
@@ -532,7 +532,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 
@@ -565,7 +565,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 class _singleExpression:public Node{
@@ -599,6 +599,7 @@ public:
    }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
+    virtual string JsonGen() override;
 
 };
 
@@ -631,7 +632,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 class _assignExpression: public Node{
@@ -674,7 +675,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 class _complexExpression: public Node{
@@ -706,7 +707,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 class _functionCall: public Node{
@@ -723,7 +724,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 
@@ -742,7 +743,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 class _whileStatement: public Node{
@@ -756,7 +757,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 class _ifStatement: public Node{
@@ -772,7 +773,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 class _elsePart: public Node{
@@ -802,7 +803,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 
@@ -819,7 +820,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    // virtual string JsonGen() override;
+    virtual string JsonGen() override;
 };
 
 
