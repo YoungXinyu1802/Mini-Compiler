@@ -36,6 +36,7 @@ clean:
 	-rm -f tree.json
 	-rm -f *.s
 	-rm -f test/*.txt
+	-rm -f objtest
 
 run :
 	./test.sh

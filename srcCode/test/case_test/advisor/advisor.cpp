@@ -16,7 +16,7 @@ int HashFunc(char key[], int TableSize,int size){
     int i;
     i=0;
     while(i!=size){
-        HashVal = HashVal*32 + key[i];
+        HashVal = HashVal*36 + key[i];
         i = i+1;
     }
     int quotient;
@@ -87,16 +87,16 @@ int main(){
                     index=index+1;
                 }
             }
-            cout << count << endl;
-            cout << type1[count].conditions << endl;
+//            cout << count << endl;
+//            cout << type1[count].course_name << ": " << type1[count].conditions << endl;
 
             //读
             scanf("%c",&temp);
             if(temp=='\n'||temp=='\r'){
                 type1[count].learned=-1;
-                cout << type1[count].learned << endl;
-                cout << endl;     
-                count=count+1;           
+//                cout << type1[count].learned << endl;
+//                cout << endl;
+                count=count+1;
             }
             else{
                 if(temp=='A'){
@@ -132,8 +132,8 @@ int main(){
                     totalTried=totalTried+credit;
                     type1[count].learned=-1;
                 }
-                cout << type1[count].learned << endl;
-                cout << endl;
+//                cout << type1[count].learned << endl;
+//                cout << endl;
                 scanf("%c",&temp);//读掉换行符
                 count=count+1;
             }
@@ -195,8 +195,9 @@ int main(){
     flag = 1;
     isOk=0;
     for(i=0;i<totalCourse;i=i+1){
+
         //只有未修读课程才需要处理
-        cout << i<< " Course learned: " << type1[i].learned << endl;
+//        cout << i<< " Course learned: " << type1[i].learned << endl;
         if(type1[i].learned==-1){
             //处理前置条件
             if(type1[i].length==0){
@@ -238,14 +239,14 @@ int main(){
                                 flag=1;
                                 for(z=0;z<5;z=z+1){
                                     if(type1[k].course_name[z]!=tName[z]){
-                                        cout << "false" << endl;
+//                                        cout << "false" << endl;
                                         flag=-1;
                                         z=5;
                                     }
                                 }
                                 if(flag==1){
                                     //remained to modified
-                                    cout << k << " flag Course learned: " << type1[k].learned << endl;
+//                                    cout << k << " flag Course learned: " << type1[k].learned << endl;
                                     if((type1[k].learned==1)&&(isOk==1)){
                                         isOk=1;
                                     }
@@ -305,12 +306,12 @@ int main(){
                             }
                             if(flag==1){
                                 //remained to modified
-                                cout << k << " Course learned: " << type1[k].learned << endl;
+//                                cout << k << " Course learned: " << type1[k].learned << endl;
                                 if((type1[k].learned==1)&&(isOk==1)){
                                     isOk=1;
                                 }
                                 else{
-                                    cout << k << ": isOK=-1" << endl;
+//                                    cout << k << ": isOK=-1" << endl;
                                     isOk=-1;
                                 }
                                 k=totalCourse;
@@ -318,7 +319,7 @@ int main(){
                         }
                     }
                 }
-                cout << i << " isOk:" << isOk << endl;
+//                cout << i << " isOk:" << isOk << endl;
                 if(isOk==1){
                     //符合修读条件
                     courseNum=1;
