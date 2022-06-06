@@ -1344,7 +1344,7 @@ string _ifStatement::JsonGen(){
 string _elsePart::JsonGen(){
 
     if(this->v_Type==NONE){
-        return "";
+        return getJsonString("else","noElse");
     }
     std::vector<string>children;
     if(this->v_Type==ELSE){
@@ -1384,6 +1384,8 @@ string _argsDefinition::JsonGen(){
 
 
 string _Variable::JsonGen(){
+    cout<<"Varible"<<endl;
+    cout<<this->v_Type<<endl;
     if(this->v_Type==CONST){
         return getJsonString("Variable",*this->ID_Name);
     }
@@ -1410,22 +1412,16 @@ string _Variable::JsonGen(){
         std::vector<string> children;
         children.push_back(this->exprID->JsonGen());
         children.push_back(getJsonString("memberName",*this->member));
-        children.push_back(getJsonString(this->exprMem->JsonGen()));
+        children.push_back(this->exprMem->JsonGen());
         return getJsonString("structMemArray",*this->ID_Name,children);
     }
     else if(this->v_Type==StructARRAY){
         std::vector<string> children;
         children.push_back(this->exprID->JsonGen());
         children.push_back(getJsonString("memberName",*this->member));
-        children.push_back(this->exprMem->JsonGen());
         return getJsonString("structARRAY",*this->ID_Name,children);
     }
-    else if(this->v_Type==StructARRAY){
-        std::vector<string> children;
-        children.push_back(this->exprID->JsonGen());
-        children.push_back(getJsonString("memberName",*this->member));
-        return getJsonString("structARRAY",*this->ID_Name,children);
-    }
+
 }
 
 
@@ -1440,12 +1436,8 @@ string _Value::JsonGen(){
         return getJsonString("Double",s);
     }
     else if(this->var_type==C_CHAR ){
-        char c=this->c_val;
-        string t="";
-        t.push_back(c);
-        cout<<"c:"<<c<<endl;
-        cout<<"t:"<<t<<endl;
-        return getJsonString("Char",t);
+        
+        return getJsonString("Char","char");
     }
     else if(this->var_type==C_STRING){
         string s=this->s_val;
