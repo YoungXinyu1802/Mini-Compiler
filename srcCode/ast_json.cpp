@@ -70,7 +70,7 @@ string _Function::JsonGen(){
     if(this->v_Type==MAIN){
         cout<<"cpp main"<<endl;
         children.push_back(this->v_Function.mainFunc->JsonGen());
-    }s
+    }
     if(this->v_Type==SUB){
         children.push_back(this->v_Function.subFunc->JsonGen());
     }
@@ -193,10 +193,15 @@ string _Definition::JsonGen(){
     return getJsonString("Definition",type,children);
 }
 
-string _Struct:public Node{
+string _Struct::JsonGen(){
     std::vector<string>children;
-    children.push_back(this->defins->JsonGen());
-    return getJsonString("Struct",this->struct_ID,children);
+    std::vector<string>datas;
+    for(auto var: *this->defins){
+        datas.push_back(var->JsonGen());
+    }
+    children.push_back(getJsonString("Definitions",datas));
+
+    return getJsonString("Struct",children);
 }
 
 string _Expression::JsonGen(){
@@ -338,9 +343,9 @@ string _functionCall::JsonGen(){
 
 string _forStatement::JsonGen(){
     std::vector<string>children;
-    children.push_back(this->exprStart->JsonGen());
-    children.push_back(this->exprCond->JsonGen());
-    children.push_back(this->exprUpdate->JsonGen());
+    children.push_back(this->startExpr->JsonGen());
+    children.push_back(this->condExpr->JsonGen());
+    children.push_back(this->stepExpr->JsonGen());
     std::vector<string>stas;
     for(auto sta: *this->statements){
         stas.push_back(sta->JsonGen());
@@ -363,7 +368,7 @@ string _whileStatement::JsonGen(){
 
 string _ifStatement::JsonGen(){
     std::vector<string>children;
-    children.push_back(this->condition1->JsonGen());
+    children.push_back(this->condition->JsonGen());
     std::vector<string>stas;
     for(auto sta: *this->statements){
         stas.push_back(sta->JsonGen());
@@ -422,7 +427,7 @@ string _Variable::JsonGen(){
     }
     else if(this->v_Type==ARRAY){
         std::vector<string> children;
-        children.push_back(this->expr->JsonGen());
+        children.push_back(this->exprID->JsonGen());
         return getJsonString("Array",*this->ID_Name,children);
     }
     else if(this->v_Type==ArrayPtr){
@@ -436,28 +441,28 @@ string _Variable::JsonGen(){
     else if(this->v_Type==MemARRAY){
         std::vector<string> children;
         children.push_back(getJsonString("memberName",*this->member));
-        children.push_back(getJsonString("memExpr",*this->exprMem));
+        children.push_back(this->exprMem->JsonGen());
         return getJsonString("memArray",*this->ID_Name,children);
     }
     else if(this->v_Type==StructMemARRAY){
         std::vector<string> children;
-        children.push_back(getJsonString("varibleExpr",*this->exprID));
+        children.push_back(this->exprID->JsonGen());
         children.push_back(getJsonString("memberName",*this->member));
-        children.push_back(getJsonString("memExpr",*this->exprMem));
-        return getJsonString("structMemArray"*this->ID_Name,children);
+        children.push_back(getJsonString(this->exprMem->JsonGen()));
+        return getJsonString("structMemArray",*this->ID_Name,children);
     }
     else if(this->v_Type==StructARRAY){
         std::vector<string> children;
-        children.push_back(getJsonString("varibleExpr",*this->exprID));
+        children.push_back(this->exprID->JsonGen());
         children.push_back(getJsonString("memberName",*this->member));
-        children.push_back(getJsonString("memExpr",*this->exprMem));
-        return getJsonString("structARRAY"*this->ID_Name,children);
+        children.push_back(this->exprMem->JsonGen());
+        return getJsonString("structARRAY",*this->ID_Name,children);
     }
     else if(this->v_Type==StructARRAY){
         std::vector<string> children;
-        children.push_back(getJsonString("varibleExpr",*this->exprID));
+        children.push_back(this->exprID->JsonGen());
         children.push_back(getJsonString("memberName",*this->member));
-        return getJsonString("structARRAY"*this->ID_Name,children);
+        return getJsonString("structARRAY",*this->ID_Name,children);
     }
 }
 
