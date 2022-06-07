@@ -632,7 +632,7 @@ public:
     }
 
     virtual llvm::Value *codeGen(CodeGenerator & generator) override;
-    virtual string JsonGen() override;
+    // virtual string JsonGen() override;
 };
 
 class _assignExpression: public Node{
