@@ -2,39 +2,36 @@
 
 ## 1. 序言
 
-- ### 1.1 概述
+### 1.1 概述
 
-  本次实验我们小组基于C语言设计并实现了一个类C语言的编译器，该系统以符合C语言基本语法规则的代码文本作为输入，输出为指定机器的目标代码，该C编译器的设计实现涵盖词法分析、语法分析、语义分析、代码生成等阶段和环节，所使用的的具体技术包括但不限于：
+本次实验我们小组基于C语言设计并实现了一个类C语言的编译器，该系统以符合C语言基本语法规则的代码文本作为输入，输出为指定机器的目标代码，该C编译器的设计实现涵盖词法分析、语法分析、语义分析、目标代码生成等阶段和环节，所使用的的具体技术包括但不限于：
 
-  - Flex实现词法分析
-  - Bison实现语法分析
-  - LLVM实现中间代码生成、目标代码生成
-  - json实现AST可视化
+- Flex实现词法分析
+- Bison实现语法分析
+- LLVM实现中间代码生成、目标代码生成
+- json实现AST可视化
 
-  该编译器，目前可以支持
+该编译器，目前可以支持
 
-  - 数据类型
-    - 内置类型int,char,bool,float
-    - 数组类型
-    - 结构体类型
-    - 数组指针
-  - 表达式
-    - 一元操作：Minus
-    - 二元操作: MUL DIV NOT ADD SUB NE,AND OR GE GT LE LT EQ
-    - 变量引用
-    - 数组引用
-  - 语句
-    - 赋值语句
-    - 复合语句
-    - 嵌套语句
-    - 分支语句
-    - 循环语句
-  - 函数
-    - 函数的声明、调用
-    - 系统IO函数：cin、cout
-    - 值传递和引用传递
-  - 可视化
-    - AST可视化
+- 数据类型
+  - 内置类型int,char,bool,float
+  - 数组类型
+  - 结构体类型
+  - 结构体与数组的嵌套
+- 表达式
+  - 一元操作：Minus（负号）
+  - 二元操作: 算数、关系与逻辑运算
+- 语句
+  - 定义语句
+  - 赋值语句：支持初始化列表赋值
+  - 分支语句：if；else；else if
+  - 循环语句：for 和 while
+- 函数
+  - 自定义函数的声明、调用
+  - 系统IO函数：实现 cin、cout
+  - 参数传递实现值传递和指针传递
+- 可视化
+  - AST可视化
 
 ### 1.2 开发环境
 
@@ -55,23 +52,29 @@
   - parser.cpp：Yacc根据compiler.y生成的语法分析器C++文件
   - parser.hpp：Yacc根据compiler.y生成的语法分析器头文件
   - ast.hh：AST函数类声明头文件
-  - ast.cpp
-  - ObjGen.cpp
-  - ObjGen.h
-- doc: 报告文档文件夹
+  - ast.cpp：AST类方法的具体实现
+  - ObjGen.cpp：生成目标代码的函数实现
+  - ObjGen.h：生成目标代码的头文件声明
+  - test: 测试代码及工具文件夹
+    - case_test
+      - quicksort：快排测试程序
+      - matrixmul：矩阵乘法测试程序
+      - advisor：选课助手测试程序
+    - self_test
+      - test_array.cmm：数组测试程序
+      - test_function.cmm：函数测试程序
+      - test_normal.cmm：一般功能测试程序
+      - test_struct.cmm：结构体测试程序
+- docs: 报告文档文件夹
   - report.pdf
-- test: 测试代码及工具文件夹
-  - test1.cmm
-  - test2.cmm
-  - test3.cmm
 
 ### 1.4 组员分工
 
-| 组员   | 具体分工                                           |
-| ------ | -------------------------------------------------- |
-| 赵晨旭 | 词法分析，语法分析，AST可视化                      |
-| 杨心妤 | 语义分析，中间代码生成，运行环境设计，目标代码生成 |
-| 李洁   | 语义分析，中间代码生成，运行环境设计，目标代码生成 |
+| 组员   | 具体分工                                    |
+| ------ | ------------------------------------------- |
+| 赵晨旭 | 词法分析，语法分析，AST可视化，测试代码编写 |
+| 杨心妤 | 运行环境设计，中间代码生成，代码测试        |
+| 李洁   | 中间代码生成，目标代码生成，测试代码调试    |
 
 
 
@@ -97,20 +100,20 @@ Lex 是一个词法分析器的生成工具，它支持使用正则表达式来�
 
 辅助函数这个部分中定义了各个动作所需要的函数，也可以包含 main 函数，这部分的代码将会放到输出的 C 代码中。
 
-### 2.2 正则表达式。
+### 2.2 正则表达式
 
-| 字符           | 描述描述                                                     |
+| 字符           | 描述                                                         |
 | -------------- | ------------------------------------------------------------ |
-| `\``\`         | 将下一个字符标记为一个特殊字符（File Format Escape，清单见本表）、或一个原义字符（Identity Escape，有^$()*+?.[\{\|共计12个)、或一个向后引用（backreferences）、或一个八进制转义符。例如，“`n`”匹配字符“`n`”。“`\n`”匹配一个换行符。序列“`\\`”匹配“`\`”而“`\(`”则匹配“`(`”。将下一个字符标记为一个特殊字符（File Format Escape，清单见本表）、或一个原义字符（Identity Escape，有^$()*+?.[\{|共计12个)、或一个向后引用（backreferences）、或一个八进制转义符。例如，“`n`”匹配字符“`n`”。“`\n`”匹配一个换行符。序列“`\\`”匹配“`\`”而“`\(`”则匹配“`(`”。 |
-| `^``^`         | 匹配输入字符串的开始位置。如果设置了RegExp对象的Multiline属性，^也匹配“`\n`”或“`\r`”之后的位置。匹配输入字符串的开始位置。如果设置了RegExp对象的Multiline属性，^也匹配“`\n`”或“`\r`”之后的位置。 |
-| `$``$`         | 匹配输入字符串的结束位置。如果设置了RegExp对象的Multiline属性，$也匹配“`\n`”或“`\r`”之前的位置。匹配输入字符串的结束位置。如果设置了RegExp对象的Multiline属性，$也匹配“`\n`”或“`\r`”之前的位置。 |
-| `*`            | 匹配前面的子表达式零次或多次。例如，zo*能匹配“`z`”、“`zo`”以及“`zoo`”。*等价于{0,}。 |
-| `+`            | 匹配前面的子表达式一次或多次。例如，“`zo+`”能匹配“`zo`”以及“`zoo`”，但不能匹配“`z`”。+等价于{1,}。 |
+| `\``\`         | 将下一个字符标记为一个特殊字符（File Format Escape，清单见本表）、或一个原义字符、或一个向后引用（backreferences）、或一个八进制转义符。 |
+| `^``^`         | 匹配输入字符串的开始位置。如果设置了RegExp对象的Multiline属性，也匹配“`\n`”或“`\r`”之后的位置。匹配输入字符串的开始位置。如果设置了RegExp对象的Multiline属性，^也匹配“`\n`”或“`\r`”之后的位置。 |
+| `$``$`         | 匹配输入字符串的结束位置。                                   |
+| `*`            | 匹配前面的子表达式零次或多次。例如，zo能匹配“`z`”、“`zo`”以及“`zoo`”。等价于{0,}。 |
+| `+`            | 匹配前面的子表达式一次或多次。例如，“`zo+`”能匹配“`zo`”以及“`zoo`”，但不能匹配“`z`”。+等价于{1}。 |
 | `?`            | 匹配前面的子表达式零次或一次。例如，“`do(es)?`”可以匹配“`does`”中的“`do`”和“`does`”。?等价于{0,1}。 |
 | `{n}`          | *n*是一个非负整数。匹配确定的*n*次。例如，“`o{2}`”不能匹配“`Bob`”中的“`o`”，但是能匹配“`food`”中的两个o。 |
 | `{n,}`         | *n*是一个非负整数。至少匹配*n*次。例如，“`o{2,}`”不能匹配“`Bob`”中的“`o`”，但能匹配“`foooood`”中的所有o。“`o{1,}`”等价于“`o+`”。“`o{0,}`”则等价于“`o*`”。 |
 | `{n,m}`        | *m*和*n*均为非负整数，其中*n*<=*m*。最少匹配*n*次且最多匹配*m*次。例如，“`o{1,3}`”将匹配“`fooooood`”中的前三个o。“`o{0,1}`”等价于“`o?`”。请注意在逗号和两个数之间不能有空格。 |
-| `?`            | 非贪心量化（Non-greedy quantifiers）：当该字符紧跟在任何一个其他重复修饰符（*,+,?，{*n*}，{*n*,}，{*n*,*m*}）后面时，匹配模式是**非**贪婪的。非贪婪模式尽可能少的匹配所搜索的字符串，而默认的贪婪模式则尽可能多的匹配所搜索的字符串。例如，对于字符串“`oooo`”，“`o+?`”将匹配单个“`o`”，而“`o+`”将匹配所有“`o`”。 |
+| `?`            | 非贪心量化（Non-greedy quantifiers）：当该字符紧跟在任何一个其他重复修饰符后面时，匹配模式是非贪婪的。非贪婪模式尽可能少的匹配所搜索的字符串，而默认的贪婪模式则尽可能多的匹配所搜索的字符串。例如，对于字符串“`oooo`”，“`o+?`”将匹配单个“`o`”，而“`o+`”将匹配所有“`o`”。 |
 | `.`            | 匹配除“`\r`”“`\n`”之外的任何单个字符。要匹配包括“`\r`”“`\n`”在内的任何字符，请使用像“`(.|\r|\n)`”的模式。 |
 | `(pattern)`    | 匹配pattern并获取这一匹配的子字符串。该子字符串用于向后引用。所获取的匹配可以从产生的Matches集合得到，在VBScript中使用SubMatches集合，在JScript中则使用$0…$9属性。要匹配圆括号字符，请使用“`\(`”或“`\)`”。可带数量后缀。 |
 | `(?:pattern)`  | 匹配pattern但不获取匹配的子字符串（shy groups），也就是说这是一个非获取匹配，不存储匹配的子字符串用于向后引用。这在使用或字符“`(|)`”来组合一个模式的各个部分是很有用。例如“`industr(?:y|ies)`”就是一个比“`industry|industries`”更简略的表达式。 |
@@ -123,12 +126,8 @@ Lex 是一个词法分析器的生成工具，它支持使用正则表达式来�
 | `[^xyz]`       | 排除型字符集合（negated character classes）。匹配未列出的任意字符。例如，“`[^abc]`”可以匹配“`plain`”中的“`plin`”。 |
 | `[a-z]`        | 字符范围。匹配指定范围内的任意字符。例如，“`[a-z]`”可以匹配“`a`”到“`z`”范围内的任意小写字母字符。 |
 | `[^a-z]`       | 排除型的字符范围。匹配任何不在指定范围内的任意字符。例如，“`[^a-z]`”可以匹配任何不在“`a`”到“`z`”范围内的任意字符。 |
-| `[:name:]`     | 增加命名字符类（named character class）[[注 1\]](https://zh.wikipedia.org/wiki/正则表达式#cite_note-2)中的字符到表达式。只能用于**方括号表达式**。 |
-| `[=elt=]`      | 增加当前locale下排序（collate）等价于字符“elt”的元素。例如，[=a=]可能会增加ä、á、à、ă、ắ、ằ、ẵ、ẳ、â、ấ、ầ、ẫ、ẩ、ǎ、å、ǻ、ä、ǟ、ã、ȧ、ǡ、ą、ā、ả、ȁ、ȃ、ạ、ặ、ậ、ḁ、ⱥ、ᶏ、ɐ、ɑ 。只能用于方括号表达式。 |
-| `[.elt.]`      | 增加[排序元素](https://zh.wikipedia.org/wiki/Collation)（collation element）elt到表达式中。这是因为某些排序元素由多个字符组成。例如，29个字母表的西班牙语， "CH"作为单个字母排在字母C之后，因此会产生如此排序“cinco, credo, chispa”。只能用于方括号表达式。 |
 | `\b`           | 匹配一个单词边界，也就是指单词和空格间的位置。例如，“`er\b`”可以匹配“`never`”中的“`er`”，但不能匹配“`verb`”中的“`er`”。 |
 | `\B`           | 匹配非单词边界。“`er\B`”能匹配“`verb`”中的“`er`”，但不能匹配“`never`”中的“`er`”。 |
-| `\cx`          | 匹配由x指明的控制字符。x的值必须为`A-Z`或`a-z`之一。否则，将c视为一个原义的“`c`”字符。控制字符的值等于x的值最低5比特（即对3210进制的余数）。例如，\cM匹配一个Control-M或回车符。\ca等效于\u0001, \cb等效于\u0002, 等等… |
 | `\d`           | 匹配一个数字字符。等价于[0-9]。注意Unicode正则表达式会匹配全角数字字符。 |
 
 
@@ -280,6 +279,8 @@ STRING "\""({LETTER}|{DIGIT}|{NQUOTE})*"\""
 
 对于整型和浮点型数值可以在parse阶段就将其转换为对应类型的变量而保存。
 
+
+
 ## 3. 语法分析
 
 语法分析是编译过程的一个逻辑阶段。语法分析的任务是在词法分析的基础上将单词序列组合成各类语法短语，如程序，语句，表达式等等.语法分析程序判断源程序在结构上是否正确.源程序的结构由上下文无关文法描述.语法分析程序可以用YACC等工具自动生成。
@@ -303,8 +304,6 @@ rules
 programs
 ```
 
-
-
 ### 3.2 抽象语法树节点类简介
 
 语法分析器的输出是抽象语法树。在计算机科学中，抽象语法树是源代码语法结构的一种抽象表示。它
@@ -312,8 +311,6 @@ programs
 “抽象”的，是因为这里的语法并不会表示出真实语法中出现的每个细节.
 
 以下是我们所设计的编译器的抽象语法树的继承体系：
-
-
 
 #### 3.2.1 _Node类
 
@@ -362,8 +359,6 @@ public:
 };
 ```
 
-
-
 #### 3.2.3 _Struct类
 
 _Struct类用来存储struct结构体声明时的结构内容，类内有两个成员变量`_DefinitionList*`类型的`defins`用于指向存储结构体的每条内部变量的声明语句类指针vector容器，`_struct_ID`用于存储结构体的名称。其中除了构造函数外，另有两个成员函数`int getIndex(std::string name)`用于获得结构体内部变量的`index`，用于`llvm`引用操作,`string getId(int index)`则反之用于获得对应`index`的成员变量的名称。
@@ -390,8 +385,6 @@ public:
 };
 ```
 
-
-
 #### 3.2.4 _Definition类
 
 _Definition类用于存储单条定义语句的内容信息，内有四个成员变量：`BuildInType`类型的`def_Type`用于保存定义数据的类型信息，`bool`类型的`isStruct`用于标识是否为结构体定义语句，若为`true`则`string*`类型的`structID`用于存储`struct`结构的名称，`_DataList*`类型的`data`是存储被定义变量的`identifier`的vector容器指针，可以通过该指针访问这些`_Data`类指针。不同的构造函数分别用于`sys_Type`类型变量的声明语句，和结构体变量的声明。`string getStructID()`用于获得struct名称。
@@ -417,8 +410,6 @@ public:
     virtual string JsonGen() override;
 };
 ```
-
-
 
 #### 3.2.5 _Function类
 
@@ -547,8 +538,6 @@ public:
     virtual string JsonGen() override;
 };
 ```
-
-
 
 #### 3.2.10 _Output类
 
@@ -693,8 +682,6 @@ public:
 };
 ```
 
-
-
 #### 3.2.15 _assignExpression类
 
 _assignExpression类用于存储单条赋值语句的具体信息，有三个成员变量：`_Variable`类型的`val`保存等式左侧被赋值变量信息，`union u_assignExpression`类型的`v_assignExpression`保存三个成员指针变量，分别指向等式左侧不同类型的语句内容：有`_singleExpression`类型的`rhs`、`_functionCall*`类型的`function`以及`DataList`类型的data.根据`enum`类型变量`v_Type`的值进行判断.
@@ -770,8 +757,6 @@ public:
 };
 ```
 
-
-
 #### 3.2.17 _functionCall类
 
 _functionCall类用于保存函数调用语句的信息，类内有两个成员变量,`string*`类型的`func_Name`保存调用函数名称，`_DataList*`类型的`args`保存参数信息。
@@ -792,8 +777,6 @@ public:
     virtual string JsonGen() override;
 };
 ```
-
-
 
 #### 3.2.18 _complexExpression类
 
@@ -849,8 +832,6 @@ public:
     virtual string JsonGen() override;
 };
 ```
-
-
 
 #### 3.2.20 _whileStatement类
 
@@ -941,8 +922,6 @@ public:
 };
 ```
 
-
-
 #### 3.2.24 _Value 类
 
 _Value类保存从yacc中解析出来的`sys_Type`值，有`int double string bool char`，通过成员变量`v_Type`的值判断存储的Value数据类型。
@@ -973,8 +952,6 @@ public:
 };
 
 ```
-
-
 
 ### 3.3 Yacc实现构造语法树
 
@@ -1023,36 +1000,25 @@ public:
     _DefinitionList *c_DefinitionList;
 }
 
-
-
 //特殊符号
-
 %token LP RP LB RB RCB LCB DOT COMMA COLON MUL DIV NOT ADD SUB NE
 %token AND OR GE GT LE LT EQ ASSIGN SEMI LD RD MOD
 
-
-
 //c 语言关键词
-
 %token IF ELSE SIGNED UNION THIS UNSIGNED CONST GOTO VIRTUAL FOR 
 %token FLOAT BREAK AUTO CLASS OPERATOR CASE DO LONG TYPEDEF STATIC FRIEND
 %token TEMPLATE DEFAULT NEW VOID REGISTER RETURN ENUM INLINE TRY SHORT CONTINUE 
 %token SIZEOF SWITCH PRIVATE PROTECTED ASM WHILE CATCH DELETE PUBLIC VOLATILE 
 %token STRUCT PRINTF SCANF MAIN CHAR CIN COUT ENDL SETW
 
-
-
 //终结符
-
 %token SYS_TYPE SYS_BOOL IDENTIFIER REAL INTEGER STRING
-
-
 %type<sVal>SYS_TYPE  IDENTIFIER STRING
 %type<intVal>INTEGER
 %type<floatVal>REAL
 %type<cVal>CHAR
-//中间变量类型定义 暂略
 
+//中间变量类型定义 暂略
 %type<c_Program>                     Program
 %type<c_functionList>                functionList
 %type<c_Function>                    Function
@@ -1083,7 +1049,6 @@ public:
 %type<c_StructList>                  structList
 %type<c_Struct>                      Struct
 %type<c_DefinitionList>              DefinitionList
-
 
 %start Program
 ```
@@ -1136,8 +1101,6 @@ Function functionList{
     $$->push_back($1);
 }
 
-
-
 Function:
 mainFunc{
     $$=new _Function($1);
@@ -1147,14 +1110,10 @@ mainFunc{
     $$=new _Function($1);
 }
 
-
-
 mainFunc:
 SYS_TYPE MAIN LP ArgsDefinitionList RP LCB StatementList RCB{
     $$=new _mainFunction($4,$7);
 }
-
-
 
 StatementList:
 Statement StatementList{
@@ -1166,8 +1125,6 @@ Statement StatementList{
     $$=new _StatementList();
     $$->push_back($1);
 }
-
-
 
 Statement:
 Definition{
@@ -1185,7 +1142,6 @@ Definition{
 |Output SEMI{
     $$=new _Statement($1);
 }
-
 
 Input:
 CIN RD InputList{
@@ -1235,8 +1191,6 @@ Variable RD InputList{
     $$->push_back($1);
 }
 ```
-
-
 
 ### 3.4 抽象语法树可视化
 
@@ -1352,8 +1306,6 @@ string _mainFunction::JsonGen(){
 
 
 
-
-
 ## 4. 语义分析
 
 ### 4.1 LLVM概述
@@ -1376,7 +1328,7 @@ LLVM 的核心是 IR（Intermediate Representation），IR 是连接编译器前
 
 <img src=".\images\llvm-IR.png" alt="llvm-IR" style="zoom: 50%;" />
 
-#### 4.2.1 IR表示形式
+#### 4.2.1 IR 表示形式
 
 它的表示形式被设计为三种不同的格式：
 
@@ -1406,7 +1358,7 @@ LLVM 的核心是 IR（Intermediate Representation），IR 是连接编译器前
 
   指令类是 LLVM 中定义的基本操作，比如加减乘除这种算数指令、函数调用指令、跳转指令、返回指令等。
 
-#### 4.2.3 IR 核心类
+#### 4.2.4 IR 核心类
 
 - Value 类
 
@@ -1450,7 +1402,43 @@ LLVM 的核心是 IR（Intermediate Representation），IR 是连接编译器前
 
   Constant 类表示一个各种常量的基类，基于它派生出了 ConstantInt 整型常量，ConstantFP 浮点型常量，ConstantArray 数组常量，ConstantStruct 结构体常量。
 
+#### 4.2.5 IR 地址计算（GEP指令）
 
+本次实验利用 GetElementPtr (GEP) 指令进行地址计算。GEP 指令的计算方式与 C 语言中的地址计算方式有相似但也有不同。GEP 指令的第一个操作数是`llvm::Type`类型，代表待操作的成员变量的类型，第二个操作数是`llvm::Pointer`类型，代表整块内存空间的起始地址，随后是一个偏移数组，指示一系列下标计算，数组的长度不定。偏移数组的第一个值代表遍历第二个操作数的索引。
+
+以下面的结构体数组作为示例：
+
+```c++
+struct munger_struct {
+  int f1;
+  int f2;
+};
+void munge(struct munger_struct *P) {
+  P[0].f1 = P[1].f1 + P[2].f2;
+}
+...
+struct munger_struct Array[3];
+...
+munge(Array);
+```
+
+函数参数`P`将是每个 GEP 指令的第二个操作数。第三个操作数作为该指针的下标。对于`f1`或`f2`字段，第四个操作数将是进入结构类型`munger_struct`的字段偏移量。所以，在LLVM IR 中，munge函数是这样的:
+
+```c++
+define void @munge(%struct.munger_struct* %P) {
+entry:
+  %tmp = getelementptr %struct.munger_struct, %struct.munger_struct* %P, i32 1, i32 0
+  %tmp1 = load i32, i32* %tmp
+  %tmp2 = getelementptr %struct.munger_struct, %struct.munger_struct* %P, i32 2, i32 1
+  %tmp3 = load i32, i32* %tmp2
+  %tmp4 = add i32 %tmp3, %tmp1
+  %tmp5 = getelementptr %struct.munger_struct, %struct.munger_struct* %P, i32 0, i32 0
+  store i32 %tmp4, i32* %tmp5
+  ret void
+}
+```
+
+本次实验将通过不同的 API 调用 GEP 指令，实现数组与结构体的地址操作。
 
 ### 4.3 IR生成
 
@@ -1465,7 +1453,7 @@ LLVM IR的生成依赖上下文环境，我们构造了`CodeGenerator`类来保�
   static llvm::IRBuilder<> TheBuilder(TheContext);
   ```
 
-- 公有的模块示例、函数栈、结构体表
+- 公有的模块实例、函数栈、结构体表
 
   - 模块实例是中间代码顶级容器，用于包含所有变量、函数和指令
 
@@ -1542,7 +1530,6 @@ LLVM IR的生成依赖上下文环境，我们构造了`CodeGenerator`类来保�
     this->printFunction = printFunc;
     ```
 
-    
 
 #### 4.3.2 类型转换
 
@@ -1574,69 +1561,68 @@ llvm::Type *llvmType(const BuildInType & type){
 }
 ```
 
-
-
 #### 4.3.3 代码入口
 
-代码入口用 `_Program` 类进行处理。` _Program`类的意义是程序，包括 `_FunctionList` 和 `_StructList` 类的指针对象成员变量。`_Program` 会将读到的所有函数保存在自己的 `myFuncs `链表中，分别调用这些函数的 `codeGen` 方法。前端在读到结构体定义时，会把所有结构体依次作为 `_Struct` 类保存在` _Program` 的 `myStructs` 链表中。在 `_Program` 类的 `codeGen`  方法中，会将 `myStructs` 链表中的 `_Struct` 依次创建 `llvm::StructType` 并保存在 `generator` 的 `TypeMap` 中，实现结构体类型名字和 `llvm::StructType` 的 map 对应。
+代码入口用 `_Program` 类进行处理。` _Program`类的意义是程序，包括 `_FunctionList` 和 `_StructList` 类的指针对象成员变量。
+
+`_Program` 会将读到的所有函数保存在自己的 `myFuncs `链表中，分别调用这些函数的 `codeGen` 方法。
 
 ```c++
-llvm::Value *_Program::codeGen(CodeGenerator & generator){
-    Debug("_Program::codeGen");
-    if(this->hasStruct())
-    {
-        for(auto stu :*this->myStructs){
-            std::string name=*stu->struct_ID;
-            generator.StructMap[name]=stu;
-            llvm::StructType *structType = generator.TheModule->getTypeByName(name);//获取当前module中名为Number的结构体
-            if (!structType) {
-                    //如果当前module中没有，就创建一个
-                structType = llvm::StructType::create(TheContext, name);
-                std::vector<llvm::Type*> elements;	//添加结构体元素
-                for (auto defvar : *stu->defins){
-                    llvm::Type* defType;
-                    if(defvar->isStruct){
-                        defType=generator.TypeMap[defvar->getStructID()];
+for (auto func : *this->myFuncs){
+    std::cout << "hello" << std::endl;
+    func->codeGen(generator);
+}
+```
+
+前端在读到结构体定义时，会把所有结构体依次作为 `_Struct` 类保存在` _Program` 的 `myStructs` 链表中。在 `_Program` 类的 `codeGen`  方法中，会将 `myStructs` 链表中的 `_Struct` 依次创建 `llvm::StructType` 并保存在 `generator` 的 `TypeMap` 中，实现结构体类型名字和 `llvm::StructType` 的 map 对应，便于后续根据结构体类型的名字查找类型的 `StructType`。在创建结构体类型时，会读取结构体的成员变量列表`defins`，根据成员类型是否是结构体以及是否是数组，获取不同的`llvm::Type`，插入到`StructType`中。
+
+```c++
+if(this->hasStruct())
+{
+    for(auto stu :*this->myStructs){
+        std::string name=*stu->struct_ID;
+        generator.StructMap[name]=stu;
+        llvm::StructType *structType = generator.TheModule->getTypeByName(name);//获取当前module中名为name的结构体
+        if (!structType) {
+            //如果当前module中没有，就创建一个
+            structType = llvm::StructType::create(TheContext, name);
+            std::vector<llvm::Type*> elements;	//添加结构体元素
+            for (auto defvar : *stu->defins){
+                llvm::Type* defType;
+                if(defvar->isStruct){
+                    defType=generator.TypeMap[defvar->getStructID()];
+                }
+                else{
+                    defType = llvmType(defvar->def_Type);
+                }
+                for (auto elemvar : *defvar->data){
+                    llvm::Type* type;
+                    _Variable * elemvariable = dynamic_cast<_Variable*>(elemvar);
+                    if(elemvariable->v_Type == _Variable::ARRAY){
+                        llvm::Value *size = elemvariable->exprID->codeGen(generator);
+                        llvm::ConstantInt *sizeInt = llvm::dyn_cast<llvm::ConstantInt>(size);                       
+                        type = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
                     }
                     else{
-                        defType = llvmType(defvar->def_Type);
+                        type=defType;
                     }
-                    for (auto elemvar : *defvar->data){
-                        llvm::Type* type;
-                        _Variable * elemvariable = dynamic_cast<_Variable*>(elemvar);
-                        if(elemvariable->v_Type == _Variable::ARRAY){
-                            llvm::Value *size = elemvariable->exprID->codeGen(generator);
-                            llvm::ConstantInt *sizeInt = llvm::dyn_cast<llvm::ConstantInt>(size);                       
-                            type = llvm::ArrayType::get(defType, sizeInt->getZExtValue());
-                        }
-                        else{
-                            type=defType;
-                        }
-                        elements.push_back(type);
-                    }
+                    elements.push_back(type);
                 }
-                structType->setBody(elements);
-                generator.TypeMap[name]=structType;
             }
-            
+            structType->setBody(elements);
+            generator.TypeMap[name]=structType;
         }
-    }
-    for (auto func : *this->myFuncs){
-        std::cout << "hello" << std::endl;
-        func->codeGen(generator);
     }
 }
 ```
 
-
-
 #### 4.3.4 变量定义
 
-每一条定义语句都会创建一个 `_Definition` 类的实例。 `_Definition`  通过 `def_Type` 成员变量记录定义式左边的类型名，`isStruct` 表示当前类型是否是结构体，如果是结构体，`structID`  变量将额外记录结构体类型名，`data` 以链表形式保存定义式右边的变量语句。从`data` 中遍历所有 `_Variable` 变量，分别进行定义操作。在遍历变量前，通过 `defType = llvmType(this->def_Type);` 将 `def_Type` 成员变量转换为内置类型。
+每一条定义语句都会创建一个 `_Definition` 类的实例。 `_Definition`  通过 `def_Type` 成员变量记录定义式左边的类型名，`isStruct` 表示当前类型是否是结构体，如果是结构体，`structID`  变量将额外记录结构体类型名，`data` 以链表形式保存定义式右边的变量语句。从`data` 中遍历所有 `_Variable` 变量，分别进行定义操作。在遍历变量前，先判断定义语句类型是否是结构体定义，如果不是结构体，通过 `defType = llvmType(this->def_Type);` 将 `def_Type` 成员变量转换为内置类型；如果是结构体，通过查找TypeMap：`defType=generator.TypeMap[this->getStructID()];`获得`StructType`。
 
 ##### 1. 单一变量
 
-对于单一变量，仅需调用 `createDefAlloca`方法，传入 `defType` 和自己的变量名即可。
+对于单一变量，仅需调用 `createDefAlloca`方法，传入 `defType` 和自己的变量名即可， `createDefAlloca`方法将为该变量分配对应类型大小的内存空间。
 
 ```c++
 auto alloc = createDefAlloca(generator.getCurFunc(), *variable->ID_Name, defType);
@@ -1644,7 +1630,7 @@ auto alloc = createDefAlloca(generator.getCurFunc(), *variable->ID_Name, defType
 
 ##### 2. 数组变量
 
-对于数组变量，不能简单传入 `defType` ，需要根据数组的大小生成相应的 `llvm::ArrayType` 。
+对于数组变量，不能简单传入 `defType` ，需要根据数组的大小生成相应的 `llvm::ArrayType` 。数组的大小通过变量的`expr`成员变量的`codeGen`方法获得。
 
 ```c++
 llvm::Value *size = variable->exprID->codeGen(generator);
@@ -1655,53 +1641,246 @@ auto alloc = createDefAlloca(generator.getCurFunc(), *variable->ID_Name, arrayTy
 
 ##### 3. 结构体变量
 
-对于结构体变量，要通过 `TypeMap`获取 `defType`。其它操作按照单一变量与数组变量分别进行。
+对于结构体变量，会在分配内存空间前把变量名与对应的结构体类型ID的关系存在VarStructID表中。其它操作按照单一变量与数组变量分别进行。
 
 ```c++
-defType=generator.TypeMap[this->getStructID()];
+generator.VarStructID[*variable->ID_Name]=this->getStructID();
 ```
 
-
-
 #### 4.3.5 赋值语句
 
-#### 4.3.5 赋值语句
-
-每一条定义语句都会创建一个 `_assignExpression` 类的实例。 根据 `v_Type` 判断赋值语句的类型是单一赋值、函数赋值还是数组赋值。成员变量 `val` 是 `_Variable` 类型的指针，保存了左式的变量类型和变量名。
+每一条定义语句都会创建一个 `_assignExpression` 类的实例。 根据 `v_Type` 判断赋值语句的右式类型是单一赋值、函数返回值赋值还是数组初始化列表赋值。成员变量 `val` 是 `_Variable` 类型的指针，保存了左式的变量类型和变量名。成员变量`v_assignExpression`是一个`union`类型的变量，记录了不同情况下右式的值。其中`rhs`存储了单一赋值时的右式表达式，`function`存储了右式的函数调用，`Data`以链表形式存储了初始化列表的所有值。
 
 ##### 1. 单一赋值
 
-先获取赋值语句的右式，得到 `codeGen` 的结果。接下来根据 `val` 的类型分类。
+先获取赋值语句的右式，得到 `rhs->codeGen` 的结果。接下来根据 `val` 的类型分类。
 
-- 单一类型
+- 单一变量类型
 
   左式也是单一变量。直接根据变量名得到存储地址，进行赋值。
 
+  ```c++
+  if(val->v_Type==_Variable::CONST)
+  	TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
+  ```
+
 - 数组元素
 
-  获取数组元素地址，再进行赋值。
+  先获取数组下标的值，构建GEP指令的偏移数组。
+
+  ```c++
+  llvm::Value *index =val->exprID->codeGen(generator);
+  llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
+  llvm::Value *Idxs[]={con_0,index};
+  ```
+
+  再获取数组变量的内存地址。
+
+  ```c++
+  auto array= generator.getValue(*this->val->ID_Name);
+  ```
+
+  为了实现函数数组传参的功能，接下来需要对数组变量所处于的函数栈进行判断，如果当前处于`Main`函数中，则直接调用GEP指令，如果不处于`Main`函数中，由于函数传参时会在函数内部重新分配空间保存参数值，因此函数的符号表所存储的将是对数组变量地址的函数内部存储空间地址。需要对该值进行`Load`操作，才能得到想要的数组变量地址的值。
+
+  ```c++
+  llvm::Value *array_i;
+  if(generator.getCurFunc()->getName()=="Main")
+  {
+      cout<<"Array in function main"<<endl;
+      array_i = TheBuilder.CreateGEP(array,Idxs);
+  }
+  else
+  {
+      cout<<"Array in function args"<<endl;
+      array=TheBuilder.CreateLoad(array);
+      array_i = TheBuilder.CreateGEP(array,index);
+  }             
+  ```
+
+  获取数组元素地址后，再进行赋值。
+
+  ```c++
+  TheBuilder.CreateStore(value,array_i);
+  ```
 
 - 结构体的成员变量
 
-​		获取结构体成员变量的地址，再进行赋值。
+  针对`Struct.Member`形式。
+
+  根据变量名从结构体表中获取结构体类型的ID，再根据ID获取结构体类型对应的`_Struct`类对象以及`StructType`。再根据成员变量的名字获取其在结构体类型中的index位置，通过GEP指令获取结构体成员变量的地址，再进行赋值。
+
+  ```c++
+  std::string name=*val->ID_Name;
+  std::string mem=*val->member;
+  
+  std::string struct_ID = generator.VarStructID[name];
+  _Struct* stru = generator.StructMap[struct_ID];
+  llvm::Type* structType = generator.TypeMap[struct_ID];
+  
+  int index = stru->getIndex(mem);
+  
+  auto alloc = generator.getValue(name);
+  TheBuilder.CreateStore(value,TheBuilder.CreateConstGEP2_32(structType,alloc,0,index));
+  ```
 
 - 结构体成员变量的数组元素
 
-  先获取结构体成员的地址，再把它当作数组地址获取对应数组元素的地址，再进行赋值。
+  针对`Struct.MemberArray[index]`形式。
+
+  先用类似方法获取结构体成员变量的地址，再把它当作数组地址获取对应数组元素的地址，再进行赋值。
+
+  ```c++
+  std::string name=*val->ID_Name;
+  std::string mem=*val->member;
+  std::string struct_ID = generator.VarStructID[name];
+  _Struct* stru = generator.StructMap[struct_ID];
+  llvm::Type* structType = generator.TypeMap[struct_ID];
+  int index1 = stru->getIndex(mem);
+  
+  auto alloc = generator.getValue(name);
+  alloc = TheBuilder.CreateConstGEP2_32(structType,alloc,0,index1);
+  
+  llvm::Value *index =val->exprMem->codeGen(generator);
+  llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
+  llvm::Value *Idxs[]={con_0,index};
+  alloc = TheBuilder.CreateGEP(alloc,Idxs);
+  TheBuilder.CreateStore(value,alloc);
+  ```
 
 - 结构体数组元素的成员变量
 
-​		先获取结构体数组元素的地址，再计算成员变量的地址，最后赋值。
+  针对`StructArray[index].Member`形式。
 
-##### 2. 数组赋值
+  先获取结构体数组元素的地址，再计算成员变量的地址，最后赋值。
 
-实现数组的花括号赋值。
+  ```c++
+  llvm::Value *index1 =val->exprID->codeGen(generator);
+  auto array= generator.getValue(*this->val->ID_Name);
+  llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
+  llvm::Value *Idxs[]={con_0,index1};
+  array = TheBuilder.CreateGEP(array,Idxs);
+  
+  std::string name=*val->ID_Name;
+  std::string mem=*val->member;
+  std::string struct_ID = generator.VarStructID[name];
+  _Struct* stru = generator.StructMap[struct_ID];
+  llvm::Type* structType = generator.TypeMap[struct_ID];
+  int index = stru->getIndex(mem);
+  
+  TheBuilder.CreateStore(value,TheBuilder.CreateConstGEP2_32(structType,array,0,index));
+  ```
 
-##### 3. 函数赋值
+- 结构体数组元素的成员变量的数组元素
 
-赋值语句的右式是函数体，需要调用函数的 `codeGen` 方法。
+  针对`StructArray[index1].MemberArray[index2]`形式。
 
+  先获取结构体数组元素的地址，再计算成员变量的地址，再把它当作数组地址获取对应数组元素的地址，最后进行赋值。
 
+  ```c++
+  llvm::Value *index0 =val->exprID->codeGen(generator);
+  auto array= generator.getValue(*this->val->ID_Name);
+  llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
+  llvm::Value *Idxs0[]={con_0,index0};
+  array = TheBuilder.CreateGEP(array,Idxs0);
+  
+  std::string name=*val->ID_Name;
+  std::string mem=*val->member;
+  std::string struct_ID = generator.VarStructID[name];
+  _Struct* stru = generator.StructMap[struct_ID];
+  llvm::Type* structType = generator.TypeMap[struct_ID];
+  int index1 = stru->getIndex(mem);
+  
+  auto alloc = TheBuilder.CreateConstGEP2_32(structType,array,0,index1);
+  
+  llvm::Value *index =val->exprMem->codeGen(generator);
+  llvm::Value *Idxs[]={con_0,index};
+  alloc = TheBuilder.CreateGEP(alloc,Idxs);
+  TheBuilder.CreateStore(value,alloc);
+  ```
+
+##### 2. 函数赋值
+
+赋值语句的右式是函数返回值，需要调用函数的 `codeGen` 方法。
+
+```c++
+value = this->v_assignExpression.function->codeGen(generator);
+
+TheBuilder.CreateStore(value, generator.getValue(*this->val->ID_Name));
+```
+
+##### 3. 数组赋值
+
+实现数组的初始化列表赋值。
+
+首先要获取数组的地址。这里分为三种情形：
+
+- 不涉及结构体类型的普通数组
+
+  直接通过符号表获取数组变量的地址。
+
+  ```c++
+  auto array= generator.getValue(*this->val->ID_Name);
+  ```
+
+- 结构体成员变量的数组
+
+  针对`Struct.Array = {...}`形式。
+
+  根据结构体成员变量的名字获取其在结构体中的下标位置，生成偏移数组，再通过GEP指令获取成员变量的地址。
+
+  ```c++
+  if(val->v_Type==_Variable::Struct){
+      cout<<"Struct member array assignment"<<endl;
+      std::string name=*val->ID_Name;
+      std::string mem=*val->member;
+      std::string struct_ID = generator.VarStructID[name];
+      _Struct* stru = generator.StructMap[struct_ID];
+      llvm::Type* structType = generator.TypeMap[struct_ID];
+      int index1 = stru->getIndex(mem);
+  
+      array = TheBuilder.CreateConstGEP2_32(structType,array,0,index1);
+  }
+  ```
+
+- 结构体数组元素的成员变量的数组
+
+  针对`StructArray[index].Array = {...}`形式。
+
+  首先获取结构体数组元素的地址，再根据成员变量的名字获取成员变量的地址。
+
+  ```c++
+  else if(val->v_Type==_Variable::StructARRAY){
+      cout<<"Struct array member assignment"<<endl;
+      llvm::Value *index1 =val->exprID->codeGen(generator);
+  
+      llvm::Constant* con_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(TheContext), 0);
+      llvm::Value *Idxs[]={con_0,index1};
+      array = TheBuilder.CreateGEP(array,Idxs);
+  
+      std::string name=*val->ID_Name;
+      std::string mem=*val->member;
+      std::string struct_ID = generator.VarStructID[name];
+      _Struct* stru = generator.StructMap[struct_ID];
+      llvm::Type* structType = generator.TypeMap[struct_ID];
+      int index = stru->getIndex(mem);
+  
+      array = TheBuilder.CreateConstGEP2_32(structType,array,0,index);
+  }
+  ```
+
+最后遍历初始化列表，分别对数组元素进行赋值。
+
+```c++
+llvm::Type * arrayType = TheBuilder.CreateLoad(array)->getType();
+
+int index=0;
+for (auto var : *this->v_assignExpression.data){
+    _Value * _value = dynamic_cast<_Value*>(var);
+    llvm::Value* value=_value->codeGen(generator);
+    TheBuilder.CreateStore(value,TheBuilder.CreateConstGEP2_32(arrayType,array,0,index));
+	index++;
+}
+```
 
 #### 4.3.6 运算符操作
 
@@ -1762,8 +1941,6 @@ switch(this->OP){
 | C_MOD  | CreateFRem    | CreateSRem    |
 | C_AND  | TYPE ERROR    | CreateAnd     |
 | C_XOR  | TYPE ERROR    | CreateXor     |
-
-
 
 #### 4.3.7 分支语句
 
@@ -1852,8 +2029,6 @@ llvm::Value *_elsePart::codeGen(CodeGenerator & generator){
 
 执行到`endBlock`之后，分支语句完成。
 
-
-
 #### 4.3.8 循环语句
 
 ##### 1. for语句
@@ -1908,8 +2083,6 @@ TheBuilder.CreateBr(condBlock);
 loopBlock = TheBuilder.GetInsertBlock();
 ```
 
-
-
 ##### 2. while语句
 
 while语句由`_whileStatement`的`codeGen`实现，格式为：
@@ -1961,8 +2134,6 @@ TheBuilder.SetInsertPoint(endBlock);
 return branch;
 ```
 
-
-
 #### 4.3.9 函数体声明
 
 ##### 1. 主函数
@@ -1990,8 +2161,6 @@ for (auto & statement : *this->statements){
 //Pop back
 generator.popFunc();
 ```
-
-
 
 ##### 2. 其他函数
 
@@ -2085,8 +2254,6 @@ if (retType == C_VOID){
 generator.popFunc();
 ```
 
-
-
 #### 4.3.10 函数调用
 
 函数调用由`_functionCall`类的`codeGen`函数实现。在函数定义时，函数名都被存在了`generator`示例的`TheModule`模块中，可以通过调用`getFunction`函数来得到该函数指针：
@@ -2107,8 +2274,6 @@ if (this->args){
 llvm::Value * ret = TheBuilder.CreateCall(function, funcArgs, "call");
 return ret;
 ```
-
-
 
 #### 4.3.11 输入
 
@@ -2150,8 +2315,6 @@ for (auto & var : *this->vars){
 params.insert(params.begin(), TheBuilder.CreateGlobalStringPtr(format));
 TheBuilder.CreateCall(generator.scanFunction, params, "scanf");
 ```
-
-
 
 #### 4.3.12 输出
 
@@ -2202,17 +2365,17 @@ TheBuilder.CreateCall(generator.printFunction, llvm::makeArrayRef(params), "prin
 
 ## 5. 代码生成
 
-### 5.1 选择目标机器
+在ObjGen.cpp中实现`int ObjGen(CodeGenerator& generator)`方法，在`main`函数中，生成中间代码后，调用`ObjGen`方法，生成目标代码。
 
-LLVM 支持本地交叉编译。我们可以将代码编译为当前计算机的体系结构，也可以像针对其他体系结构
-一样轻松地进行编译。LLVM 提供了 `sys::getDefaultTargetTriple` ，它返回当前计算机的目标三元
-组：
+### 5.1 选择目标
+
+LLVM 支持本地交叉编译。我们将代码编译为当前计算机的体系结构。要指定体系结构，需要“目标三元组”的字符串。LLVM 提供了 `sys::getDefaultTargetTriple` ，它返回当前计算机的目标三元组：
 
 ```c++
 auto TargetTriple = sys::getDefaultTargetTriple();
 ```
 
-在获取Target前，初始化所有目标以发出目标代码：
+LLVM不要求链接所有目标功能。在获取目标机器前，初始化发出目标代码的所有目标：
 
 ```c++
 InitializeAllTargetInfos();
@@ -2236,27 +2399,28 @@ if (!Target) {
 }
 ```
 
-`TargetMachine` 类提供了我们要定位的机器的完整机器描述：
+### 5.2 目标机器
+
+`TargetMachine` 类提供了我们要定位的机器的完整机器描述。本实验使用通用CPU。
 
 ```c++
 auto CPU = "generic";
 auto Features = "";
 TargetOptions opt;
 auto RM = Optional<Reloc::Model>();
-auto TargetMachine = Target->createTargetMachine(TargetTriple, CPU, Features,
-opt, RM);
+auto TargetMachine = Target->createTargetMachine(TargetTriple, CPU, Features,opt, RM);
 ```
 
-### 5.2 配置 Module
+### 5.3 配置模块
 
-配置模块，以指定目标和数据布局，可以方便了解目标和数据布局。
+配置模块，以指定目标和数据布局，这个操作不是必要的，但是通过了解目标和数据布局可以进行优化。
 
 ```c++
 generator.TheModule->setDataLayout(TargetMachine->createDataLayout());
 generator.TheModule->setTargetTriple(TargetTriple);
 ```
 
-### 5.3 生成目标代码
+### 5.4 发射目标代码
 
 1. 先定义要将文件写入的位置
 
@@ -2270,7 +2434,7 @@ if (EC) {
 }
 ```
 
-2.定义一个发出目标代码的过程，然后运行该 pass
+2.定义一个发出目标代码的传递，然后运行该传递
 
 ```c++
 legacy::PassManager pass;
@@ -2283,17 +2447,34 @@ pass.run(*generator.TheModule);
 dest.flush();
 ```
 
-更简便的方法是使用LLVM自带的工具套件：llvm-as和llc
-
-- llvm-as可以将生成的IR文件编译为以.bc为后缀的字节码
-- llc可以将字节码编译成以.s为后缀的汇编代码
+3.输出标识信息，指示写入成功
 
 ```c++
-llvm-as spl.ll -o spl.bc
-llc -march=x86_64 spl.bc -o spl.s
+outs() << "Wrote " << Filename << "\n";
 ```
 
-### 
+### 5.5 生成可执行文件
+
+在生成 IR 后将目标代码写入目标代码文件`output.o`。设计`objtest.cpp`函数声明外部用`C`语言编译的`Main`函数，并调用。
+
+```c++
+#include <iostream>
+extern "C" {
+    int Main();
+}
+int main() {
+    Main();
+}
+```
+
+执行运行脚本，将程序链接到`output.o`，生成并运行可执行文件。
+
+```c++
+clang++ objtest.cpp output.o -o objtest
+./objtest
+```
+
+
 
 ## 6. 代码测试
 
@@ -2313,8 +2494,6 @@ run.sh文件：
 clang++ objtest.cpp output.o -o objtest
 ./objtest
 ```
-
-
 
 ### 6.2 基本测试
 
@@ -2422,8 +2601,6 @@ int main(){
     br i1 %ifCond, label %then, label %else
   ```
 
-  
-
 - if 分支
 
   每个if分支生成了then（条件满足时执行的基本块）、else（条件不满足时执行语句）、ifend（执行结束）三个基本块，并生成cond（条件判断）块。其中else if语句中还可以再生成这几个基本块。
@@ -2467,8 +2644,6 @@ int main(){
     br i1 %cmptmpi12, label %loop, label %loopend
   ```
 
-  
-
 - while循环
 
   while循环生成loop（循环体）和loopend（循环结束体）基本块。
@@ -2491,15 +2666,12 @@ int main(){
     %printf14 = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([7 x i8], [7 x i8]* @13, i32 0, i32 0), i8* getelementptr inbounds ([8 x i8], [8 x i8]* @12, i32 0, i32 0), i32 %16, i8 10)
   ```
 
-  
 
 执行测试文件，可以看到正确输出，逻辑正确。
 
 ![normal](images/normal.png)
 
-
-
-#### 6.2.3 数组测试
+#### 6.2.2 数组测试
 
 编译器实现了数组的数据结构。可以支持如下操作：
 
@@ -2557,9 +2729,7 @@ int main(){
 
 ![array](images/array.png)
 
-
-
-#### 6.2.4 结构体测试
+#### 6.2.3 结构体测试
 
 编译器实现了结构体的数据结构。结构体类型需要在全局进行定义，然后在函数体中定义结构体变量。
 
@@ -2620,9 +2790,7 @@ int main(){
 
 ![struct](images/struct.png)
 
-
-
-#### 6.2.5 函数定义及调用
+#### 6.2.4 函数定义及调用
 
 编译器实现了函数，支持`int`， `void`类型的函数，并支持数组传参。函数定义需要在main函数之前。编写测试代码如下：
 
@@ -2667,8 +2835,6 @@ int main(){
   }
   ```
 
-  
-
 - addFunc
 
   addFunc的类型为interger，参数类型也为intgeger，可以看到相应位置的定义为i32.
@@ -2687,8 +2853,6 @@ int main(){
   }
   ```
 
-  
-
 - 函数调用
 
   - addFunc
@@ -2704,13 +2868,9 @@ int main(){
     %call2 = call void @voidFunc([2 x i32]* %array)
     ```
 
-
-
 生成可执行文件并运行，可以看到输出结果正确。正确传入数组指针，数组的值在调用函数后被改变。
 
 ![function](images/function.png)
-
-
 
 ### 6.3 测试样例
 
@@ -2785,8 +2945,6 @@ int main(){
     return 0;
 }
 ```
-
-
 
 ##### 3. 测试结果
 
@@ -2906,8 +3064,6 @@ int main(){
 }
 ```
 
-
-
 ##### 3. 测试结果
 
 测试输入样例得出结果如下：
@@ -2969,8 +3125,6 @@ int HashFunc(char key[], int TableSize,int size){
 
 设计了如上数据结构和函数后，我们将读入的每一行字符都存放到对应的课程结构体中，根据是否获得学分来判断其是否已修读，之后循环遍历所有课程来判断其是否已修读过、是否满足前置条件，并进行对应的输出。
 
-
-
 ##### 3. 测试结果
 
 对测试样例进行测试，得到以下结果：
@@ -2984,3 +3138,14 @@ int HashFunc(char key[], int TableSize,int size){
 ![advisor-2](images/advisor-2.png)
 
 ### 7. 总结
+
+本次项目开发全程使用 `git` 进行版本控制，并且达成了一致的代码风格，尽可能优化代码可读性。最终完成了一个类C语言编译器，实现了C语言的大部分基本功能，通过了全部测试点。除基本功能外，我们探索了复杂数据结构类型，实现了结构体的基本操作以及结构体与数组的嵌套类型；实现了将数组作为函数参数进行指针传递，使被调用的函数可以操作外部的数组内存空间。
+
+在开发过程中，主要遇到了以下困难：
+
+1. 在词法分析中，遇到了`shift-reduce conflict`，为此重新调整了Yacc文法结构设计。
+2. 在中间代码生成的实现过程中，在地址操作上遇到了困难。通过查询教程资料后，使用GEP指令相关的API调用实现了数组的定义与赋值。后续在对GEP指令掌握的基础上实现了结构体操作以及结构体与数组的嵌套类型。理解GEP指令以及LLVM IR的地址计算方式非常重要。
+3. 解决测试一的快排问题时，要求不允许使用迭代，那么就必须实现数组的函数参数传递。因为不了解LLVM IR的内存空间分配方式以及函数参数传递的存储，一开始一头雾水，后来发现函数调用会在函数内部重新分配空间给形参变量，存储传递的参数值。然后就涉及到如何访问外部的数组内存空间的问题，因为本次项目使用的符号表是函数自带的符号表，而符号表存储的是变量的地址，因此在函数内部通过符号表访问数组变量时只能得到函数内部分配给形参的地址，需要从形参地址`Load`出数组的实际地址，再像普通数组一样操作。为了区分数组是否是函数参数，使用判断当前函数的方式进行区分。
+4. 解决测试三的选课助手问题时，经历了很多波折，我们采用的是先写`cpp`程序验证代码逻辑正确，再改成`cmm`语言的方式，在测试过程中，经历了对`cpp`程序正确的质疑、对`cmm`是否正确翻译的质疑、对`tester`工具功能正确性的质疑（因为中途了解到有反馈`tester`工具可能有问题）、对windows平台和linux平台内存分配等差别导致了问题的怀疑。最后通过各种检查调试通过了测试。
+
+本次项目开发使我们对编译器的底层架构有了更深入具体的理解，对自己在学习语言时遇到的一些问题也有了更加充分的体会。比如，大一上刚开始学习C语言时，遇到过因为没有做变量初始化而导致奇怪输出结果的问题，现在对这个问题产生的原因有了编译器层面的深入理解。此外，本次项目开发工程量较大，持续时间较久，对小组成员的团队合作与沟通配合有较高的要求，我们小组在本次开发过程中达到了很好的合作与理解，锻炼了我们的团队合作能力。
