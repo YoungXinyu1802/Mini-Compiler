@@ -52,6 +52,14 @@ xixi (# ^ . ^#)
 本次提交的文件及其说明如下、
 
 - srcCode: 源代码文件夹
+
+  - test
+    - case_test：给出的三个测试案例，每个文件夹中包括：
+      - test_xxx：测试文件
+      - xxx.cmm：测试代码
+      - xxx：测试生成文件
+    - self_test：自测代码
+
   - compiler.l ：Flex源代码，主要实现词法分析，生成Token
   - compiler.y: Yacc源代码，主要实现语法分析，生成抽象语法树
   - tokenizer.cpp：Flex根据compiler.l生成的词法分析器
@@ -61,12 +69,10 @@ xixi (# ^ . ^#)
   - ast.cpp
   - ObjGen.cpp
   - ObjGen.h
+
 - doc: 报告文档文件夹
   - report.pdf
-- test: 测试代码及工具文件夹
-  - test1.cmm
-  - test2.cmm
-  - test3.cmm
+  - presentation.pptx
 
 
 ## 测试说明
@@ -79,6 +85,8 @@ make
 ./run.sh
 ```
 
+生成中间代码后，同时生成`.json`文件和`.html`文件。使用`vscode`插件`liveserver`打开`html`插件，可以在网页上查看可视化树。
+
 run.sh文件：
 
 ```bash
@@ -86,3 +94,9 @@ clang++ objtest.cpp output.o -o objtest
 ./objtest
 ```
 运行生成的`objtest`可执行文件，输入测试，输出结果
+
+用测试工具进行测试：
+
+```shell
+./test/case_test/test_advisor ./advisor # 测试工具 可执行文件
+```
